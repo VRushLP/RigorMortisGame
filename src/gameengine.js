@@ -21,18 +21,16 @@ function Timer() {
     this.wallLastTimestamp = 0;
 }
 
-Timer.prototype = {
+Timer.prototype.tick = function () {
+    var wallCurrent = Date.now();
+    var wallDelta = (wallCurrent - this.wallLastTimestamp) / 1000;
+    this.wallLastTimestamp = wallCurrent;
 
-    tick: function () {
-        var wallCurrent = Date.now();
-        var wallDelta = (wallCurrent - this.wallLastTimestamp) / 1000;
-        this.wallLastTimestamp = wallCurrent;
-
-        var gameDelta = Math.min(wallDelta, this.maxStep);
-        this.gameTime += gameDelta;
-        return gameDelta;
-    }
+    var gameDelta = Math.min(wallDelta, this.maxStep);
+    this.gameTime += gameDelta;
+    return gameDelta;
 }
+
 
 /********************
  * GameEngine Start *
