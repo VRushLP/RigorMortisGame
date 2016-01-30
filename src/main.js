@@ -1,4 +1,11 @@
-var FOREST_STAGE_SCROLL_SPEED = 10000;
+var RM_GLOBALS = {
+    
+    FOREST_STAGE : {
+        SCROLL_SPEED: 10000,
+        KNIGHT_SPAWN_X: 0,
+        KNIGHT_SPAWN_Y: 0,
+    },
+}
 
 var AM = new AssetManager();
 
@@ -19,7 +26,7 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     
-    var knight = new Knight(gameEngine, AM, 0, 350);
+    var knight = new Knight(gameEngine, AM, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y);
     gameEngine.addAgent(knight);
     knight.entity.controllable = true;
     knight.entity.moveable = true;
@@ -38,7 +45,7 @@ AM.downloadAll(function () {
     
     var forestStage = new Stage(ctx, 0, 350);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), 0);
-    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), FOREST_STAGE_SCROLL_SPEED);
+    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.SCROLL_SPEED);
     gameEngine.addStage(forestStage);
     
     
