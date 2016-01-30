@@ -20,30 +20,35 @@ function Entity(game, x, y, width, height) {
     this.camerable = false;
     this.respawnable = false;
     this.collidable = true;
+
 }
 
-/**
- * Request the entity to draw the current animation frame.
- */
-Entity.prototype.draw = function (cameraX) {
-    if(this.animationList.length <= 0) return;
-    this.animationList[this.currentAnimation]
-        .drawFrame(this.game.clockTick, this.ctx, this.x + cameraX, this.y);
-}
+Entity.prototype = {
 
-/*
- * Add a new animation to the entity's list of animations.
- */
-Entity.prototype.addAnimation = function(newAnimation) {
-    this.animationList.push(newAnimation);
-};
+    /*
+    * Request the entity to draw the current animation frame.
+    */
+    draw : function(cameraX){
+        if (this.animationList.length <= 0)
+            return;
+        this.animationList[this.currentAnimation]
+            .drawFrame(this.game.clockTick, this.ctx, this.x + cameraX, this.y);
+    },
 
-/*
- * Set the current animation that the entity will draw.
- */
-Entity.prototype.setAnimation = function(animation) {
-    if(this.currentAnimation !== animation) {
-        this.animationList[this.currentAnimation].elapsedTime = 0;
+    /*
+    * Add an animation to the entity's list of animations.
+    */
+    addAnimation : function(newAnimation) {
+        this.animationList.push(newAnimation);
+    },
+
+    /*
+    * Set the current animation that the entity will draw.
+    */
+    setAnimation : function(animation) {
+        if(this.currentAnimation !== animation) {
+            this.animationList[this.currentAnimation].elapsedTime = 0;
+        }
+        this.currentAnimation = animation;
     }
-    this.currentAnimation = animation;
-}
+};

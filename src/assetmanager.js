@@ -5,40 +5,43 @@ function AssetManager() {
     this.downloadQueue = [];
 }
 
-AssetManager.prototype.queueDownload = function (path) {
-    console.log("Queueing " + path);
-    this.downloadQueue.push(path);
-}
+AssetManager.prototype = {
 
-AssetManager.prototype.isDone = function () {
-    return this.downloadQueue.length === this.successCount + this.errorCount;
-}
+    queueDownload: function (path) {
+        console.log("Queueing " + path);
+        this.downloadQueue.push(path);
+    },
 
-AssetManager.prototype.downloadAll = function (callback) {
-    for (var i = 0; i < this.downloadQueue.length; i++) {
-        var img = new Image();
-        var that = this;
+    isDone: function () {
+        return this.downloadQueue.length === this.successCount + this.errorCount;
+    },
 
-        var path = this.downloadQueue[i];
-        console.log(path);
+    downloadAll: function (callback) {
+        for (var i = 0; i < this.downloadQueue.length; i++) {
+            var img = new Image();
+            var that = this;
 
-        img.addEventListener("load", function () {
-            console.log("Loaded " + this.src);
-            that.successCount++;
-            if(that.isDone()) callback();
-        });
+            var path = this.downloadQueue[i];
+            console.log(path);
 
-        img.addEventListener("error", function () {
-            console.log("Error loading " + this.src);
-            that.errorCount++;
-            if (that.isDone()) callback();
-        });
+            img.addEventListener("load", function () {
+                console.log("Loaded " + this.src);
+                that.successCount++;
+                if (that.isDone()) callback();
+            });
 
-        img.src = path;
-        this.cache[path] = img;
+            img.addEventListener("error", function () {
+                console.log("Error loading " + this.src);
+                that.errorCount++;
+                if (that.isDone()) callback();
+            });
+
+            img.src = path;
+            this.cache[path] = img;
+        }
+    },
+
+    getAsset: function (path) {
+        return this.cache[path];
     }
-}
-
-AssetManager.prototype.getAsset = function (path) {
-    return this.cache[path];
 }
