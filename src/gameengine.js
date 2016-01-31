@@ -152,6 +152,8 @@ GameEngine.prototype.update = function () {
  */
 GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
     if(!entity.moveable) return;
+    amountX = Math.floor(amountX);
+    amountY = Math.floor(amountY);
     //Calculate the new sides of the moving entity.
     var newLeft = entity.x + amountX;
     var newRight = newLeft + entity.width;
@@ -199,6 +201,31 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
             yMoveValid = false;
         }
         
+        //Check if other entity would exist vertically inside of this one.
+        if(newTop <= other.y && other.y + other.height <= newBottom) {
+            adjustedY = 0;
+            yMoveValid = false;
+        }
+        
+        //Check if this entity would exist vertically inside of the other one.
+        if(other.y <= newTop && newBottom <= other.y + other.height) {
+            adjustedY = 0;
+            yMoveValid = false;
+        }
+        
+        //Check if other entity would exist horizontally inside of this one.
+        if(newLeft <= other.x && other.x + other.width <= newRight) {
+            adjustedX = 0;
+            xMoveValid = false;
+        }
+        
+        //Check if this entity would exist vertically inside of the other one.
+        if(other.x <= newLeft && newRight <= other.x + other.width) {
+            adjustedX = 0;
+            xMoveValid = false;
+        }        
+        
+        
         
         /*
          * If the moving entity will be in the same horizontal and vertical plane as the other,
@@ -215,8 +242,6 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
     //Move the entity.
     entity.x += amountX;
     entity.y += amountY;
-    
-    if(amountX !== 0) console.log(amountX);
     
     //Prevent unit from moving off left side of screen.
     if(entity.x < 0) entity.x = 0;
