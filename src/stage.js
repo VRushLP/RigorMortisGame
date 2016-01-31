@@ -57,7 +57,7 @@ Stage.prototype = {
                 }
                 if(currentSymbol === '@') {
                     this.spawnX = currentX;
-                    this.spawnY = currentY;
+                    this.spawnY = currentY - 5; //Small drop to avoid spawning into other entities.
                     console.log(currentX);
                     console.log(currentY);
                 }

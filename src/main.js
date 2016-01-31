@@ -28,20 +28,21 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     
-    var knight = new Knight(gameEngine, AM, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y);
+    var forestStage = new Stage(ctx, gameEngine, 0, 350);
+    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), 0);
+    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.SCROLL_SPEED);
+    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);    
+    
+    var knight = new Knight(gameEngine, AM, forestStage.spawnX, forestStage.spawnY);
     knight.entity.controllable = true;
     knight.entity.moveable = true;
     knight.entity.fallable = true;
     knight.entity.camerable = true;
     knight.entity.respawnable = true;
-    
-    var forestStage = new Stage(ctx, gameEngine, 0, 350);
-    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), 0);
-    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.SCROLL_SPEED);
     forestStage.entityList.push(knight);
     
-    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);    
     gameEngine.addStage(forestStage);
     
     gameEngine.start();
+    gameEngine.requestMove(knight.entity, 0, 0); //Reset camera
 });

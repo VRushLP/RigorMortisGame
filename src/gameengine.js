@@ -89,8 +89,12 @@ GameEngine.prototype.startInput = function () {
     }, false);
 }
 
-GameEngine.prototype.addAgent = function (entity) {
-    this.agents.push(entity);
+GameEngine.prototype.addAgent = function (agent) {
+    if(agent.entity.controllable) {
+        agent.entity.x = this.stages[this.currentStage].spawnX;
+        agent.entity.y = this.stages[this.currentStage].spawnY;
+    }
+    this.agents.push(agent);
 }
 
 GameEngine.prototype.addStage = function (stage) {
@@ -148,7 +152,7 @@ GameEngine.prototype.update = function () {
  */
 GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
     if(!entity.moveable) return;
-    
+    console.log(entity.x);
     //Calculate the new sides of the moving entity.
     var newLeft = entity.x + amountX;
     var newRight = newLeft + entity.width;
@@ -190,12 +194,14 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
         }
          if(other.y <= newTop && newTop <= other.y + other.height) {
             if(amountY !== 0) {
+                if(!xMoveValid) console.log("Top collision");
                 adjustedY = other.y - entity.y + other.height + 1;
             }
             yMoveValid = false;
         }
           if(other.y <= newBottom && newBottom <= other.y + other.height) {
             if(amountY !== 0) {
+                if(!xMoveValid) console.log("Bottom collision");
                 adjustedY = other.y - entity.y - entity.height - 1;
             }
             yMoveValid = false;
