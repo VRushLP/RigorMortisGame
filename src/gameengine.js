@@ -152,7 +152,6 @@ GameEngine.prototype.update = function () {
  */
 GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
     if(!entity.moveable) return;
-    console.log(entity.x);
     //Calculate the new sides of the moving entity.
     var newLeft = entity.x + amountX;
     var newRight = newLeft + entity.width;
@@ -170,38 +169,31 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
         var adjustedX = 0;
         var adjustedY = 0;
         
-        var debugleft = false;
-        var debugright = false;
-        
         
         /*
          * For each side, check if it will be in the same plane as the other entity.
          * If so, determine how far the entity can move before it would be.
          */
         if(other.x <= newLeft && newLeft <= other.x + other.width) {
-            xMoveValid = false;
             if(amountX !== 0) {
-                var debugleft = true;
                 adjustedX = other.x - entity.x + other.width + 1;
             }
+            xMoveValid = false;
         }
         if(other.x <= newRight && newRight <= other.x + other.width) {
-            xMoveValid = false;
             if(amountX !== 0) {
-                var debugright = true;
                 adjustedX = other.x - entity.x - entity.width - 1;
             }
+            xMoveValid = false;
         }
          if(other.y <= newTop && newTop <= other.y + other.height) {
             if(amountY !== 0) {
-                if(!xMoveValid) console.log("Top collision");
                 adjustedY = other.y - entity.y + other.height + 1;
             }
             yMoveValid = false;
         }
           if(other.y <= newBottom && newBottom <= other.y + other.height) {
             if(amountY !== 0) {
-                if(!xMoveValid) console.log("Bottom collision");
                 adjustedY = other.y - entity.y - entity.height - 1;
             }
             yMoveValid = false;
@@ -214,8 +206,6 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
          * TODO: If two collisions are possible, this may only detect and adjust for one of them.
          */
         if(!xMoveValid && !yMoveValid) {
-            if(debugleft) console.log("Left Collision");
-            else if(debugright) console.log("Right Collision");
             amountX = adjustedX;
             amountY = adjustedY;
             break;
@@ -225,6 +215,8 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
     //Move the entity.
     entity.x += amountX;
     entity.y += amountY;
+    
+    if(amountX !== 0) console.log(amountX);
     
     //Prevent unit from moving off left side of screen.
     if(entity.x < 0) entity.x = 0;
