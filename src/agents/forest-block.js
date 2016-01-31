@@ -12,9 +12,10 @@ function ForestBlock(game, AM, x, y) {
 }
 
 ForestBlock.prototype = { 
+    
     draw: function () {
         this.entity.draw();
-    }
+    },
     
     update: function () {
         //Nothing to do.

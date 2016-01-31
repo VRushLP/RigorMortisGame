@@ -58,7 +58,7 @@ GameEngine.prototype.init = function (ctx) {
 
 GameEngine.prototype.start = function () {
     console.log("starting game");
-    this.currentStage = FOREST_STAGE;
+    this.loadStage(FOREST_STAGE);
     var that = this;
     (function gameLoop() {
         that.loop();
@@ -94,6 +94,11 @@ GameEngine.prototype.addAgent = function (entity) {
 
 GameEngine.prototype.addStage = function (stage) {
     this.stages.push(stage);
+}
+
+GameEngine.prototype.loadStage = function (stageNumber) {
+    this.currentStage = stageNumber;
+    this.agents = this.stages[this.currentStage].entityList;
 }
 
 /*********************
