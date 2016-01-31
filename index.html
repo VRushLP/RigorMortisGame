@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>Rigor Mortis Game</title>
+    <script type="text/javascript" src="./src/howler.js"></script>
     <script type="text/javascript" src="./src/gameengine.js"></script>
     <script type="text/javascript" src="./src/assetmanager.js"></script>
     <script type="text/javascript" src="./src/main.js"></script>
@@ -14,6 +15,20 @@
     <script type="text/javascript" src="./src/agents/forest-block.js"></script>
 </head>
 <body>
+    <audio src="./snd/bloody_tears.mp3" preload="auto"></audio>
+    <audio src="./snd/awake.mp3" preload="auto"></audio>
+    <noscript>This game requires JavaScript to play. Please disable NoScript!</noscript>
     <canvas id="gameWorld" tabindex="1" width="1280" height="720" style="border: 1px solid brown; background: lightskyblue"></canvas>
 </body>
 </html>
+
+<!--This game was created for Chris Marriott's TCSS491 Computational Worlds class in Winter of 2016 by:
+    Ian Cresse : Only Artist (All the art assets were done by him!), Senior Idea Dude
+    Robert Ferguson : Senior Idea Poo-pooer, sound integration
+    Kyle Doan & Taylor Gorman : The guys who did all the real work
+
+    This game uses code created by Seth Ladd during his 2011 Google IO talk. A video of which can be found here: https://www.youtube.com/watch?v=yEocRtn_j9s
+    This game uses the Howler.js library, which can be found here: http://goldfirestudios.com/blog/104/howler.js-Modern-Web-Audio-Javascript-Library
+
+    Thanks for playing!
+    -->
