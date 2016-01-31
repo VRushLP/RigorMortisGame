@@ -7,6 +7,8 @@ function Stage(ctx, gameEngine, spawnX, spawnY) {
     this.canvasX = ctx.canvas.width;
     this.canvasY = ctx.canvas.height;
     this.gameEngine = gameEngine;
+    
+    this.stageHeight = 0;
 }
 
 Stage.prototype = {
@@ -64,5 +66,7 @@ Stage.prototype = {
             currentX = 0;
             currentY += 50;
         }
+        
+        this.stageHeight = currentY + 50;
     }
 }

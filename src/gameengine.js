@@ -228,9 +228,10 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
     }
     
     //Respawn the player if they fall off the stage.
-    if(entity.respawnable && entity.y > this.surfaceHeight + 150) {
-//        entity.x = this.stages[this.currentStage].spawnX;
-//        entity.y = this.stages[this.currentStage].spawnY;
+    if(entity.respawnable && entity.y > this.stages[this.currentStage].stageHeight + 100) {
+        entity.x = this.stages[this.currentStage].spawnX;
+        entity.y = this.stages[this.currentStage].spawnY;
+        this.requestMove(entity, 0, 0); //resets camera
     }
 }
 
