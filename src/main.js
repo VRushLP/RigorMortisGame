@@ -42,7 +42,24 @@ AM.downloadAll(function () {
     forestStage.entityList.push(knight);
     
     gameEngine.addStage(forestStage);
-    
+
+    var forestBGM = new Howl({
+        urls: ['./snd/bloody_tears.mp3'],
+        volume: .1,
+        loop: true
+    });
+
+    var awake = new Howl({
+        urls: ['./snd/awake.mp3'],
+        volume: .1,
+        loop: true,
+        onend: function () {
+            awake.pos(17.925); //Skips the intro
+        }
+    });
+
+    //awake.play();
+    forestBGM.play();
     gameEngine.start();
     gameEngine.requestMove(knight.entity, 0, 0); //Reset camera
 });
