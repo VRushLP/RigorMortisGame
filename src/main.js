@@ -51,6 +51,8 @@ AM.downloadAll(function () {
         forestStage.entityList.push(mushroomLoopFloor);
     }
     
+    forestStage.parseLevelFile(["xxxxxxxxx", "xxxxxx"], AM);
+    
     gameEngine.addStage(forestStage);
     
     gameEngine.start();

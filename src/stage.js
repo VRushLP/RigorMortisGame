@@ -43,17 +43,18 @@ Stage.prototype = {
         }
     },
     
-    parseLevelFile: function (inputArray, gameEngine, AM) {
+    parseLevelFile: function (inputArray, AM) {
         var currentX = 0;
         var currentY = 0;
         
         for(var lineNum = 0; lineNum < inputArray.length; lineNum++) {
             for(var tileNum = 0; tileNum < inputArray[lineNum].length; tileNum++) {
                 if(inputArray[lineNum][tileNum] === 'x') {
-                    this.entityList.push(new ForestBlock(gameEngine, AM, currentX, currentY));
+                    this.entityList.push(new ForestBlock(this.gameEngine, AM, currentX, currentY));
                 }
                 currentX += 25;
             }
+            currentX = 0;
             currentY += 25;
         }
     }
