@@ -42,6 +42,7 @@ function GameEngine() {
     this.surfaceWidth = null;
     this.surfaceHeight = null;
     this.cameraX = 0;
+    this.cameraY = 0;
     
     this.stages = [];
     this.currentStage;
@@ -130,7 +131,7 @@ GameEngine.prototype.draw = function () {
         this.stages[i].drawBackground(this.ctx, this.cameraX);
     }
     for (var i = 0; i < this.agents.length; i++) {
-        this.agents[i].entity.draw(this.cameraX);
+        this.agents[i].entity.draw(this.cameraX, this.cameraY);
     }
     this.ctx.restore();
 }
@@ -223,12 +224,13 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
         } else {
             this.cameraX = 0;
         } 
+        this.cameraY = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
     }
     
     //Respawn the player if they fall off the stage.
     if(entity.respawnable && entity.y > this.surfaceHeight + 150) {
-        entity.x = this.stages[this.currentStage].spawnX;
-        entity.y = this.stages[this.currentStage].spawnY;
+//        entity.x = this.stages[this.currentStage].spawnX;
+//        entity.y = this.stages[this.currentStage].spawnY;
     }
 }
 

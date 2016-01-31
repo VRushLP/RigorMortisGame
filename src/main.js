@@ -3,7 +3,7 @@ var RM_GLOBALS = {
     FOREST_STAGE : {
         SCROLL_SPEED: 10000,
         KNIGHT_SPAWN_X: 0,
-        KNIGHT_SPAWN_Y: 0,
+        KNIGHT_SPAWN_Y: 800,
     },
 }
 
