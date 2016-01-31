@@ -20,6 +20,8 @@ AM.queueDownload("./img/forest-stage/forest sky.png");
 AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
 
+AM.queueStageDownload("./txt/forest-stage.txt");
+
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
@@ -51,7 +53,9 @@ AM.downloadAll(function () {
         forestStage.entityList.push(mushroomLoopFloor);
     }
     
-    forestStage.parseLevelFile(["xxxxxxxxx", "xxxxxx"], AM);
+    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
+    //console.log("Stage Loaded: " + AM.getAsset("./txt/forest-stage.txt"));
+    //forestStage.parseLevelFile(["xxxxxxxxx", "xxxxxx"], AM);
     
     gameEngine.addStage(forestStage);
     
