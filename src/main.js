@@ -18,6 +18,7 @@ AM.queueDownload("./img/knight/knight run flipped.png");
 AM.queueDownload("./img/knight/knight standing flipped.png");
 AM.queueDownload("./img/forest-stage/forest sky.png");
 AM.queueDownload("./img/forest-stage/forest trees.png");
+AM.queueDownload("./img/forest-stage/forest block.png");
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");

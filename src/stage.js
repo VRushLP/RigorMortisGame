@@ -41,5 +41,12 @@ Stage.prototype = {
             } 
         }
     }
+    
+//    parseLevelFile: function (inputArray) {
+//        for(var lineNum = 0; lineNum < inputArray.length; i++) {
+//    
+//        }
+//    
+//    }
 
 }
