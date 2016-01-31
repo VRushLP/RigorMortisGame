@@ -166,6 +166,9 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
         var adjustedX = 0;
         var adjustedY = 0;
         
+        var debugleft = false;
+        var debugright = false;
+        
         
         /*
          * For each side, check if it will be in the same plane as the other entity.
@@ -173,24 +176,26 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
          */
         if(other.x <= newLeft && newLeft <= other.x + other.width) {
             xMoveValid = false;
-            if(amountX > 0) {
+            if(amountX !== 0) {
+                var debugleft = true;
                 adjustedX = other.x - entity.x + other.width + 1;
             }
         }
         if(other.x <= newRight && newRight <= other.x + other.width) {
             xMoveValid = false;
-            if(amountX > 0) {
+            if(amountX !== 0) {
+                var debugright = true;
                 adjustedX = other.x - entity.x - entity.width - 1;
             }
         }
          if(other.y <= newTop && newTop <= other.y + other.height) {
-            if(amountY > 0) {
+            if(amountY !== 0) {
                 adjustedY = other.y - entity.y + other.height + 1;
             }
             yMoveValid = false;
         }
           if(other.y <= newBottom && newBottom <= other.y + other.height) {
-            if(amountY > 0) {
+            if(amountY !== 0) {
                 adjustedY = other.y - entity.y - entity.height - 1;
             }
             yMoveValid = false;
@@ -203,6 +208,8 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
          * TODO: If two collisions are possible, this may only detect and adjust for one of them.
          */
         if(!xMoveValid && !yMoveValid) {
+            if(debugleft) console.log("Left Collision");
+            else if(debugright) console.log("Right Collision");
             amountX = adjustedX;
             amountY = adjustedY;
             break;
