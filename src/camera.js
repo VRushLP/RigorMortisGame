@@ -103,8 +103,7 @@ Camera.prototype = {
                 }
             }						
 
-        }		
-
+        }
         // update viewportRect
         this.viewportRect.set(this.xView, this.yView);
 

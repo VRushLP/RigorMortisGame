@@ -1,59 +1,56 @@
-var RM_GLOBALS = {
-    
-    FOREST_STAGE : {
-        SCROLL_SPEED: 10000,
-        KNIGHT_SPAWN_X: 0,
-        KNIGHT_SPAWN_Y: 0,
-    },
-}
+var ASSET_MANAGER = new AssetManager();
 
-var AM = new AssetManager();
+ASSET_MANAGER.queueDownload("img/knight/knight jump.png");
+ASSET_MANAGER.queueDownload("img/knight/knight jump flipped.png");
+ASSET_MANAGER.queueDownload("img/knight/knight run.png");
+ASSET_MANAGER.queueDownload("img/knight/knight run flipped.png");
+ASSET_MANAGER.queueDownload("img/knight/knight standing.png");
+ASSET_MANAGER.queueDownload("img/knight/knight standing flipped.png");
+ASSET_MANAGER.queueDownload("img/forest-stage/forest ground block.png");
+ASSET_MANAGER.queueDownload("img/forest-stage/ground block.png");
+ASSET_MANAGER.queueDownload("img/forest-stage/tree outer door.png");
+ASSET_MANAGER.queueDownload("img/forest-stage/tree tile.png");
+ASSET_MANAGER.queueDownload("img/forest-stage/tree tile inner.png");
+ASSET_MANAGER.queueDownload("img/forest-stage/forest sky.png");
+ASSET_MANAGER.queueDownload("img/forest-stage/forest trees.png");
 
-AM.queueDownload("./img/agents/mushroomdude.png");
-AM.queueDownload("./img/knight/knight jump.png");
-AM.queueDownload("./img/knight/knight run.png");
-AM.queueDownload("./img/knight/knight standing.png");
-AM.queueDownload("./img/knight/knight jump flipped.png");
-AM.queueDownload("./img/knight/knight run flipped.png");
-AM.queueDownload("./img/knight/knight standing flipped.png");
-AM.queueDownload("./img/forest-stage/forest sky.png");
-AM.queueDownload("./img/forest-stage/forest trees.png");
+/*
+Download all the elements and add entities to the game.
+*/
+ASSET_MANAGER.downloadAll(function () {
+    console.log("Initializing world");
+    var canvas = document.getElementById('gameWorld');
+    var ctx = canvas.getContext('2d');
+    var simpleLevelPlan = [
+"|                                                                     |             |",
+"|                                                                     |             |",
+"|                                                                     |             |",
+"|                                                                     |             |",
+"|                                                                     |             |",
+"|                                   xxxxxxxxxxxxxxxx   xxxx     xxxx  |             |",
+"|                                       |0000000000|                  |             |",
+"|                        xxx  xx        |0000000000|       xx         |             |",
+"|                          |            |0000000000|              xxxx|             |",
+"|                          |      xxx   |000000xxxx|                  |             |",
+"|                    xxx   |            |0000000000|         xxx                 @  |",
+"|                          |            |xxx0000000|                                D",
+"|                          |   xx       |0000000000|              xxxxxxxxxxxxxxxxxx|",
+"|                        xx|            |0000000000|                  |             |",
+"|                          |       xx   |000000xxxx|                  |             |",
+"|            x             |            |0000000000|          xxxx    |             |",
+"|            |      xxx    |            D0000000000|                  |             |",
+"|           x|      | |  xx|xxxxxxxxxxxx|xxxxxxxxxx|xxxxxxxxxxxxxxxxxx|             |",
+"|xxx     xxx |     x   xx                                                           |",
+"|   xxxxx    |xxxxxx                                                                |"
+    ];
 
-AM.downloadAll(function () {
-    var canvas = document.getElementById("gameWorld");
-    var ctx = canvas.getContext("2d");
-
-    var gameEngine = new GameEngine();
-    gameEngine.init(ctx);
-    
-    var knight = new Knight(gameEngine, AM, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y);
-    gameEngine.addAgent(knight);
-    knight.entity.controllable = true;
-    knight.entity.moveable = true;
-    knight.entity.fallable = true;
-    knight.entity.camerable = true;
-    knight.entity.respawnable = true;
-    
-    var mushroomWall = new MushroomDude(gameEngine, AM, 500, 50);
-    gameEngine.addAgent(mushroomWall);
-    
-    var mushroomFloor = new MushroomDude(gameEngine, AM, 0, 500);
-    gameEngine.addAgent(mushroomFloor);
-    
-    var mushroomFloor2 = new MushroomDude(gameEngine, AM, 400, 650);
-    gameEngine.addAgent(mushroomFloor2);
-    
-    var forestStage = new Stage(ctx, 0, 350);
-    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), 0);
-    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.SCROLL_SPEED);
-    gameEngine.addStage(forestStage);
-    
-    
-    for (var i = 0; i < 10; i++) {
-        if(i === 3 || i === 5 || i === 8) continue;
-        var mushroomLoopFloor = new MushroomDude(gameEngine, AM, 190 * i + 590, 650);
-        gameEngine.addAgent(mushroomLoopFloor);
-    }
-    
-    gameEngine.start();
+    var game = new GameEngine(ctx);
+    var lv1 = new Level(simpleLevelPlan, game);
+    lv1.generate();
+    var camera = new Camera(0, 0, canvas.width, canvas.height, lv1.width_px, lv1.height_px);
+    camera.follow(lv1.player, canvas.width/2 - 120, canvas.height/2 - 120);
+    game.init(camera);
+    game.addEntity(lv1);
+    game.addEntity(lv1.player);
+    game.start();
 });

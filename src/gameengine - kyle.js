@@ -74,6 +74,7 @@ GameEngine.prototype = {
     },
 
     addEntity : function (entity) {
+         
         this.entities.push(entity);
     },
 
