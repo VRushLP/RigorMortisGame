@@ -1,10 +1,10 @@
-var ENTITY_WIDTH = 25;
-var ENTITY_HEIGHT = 25;
+var ENTITY_WIDTH = 50;
+var ENTITY_HEIGHT = 50;
 
 function ForestBlock(game, AM, x, y) {
     this.entity = new Entity(game, x , y, ENTITY_WIDTH, ENTITY_HEIGHT);
     
-    var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), 25, 25, 0.10, true);
+    var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), 50, 50, 0.10, true);
     NormalState.addFrame(0, 0);
     
     this.entity.addAnimation(NormalState);

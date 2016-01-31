@@ -54,13 +54,15 @@ Stage.prototype = {
                     this.entityList.push(new ForestBlock(this.gameEngine, AM, currentX, currentY));
                 }
                 if(currentSymbol === '@') {
-                    this.spawnX = tileNum;
-                    this.spawnY = lineNum;
+                    this.spawnX = currentX;
+                    this.spawnY = currentY;
+                    console.log(currentX);
+                    console.log(currentY);
                 }
-                currentX += 25;
+                currentX += 50;
             }
             currentX = 0;
-            currentY += 25;
+            currentY += 50;
         }
     }
 }
