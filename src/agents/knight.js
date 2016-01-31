@@ -25,7 +25,7 @@ var PRESS_DOWN_SPEED = 2;
  * and also attach to it all animations.
  */
 function Knight(game, AM, x, y) {
-    this.entity = new Entity(game, x , y, 55, 54);
+    this.entity = new Entity(game, x , y, 48, 54);
     this.velocity = 0;
     this.direction = RIGHT;
 

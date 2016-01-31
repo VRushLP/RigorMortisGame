@@ -1,4 +1,4 @@
-function Stage(ctx, spawnX, spawnY) {
+function Stage(ctx, gameEngine, spawnX, spawnY) {
     this.entityList = [];
     this.spawnX = spawnX;
     this.spawnY = spawnY;
@@ -6,6 +6,9 @@ function Stage(ctx, spawnX, spawnY) {
     this.stageMusic = null;
     this.canvasX = ctx.canvas.width;
     this.canvasY = ctx.canvas.height;
+    this.gameEngine = gameEngine;
+    
+    this.stageHeight = 0;
 }
 
 Stage.prototype = {
@@ -40,6 +43,30 @@ Stage.prototype = {
                 ctx.drawImage(this.backgroundList[i], 0, 0, this.canvasX, this.canvasY);
             } 
         }
+    },
+    
+    parseLevelFile: function (inputArray, AM) {
+        var currentX = 0;
+        var currentY = 0;
+        
+        for(var lineNum = 0; lineNum < inputArray.length; lineNum++) {
+            for(var tileNum = 0; tileNum < inputArray[lineNum].length; tileNum++) {
+                var currentSymbol = inputArray[lineNum][tileNum];
+                if(currentSymbol === 'x') {
+                    this.entityList.push(new ForestBlock(this.gameEngine, AM, currentX, currentY));
+                }
+                if(currentSymbol === '@') {
+                    this.spawnX = currentX;
+                    this.spawnY = currentY - 5; //Small drop to avoid spawning into other entities.
+                    console.log(currentX);
+                    console.log(currentY);
+                }
+                currentX += 50;
+            }
+            currentX = 0;
+            currentY += 50;
+        }
+        
+        this.stageHeight = currentY + 50;
     }
-
 }

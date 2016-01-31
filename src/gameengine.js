@@ -42,6 +42,7 @@ function GameEngine() {
     this.surfaceWidth = null;
     this.surfaceHeight = null;
     this.cameraX = 0;
+    this.cameraY = 0;
     
     this.stages = [];
     this.currentStage;
@@ -58,7 +59,7 @@ GameEngine.prototype.init = function (ctx) {
 
 GameEngine.prototype.start = function () {
     console.log("starting game");
-    this.currentStage = FOREST_STAGE;
+    this.loadStage(FOREST_STAGE);
     var that = this;
     (function gameLoop() {
         that.loop();
@@ -88,12 +89,21 @@ GameEngine.prototype.startInput = function () {
     }, false);
 }
 
-GameEngine.prototype.addAgent = function (entity) {
-    this.agents.push(entity);
+GameEngine.prototype.addAgent = function (agent) {
+    if(agent.entity.controllable) {
+        agent.entity.x = this.stages[this.currentStage].spawnX;
+        agent.entity.y = this.stages[this.currentStage].spawnY;
+    }
+    this.agents.push(agent);
 }
 
 GameEngine.prototype.addStage = function (stage) {
     this.stages.push(stage);
+}
+
+GameEngine.prototype.loadStage = function (stageNumber) {
+    this.currentStage = stageNumber;
+    this.agents = this.stages[this.currentStage].entityList;
 }
 
 /*********************
@@ -125,7 +135,7 @@ GameEngine.prototype.draw = function () {
         this.stages[i].drawBackground(this.ctx, this.cameraX);
     }
     for (var i = 0; i < this.agents.length; i++) {
-        this.agents[i].entity.draw(this.cameraX);
+        this.agents[i].entity.draw(this.cameraX, this.cameraY);
     }
     this.ctx.restore();
 }
@@ -142,7 +152,8 @@ GameEngine.prototype.update = function () {
  */
 GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
     if(!entity.moveable) return;
-    
+    amountX = Math.floor(amountX);
+    amountY = Math.floor(amountY);
     //Calculate the new sides of the moving entity.
     var newLeft = entity.x + amountX;
     var newRight = newLeft + entity.width;
@@ -166,29 +177,54 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
          * If so, determine how far the entity can move before it would be.
          */
         if(other.x <= newLeft && newLeft <= other.x + other.width) {
-            xMoveValid = false;
-            if(amountX > 0) {
+            if(amountX !== 0) {
                 adjustedX = other.x - entity.x + other.width + 1;
             }
+            xMoveValid = false;
         }
         if(other.x <= newRight && newRight <= other.x + other.width) {
-            xMoveValid = false;
-            if(amountX > 0) {
+            if(amountX !== 0) {
                 adjustedX = other.x - entity.x - entity.width - 1;
             }
+            xMoveValid = false;
         }
          if(other.y <= newTop && newTop <= other.y + other.height) {
-            if(amountY > 0) {
+            if(amountY !== 0) {
                 adjustedY = other.y - entity.y + other.height + 1;
             }
             yMoveValid = false;
         }
           if(other.y <= newBottom && newBottom <= other.y + other.height) {
-            if(amountY > 0) {
+            if(amountY !== 0) {
                 adjustedY = other.y - entity.y - entity.height - 1;
             }
             yMoveValid = false;
         }
+        
+        //Check if other entity would exist vertically inside of this one.
+        if(newTop <= other.y && other.y + other.height <= newBottom) {
+            adjustedY = 0;
+            yMoveValid = false;
+        }
+        
+        //Check if this entity would exist vertically inside of the other one.
+        if(other.y <= newTop && newBottom <= other.y + other.height) {
+            adjustedY = 0;
+            yMoveValid = false;
+        }
+        
+        //Check if other entity would exist horizontally inside of this one.
+        if(newLeft <= other.x && other.x + other.width <= newRight) {
+            adjustedX = 0;
+            xMoveValid = false;
+        }
+        
+        //Check if this entity would exist vertically inside of the other one.
+        if(other.x <= newLeft && newRight <= other.x + other.width) {
+            adjustedX = 0;
+            xMoveValid = false;
+        }        
+        
         
         
         /*
@@ -218,12 +254,14 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
         } else {
             this.cameraX = 0;
         } 
+        this.cameraY = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
     }
     
     //Respawn the player if they fall off the stage.
-    if(entity.respawnable && entity.y > this.surfaceHeight + 150) {
+    if(entity.respawnable && entity.y > this.stages[this.currentStage].stageHeight + 100) {
         entity.x = this.stages[this.currentStage].spawnX;
         entity.y = this.stages[this.currentStage].spawnY;
+        this.requestMove(entity, 0, 0); //resets camera
     }
 }
 
