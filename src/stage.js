@@ -49,8 +49,13 @@ Stage.prototype = {
         
         for(var lineNum = 0; lineNum < inputArray.length; lineNum++) {
             for(var tileNum = 0; tileNum < inputArray[lineNum].length; tileNum++) {
-                if(inputArray[lineNum][tileNum] === 'x') {
+                var currentSymbol = inputArray[lineNum][tileNum];
+                if(currentSymbol === 'x') {
                     this.entityList.push(new ForestBlock(this.gameEngine, AM, currentX, currentY));
+                }
+                if(currentSymbol === '@') {
+                    this.spawnX = tileNum;
+                    this.spawnY = lineNum;
                 }
                 currentX += 25;
             }

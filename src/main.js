@@ -9,7 +9,6 @@ var RM_GLOBALS = {
 
 var AM = new AssetManager();
 
-AM.queueDownload("./img/agents/mushroomdude.png");
 AM.queueDownload("./img/knight/knight jump.png");
 AM.queueDownload("./img/knight/knight run.png");
 AM.queueDownload("./img/knight/knight standing.png");
@@ -36,27 +35,12 @@ AM.downloadAll(function () {
     knight.entity.camerable = true;
     knight.entity.respawnable = true;
     
-    var mushroomWall = new MushroomDude(gameEngine, AM, 500, 50);    
-    var mushroomFloor = new MushroomDude(gameEngine, AM, 0, 500);    
-    var mushroomFloor2 = new MushroomDude(gameEngine, AM, 400, 650);
-    
     var forestStage = new Stage(ctx, gameEngine, 0, 350);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), 0);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.SCROLL_SPEED);
     forestStage.entityList.push(knight);
-    forestStage.entityList.push(mushroomWall);
-    forestStage.entityList.push(mushroomFloor);
-    forestStage.entityList.push(mushroomFloor2);
-    for (var i = 0; i < 10; i++) {
-        if(i === 3 || i === 5 || i === 8) continue;
-        var mushroomLoopFloor = new MushroomDude(gameEngine, AM, 190 * i + 590, 650);
-        forestStage.entityList.push(mushroomLoopFloor);
-    }
     
-    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
-    //console.log("Stage Loaded: " + AM.getAsset("./txt/forest-stage.txt"));
-    //forestStage.parseLevelFile(["xxxxxxxxx", "xxxxxx"], AM);
-    
+    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);    
     gameEngine.addStage(forestStage);
     
     gameEngine.start();
