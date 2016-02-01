@@ -14,10 +14,15 @@ var RIGHT = 1;
 
 //Physics Constants
 var TERMINAL_VELOCITY = 16;
-var JUMP_VELOCITY = 10;
-var Y_ACCELERATION = 0.3
+//Initial jump velocity for tapping jump.
+var JUMP_VELOCITY = 8;
+//Gravity's downward acceleration
+var Y_ACCELERATION = 0.35;
 var RUNNING_SPEED = 5;
+//Extra velocity added for holding down while falling.
 var PRESS_DOWN_SPEED = 2;
+//Gravity reduction for holding up while rising.
+var PRESS_UP_SPEED = 0.17;
 
 /**
  * Create a new Knight agent.
@@ -28,6 +33,7 @@ function Knight(game, AM, x, y) {
     this.entity = new Entity(game, x , y, 48, 54);
     this.velocity = 0;
     this.direction = RIGHT;
+    this.canJump = true;
 
     var KnightRestRight = new Animation(AM.getAsset("./img/knight/knight standing.png"), 48, 54, 0.10, true);
     KnightRestRight.addFrame(0, 0);
@@ -78,6 +84,14 @@ Knight.prototype.update = function() {
     } else if (this.velocity > 0) {
         //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
         this.velocity = 0;
+        
+        //If the knight previously had a jumping/falling animation, request the knight to go into a rest state.
+        if(this.entity.currentAnimation === JUMPING_RIGHT_ANIMATION ||
+               this.entity.currentAnimation === JUMPING_LEFT_ANIMATION ||
+               this.entity.currentAnimation === FALLING_RIGHT_ANIMATION ||
+               this.entity.currentAnimation === FALLING_LEFT_ANIMATION) {    
+                   this.readInput("none");    
+            }
     }
     
     //If the agent is moving upwards, then it is jumping.
@@ -113,9 +127,11 @@ Knight.prototype.update = function() {
  */
 Knight.prototype.jump = function() {
     //Allow the jump only if the agent is on the ground.
-    if(this.entity.game.checkBottomCollision(this.entity)) {
+    if(this.entity.game.checkBottomCollision(this.entity) && this.canJump) {
         this.velocity = -(JUMP_VELOCITY);
     }
+    //The player must actively press up to jump, they can't just hold it.
+    this.canJump = false;
 }
 
 /**
@@ -126,6 +142,8 @@ Knight.prototype.readInput = function(input) {
         this.entity.game.requestMove(this.entity, 0, PRESS_DOWN_SPEED);
     } 
     if (input === "up") {
+        //Add upwards velocity if the player is holding up while jumping.
+        if(this.velocity < 0) this.velocity -= PRESS_UP_SPEED;
         this.jump();
     } 
     if (input === "left") {
@@ -151,4 +169,20 @@ Knight.prototype.readInput = function(input) {
             this.entity.setAnimation(REST_LEFT_ANIMATION);
         }
     }
+    
+    //Knight can only jump upon pressing jump, so reset the ability to jump
+    //whenever the jump key is released.
+    if (input === "up_released") {
+        this.canJump = true;
+    }
+    
+    //If right or left aren't being pressed, but the knight is currently running, then reset
+    //the knight's animation.
+    if(input === "right_released" && this.entity.currentAnimation === WALKING_RIGHT_ANIMATION) {
+        this.readInput("none");
+    }
+    if(input === "left_released" && this.entity.currentAnimation === WALKING_LEFT_ANIMATION) {
+        this.readInput("none");
+    }
+    
 }
