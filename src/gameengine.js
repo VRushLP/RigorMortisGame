@@ -46,6 +46,7 @@ function GameEngine() {
     
     this.stages = [];
     this.currentStage;
+    this.DEBUG_MODE = 1;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -75,6 +76,7 @@ GameEngine.prototype.startInput = function () {
         if (e.which === 83) that.pressDown = true;
         if (e.which === 65) that.pressLeft = true;
         if (e.which === 87) that.pressUp = true;
+        if (e.which === 78) that.pressN = true;
         //console.log(e.which);
         e.preventDefault();
     }, false);
@@ -84,6 +86,7 @@ GameEngine.prototype.startInput = function () {
         if (e.which === 83) that.pressDown = false;
         if (e.which === 65) that.pressLeft = false;
         if (e.which === 87) that.pressUp = false;
+        if (e.which === 78) that.pressN = false;
         //console.log(e.which);
         e.preventDefault();
     }, false);
@@ -118,6 +121,7 @@ GameEngine.prototype.loop = function () {
             if(this.pressDown) this.agents[i].readInput("down");
             if(this.pressUp) this.agents[i].readInput("up");
             if(this.pressLeft) this.agents[i].readInput("left");
+            if(this.pressN) this.agents[i].readInput('n');
             
             if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp) this.agents[i].readInput("none");
         }
@@ -161,6 +165,7 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
     var newBottom = newTop + entity.height;
     
     for (var i = 0; i < this.agents.length; i++) {
+        if(!entity.collidable) break;
         
         var other = this.agents[i].entity;
         if(other === entity) continue; //Prevent an entity from colliding with itself.
@@ -270,6 +275,7 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
  */
 GameEngine.prototype.checkBottomCollision = function(entity) {
     var onGround = false;
+    if(!entity.collidable) return;
     
     for (var i = 0; i < this.agents.length; i++) {
         var other = this.agents[i].entity;
@@ -302,6 +308,7 @@ GameEngine.prototype.checkBottomCollision = function(entity) {
  */
 GameEngine.prototype.checkTopCollision = function(entity) {
     var topCollision = false;
+    if(!entity.collidable) return;
     
     for (var i = 0; i < this.agents.length; i++) {
         var other = this.agents[i].entity;

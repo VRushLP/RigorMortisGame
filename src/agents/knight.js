@@ -127,6 +127,11 @@ Knight.prototype.readInput = function(input) {
     } 
     if (input === "up") {
         this.jump();
+        
+        //Allows no-clip debugging.
+        if(!this.entity.fallable) {
+            this.entity.game.requestMove(this.entity, 0, -10)
+        }
     } 
     if (input === "left") {
         this.direction = LEFT;
@@ -149,6 +154,12 @@ Knight.prototype.readInput = function(input) {
             this.entity.setAnimation(REST_RIGHT_ANIMATION);
         } else {
             this.entity.setAnimation(REST_LEFT_ANIMATION);
+        }
+    }
+    if (input === 'n') {
+        if(this.entity.game.DEBUG_MODE === 1) {
+            this.entity.fallable = !this.entity.fallable;
+            this.entity.collidable = !this.entity.collidable;
         }
     }
 }
