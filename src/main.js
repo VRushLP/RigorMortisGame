@@ -26,17 +26,17 @@ ASSET_MANAGER.downloadAll(function () {
 "|                                                                     |             |",
 "|                                                                     |             |",
 "|                                                                     |             |",
-"|                                                                     |             |",
+"|                                       !                             |             |",
 "|                                   xxxxxxxxxxxxxxxx   xxxx     xxxx  |             |",
-"|                                       |0000000000|                  |             |",
+"|                         !             |0000000000|                  |             |",
 "|                        xxx  xx        |0000000000|       xx         |             |",
 "|                          |            |0000000000|              xxxx|             |",
-"|                          |      xxx   |000000xxxx|                  |             |",
-"|                    xxx   |            |0000000000|         xxx                 @  |",
+"|                    *     |      xxx   |000000xxxx|                  |             |",
+"|                    xxx   |            |0000000000|         xxx                    |",
 "|                          |            |xxx0000000|                                D",
 "|                          |   xx       |0000000000|              xxxxxxxxxxxxxxxxxx|",
 "|                        xx|            |0000000000|                  |             |",
-"|                          |       xx   |000000xxxx|                  |             |",
+"|                    @     |       xx   |000000xxxx|                  |             |",
 "|            x             |            |0000000000|          xxxx    |             |",
 "|            |      xxx    |            D0000000000|                  |             |",
 "|           x|      | |  xx|xxxxxxxxxxxx|xxxxxxxxxx|xxxxxxxxxxxxxxxxxx|             |",
@@ -51,6 +51,9 @@ ASSET_MANAGER.downloadAll(function () {
     camera.follow(lv1.player, canvas.width/2 - 120, canvas.height/2 - 120);
     game.init(camera);
     game.addEntity(lv1);
-    game.addEntity(lv1.player);
+    game.addPlayer(lv1.player);
+    for (var i = 0; i < lv1.enemies.length; i += 1) {
+        game.addEntity(lv1.enemies[i]);
+    }
     game.start();
 });

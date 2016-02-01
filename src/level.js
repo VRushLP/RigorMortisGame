@@ -9,6 +9,7 @@ function Level (map, game) {
     this.image = null;
     var foreground = new Foreground();
     this.door = [];
+    this.enemies = [];
     
     for (var y = 0; y < this.height; y += 1) {
         var line = map[y], gridLine = [];
@@ -17,6 +18,7 @@ function Level (map, game) {
             switch (ch) {
                 case "x" : fieldType = "ground"; break;
                 case "|" : fieldType = "wall"; break;
+                case "!" : this.enemies.push(new Monster(x, y, this)); break;
                 case "D" : fieldType = "door"; this.door.push(new Door(x, y)); break;
                 case "K" : fieldType = "key"; break;
                 case "0" : fieldType = "hidden"; foreground.set(x, y); break;
@@ -161,6 +163,17 @@ Level.prototype = {
                 }
                 if (fieldType) {return fieldType;}
             }
+        }
+    },
+    
+    enemyAt : function (player) {
+        for (var i = 0; i < this.enemies.length; i += 1) {
+            var monster = this.enemies[i];
+            if (player.currentX_px + player.width > monster.currentX_px &&
+                player.currentX_px < monster.currentX_px + monster.width &&
+                player.currentY_px + player.height > monster.currentY_px &&
+                player.currentY_px < monster.currentY_px + monster.height)
+                return monster;
         }
     }
 }

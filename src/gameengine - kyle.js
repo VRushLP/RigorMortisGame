@@ -25,6 +25,7 @@ function GameEngine(ctx) {
     this.entities = [];
     this.ctx = ctx;
     this.camera = null;
+    this.player = null;
 
     this.keyStatus = {};
     this.keysDown = false;
@@ -72,33 +73,37 @@ GameEngine.prototype = {
             }
         }, false);
     },
+    
+    addPlayer : function (player) {
+        this.player = player;
+    },
 
     addEntity : function (entity) {
          
         this.entities.push(entity);
     },
 
-    draw : function () {
-         
+    draw : function () { 
         var i;
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.ctx.save();
         for (i = 0; i < this.entities.length; i += 1) {
             this.entities[i].draw(this.ctx, this.camera.xView, this.camera.yView);
         }
+        this.player.draw(this.ctx, this.camera.xView, this.camera.yView);
         this.ctx.restore();
     },
 
     update : function () {
          
         var entitiesCount = this.entities.length, i, entity;
-
+        this.player.update();
         for (i = 0; i < entitiesCount; i += 1) {
             entity = this.entities[i];
 
             if (!entity.removeFromWorld) {
                 // console.log(entity);
-                entity.update();
+                entity.update(this.player.currentX_px, this.player.currentY_px, this.player.width, this.player.height);
             }
         }
 
