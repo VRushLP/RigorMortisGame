@@ -14,8 +14,8 @@ var RIGHT = 1;
 
 //Physics Constants
 var TERMINAL_VELOCITY = 16;
-var JUMP_VELOCITY = 10;
-var Y_ACCELERATION = 0.3
+var JUMP_VELOCITY = 8;
+var Y_ACCELERATION = 0.35;
 var RUNNING_SPEED = 5;
 var PRESS_DOWN_SPEED = 2;
 
@@ -126,6 +126,7 @@ Knight.prototype.readInput = function(input) {
         this.entity.game.requestMove(this.entity, 0, PRESS_DOWN_SPEED);
     } 
     if (input === "up") {
+        if(this.velocity < 0) this.velocity -= .17;
         this.jump();
     } 
     if (input === "left") {
