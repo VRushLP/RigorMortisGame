@@ -156,6 +156,7 @@ Knight.prototype.readInput = function(input) {
             this.entity.setAnimation(REST_LEFT_ANIMATION);
         }
     }
+    //No-clip activation/deactivation
     if (input === 'n') {
         if(this.entity.game.DEBUG_MODE === 1) {
             this.entity.fallable = !this.entity.fallable;

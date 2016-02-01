@@ -165,7 +165,7 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
     var newBottom = newTop + entity.height;
     
     for (var i = 0; i < this.agents.length; i++) {
-        if(!entity.collidable) break;
+        if(!entity.collidable) break; //Non-collidable; skip the following collision tests.
         
         var other = this.agents[i].entity;
         if(other === entity) continue; //Prevent an entity from colliding with itself.
@@ -274,8 +274,9 @@ GameEngine.prototype.requestMove = function(entity, amountX, amountY) {
  * Return true if the entity is directly on top of another entity; false otherwise.
  */
 GameEngine.prototype.checkBottomCollision = function(entity) {
+    if(!entity.collidable) return false;
+    
     var onGround = false;
-    if(!entity.collidable) return;
     
     for (var i = 0; i < this.agents.length; i++) {
         var other = this.agents[i].entity;
@@ -307,8 +308,9 @@ GameEngine.prototype.checkBottomCollision = function(entity) {
  * Return true if the entity is directly below another entity; false otherwise.
  */
 GameEngine.prototype.checkTopCollision = function(entity) {
+    if(!entity.collidable) return false;
+    
     var topCollision = false;
-    if(!entity.collidable) return;
     
     for (var i = 0; i < this.agents.length; i++) {
         var other = this.agents[i].entity;
