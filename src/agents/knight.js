@@ -28,6 +28,7 @@ function Knight(game, AM, x, y) {
     this.entity = new Entity(game, x , y, 48, 54);
     this.velocity = 0;
     this.direction = RIGHT;
+    this.canJump = true;
 
     var KnightRestRight = new Animation(AM.getAsset("./img/knight/knight standing.png"), 48, 54, 0.10, true);
     KnightRestRight.addFrame(0, 0);
@@ -113,9 +114,11 @@ Knight.prototype.update = function() {
  */
 Knight.prototype.jump = function() {
     //Allow the jump only if the agent is on the ground.
-    if(this.entity.game.checkBottomCollision(this.entity)) {
+    if(this.entity.game.checkBottomCollision(this.entity) && this.canJump) {
         this.velocity = -(JUMP_VELOCITY);
     }
+    
+    this.canJump = false;
 }
 
 /**
@@ -151,5 +154,9 @@ Knight.prototype.readInput = function(input) {
         } else {
             this.entity.setAnimation(REST_LEFT_ANIMATION);
         }
+    }
+    
+    if (input === "up_released") {
+        this.canJump = true;
     }
 }
