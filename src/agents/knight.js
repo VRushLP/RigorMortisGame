@@ -79,6 +79,14 @@ Knight.prototype.update = function() {
     } else if (this.velocity > 0) {
         //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
         this.velocity = 0;
+        
+        //If the knight previously had a jumping/falling animation, request the knight to go into a rest state.
+        if(this.entity.currentAnimation === JUMPING_RIGHT_ANIMATION ||
+               this.entity.currentAnimation === JUMPING_LEFT_ANIMATION ||
+               this.entity.currentAnimation === FALLING_RIGHT_ANIMATION ||
+               this.entity.currentAnimation === FALLING_LEFT_ANIMATION) {    
+                   this.readInput("none");    
+            }
     }
     
     //If the agent is moving upwards, then it is jumping.
@@ -117,7 +125,7 @@ Knight.prototype.jump = function() {
     if(this.entity.game.checkBottomCollision(this.entity) && this.canJump) {
         this.velocity = -(JUMP_VELOCITY);
     }
-    
+    //The player must actively press up to jump, they can't just hold it.
     this.canJump = false;
 }
 
@@ -129,6 +137,7 @@ Knight.prototype.readInput = function(input) {
         this.entity.game.requestMove(this.entity, 0, PRESS_DOWN_SPEED);
     } 
     if (input === "up") {
+        //Add upwards velocity if the player is holding up while jumping.
         if(this.velocity < 0) this.velocity -= .17;
         this.jump();
     } 
@@ -156,7 +165,19 @@ Knight.prototype.readInput = function(input) {
         }
     }
     
+    //Knight can only jump upon pressing jump, so reset the ability to jump
+    //whenever the jump key is released.
     if (input === "up_released") {
         this.canJump = true;
     }
+    
+    //If right or left aren't being pressed, but the knight is currently running, then reset
+    //the knight's animation.
+    if(input === "right_released" && this.entity.currentAnimation === WALKING_RIGHT_ANIMATION) {
+        this.readInput("none");
+    }
+    if(input === "left_released" && this.entity.currentAnimation === WALKING_LEFT_ANIMATION) {
+        this.readInput("none");
+    }
+    
 }

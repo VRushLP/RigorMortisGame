@@ -117,8 +117,11 @@ GameEngine.prototype.loop = function () {
             if(this.pressRight) this.agents[i].readInput("right");
             if(this.pressDown) this.agents[i].readInput("down");
             if(this.pressUp) this.agents[i].readInput("up");
-            if(!this.pressUp) this.agents[i].readInput("up_released");
             if(this.pressLeft) this.agents[i].readInput("left");
+            
+            if(!this.pressUp) this.agents[i].readInput("up_released");
+            if(!this.pressLeft) this.agents[i].readInput("left_released");
+            if(!this.pressRight) this.agents[i].readInput("right_released");
             
             if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp) this.agents[i].readInput("none");
         }
