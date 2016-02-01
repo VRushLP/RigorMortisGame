@@ -14,10 +14,15 @@ var RIGHT = 1;
 
 //Physics Constants
 var TERMINAL_VELOCITY = 16;
+//Initial jump velocity for tapping jump.
 var JUMP_VELOCITY = 8;
+//Gravity's downward acceleration
 var Y_ACCELERATION = 0.35;
 var RUNNING_SPEED = 5;
+//Extra velocity added for holding down while falling.
 var PRESS_DOWN_SPEED = 2;
+//Gravity reduction for holding up while rising.
+var PRESS_UP_SPEED = 0.17;
 
 /**
  * Create a new Knight agent.
@@ -138,7 +143,7 @@ Knight.prototype.readInput = function(input) {
     } 
     if (input === "up") {
         //Add upwards velocity if the player is holding up while jumping.
-        if(this.velocity < 0) this.velocity -= .17;
+        if(this.velocity < 0) this.velocity -= PRESS_UP_SPEED;
         this.jump();
     } 
     if (input === "left") {
