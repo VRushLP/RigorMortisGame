@@ -145,6 +145,11 @@ Knight.prototype.readInput = function(input) {
         //Add upwards velocity if the player is holding up while jumping.
         if(this.velocity < 0) this.velocity -= PRESS_UP_SPEED;
         this.jump();
+        
+        //Allows no-clip debugging.
+        if(!this.entity.fallable) {
+            this.entity.game.requestMove(this.entity, 0, -10)
+        }
     } 
     if (input === "left") {
         this.direction = LEFT;
@@ -185,4 +190,11 @@ Knight.prototype.readInput = function(input) {
         this.readInput("none");
     }
     
+    //No-clip activation/deactivation
+    if (input === 'n') {
+        if(this.entity.game.DEBUG_MODE === 1) {
+            this.entity.fallable = !this.entity.fallable;
+            this.entity.collidable = !this.entity.collidable;
+        }
+    }
 }
