@@ -55,7 +55,7 @@ Stage.prototype = {
 
                 switch (currentSymbol) {
                     case 'x':
-                        this.entityList.push(new ForestBlock(this.gameEngine, AM, currentX, currentY));
+                        this.entityList.push(new Block(this.gameEngine, AM, currentX, currentY));
                         break;
                     case '@':
                         this.spawnX = currentX;
