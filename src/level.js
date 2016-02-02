@@ -18,7 +18,6 @@ function Level (map, game) {
             switch (ch) {
                 case "x" : fieldType = "ground"; break;
                 case "|" : fieldType = "wall"; break;
-                case "!" : this.enemies.push(new Monster(x, y, this)); break;
                 case "D" : fieldType = "door"; this.door.push(new Door(x, y)); break;
                 case "K" : fieldType = "key"; break;
                 case "0" : fieldType = "hidden"; foreground.set(x, y); break;
