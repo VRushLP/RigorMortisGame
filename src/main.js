@@ -1,10 +1,29 @@
 var RM_GLOBALS = {
     
+    //This should be moved into the forest stage eventually.
     FOREST_STAGE : {
         SCROLL_SPEED: 10000,
         KNIGHT_SPAWN_X: 0,
         KNIGHT_SPAWN_Y: 800,
     },
+}
+
+//This should eventually be moved into the data for an individual level
+var BGM = {
+   forest : new Howl({
+        urls: ['./snd/bloody_tears.mp3'],
+        volume: .1,
+        loop: true
+    }),
+
+    castle : new Howl({
+    urls: ['./snd/awake.mp3'],
+    volume: .1,
+    loop: true,
+    onend: function () {
+        awake.pos(17.925); //Skips the intro
+        }
+    }),
 }
 
 var AM = new AssetManager();
@@ -43,23 +62,7 @@ AM.downloadAll(function () {
     
     gameEngine.addStage(forestStage);
 
-    var forestBGM = new Howl({
-        urls: ['./snd/bloody_tears.mp3'],
-        volume: .1,
-        loop: true
-    });
-
-    var awake = new Howl({
-        urls: ['./snd/awake.mp3'],
-        volume: .1,
-        loop: true,
-        onend: function () {
-            awake.pos(17.925); //Skips the intro
-        }
-    });
-
-    //awake.play();
-    forestBGM.play();
+    BGM.forest.play();
     gameEngine.start();
     gameEngine.requestMove(knight.entity, 0, 0); //Reset camera
 });

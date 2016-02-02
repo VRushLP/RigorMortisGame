@@ -52,14 +52,17 @@ Stage.prototype = {
         for(var lineNum = 0; lineNum < inputArray.length; lineNum++) {
             for(var tileNum = 0; tileNum < inputArray[lineNum].length; tileNum++) {
                 var currentSymbol = inputArray[lineNum][tileNum];
-                if(currentSymbol === 'x') {
-                    this.entityList.push(new Block(this.gameEngine, AM, currentX, currentY));
-                }
-                if(currentSymbol === '@') {
-                    this.spawnX = currentX;
-                    this.spawnY = currentY - 5; //Small drop to avoid spawning into other entities.
-                    console.log(currentX);
-                    console.log(currentY);
+
+                switch (currentSymbol) {
+                    case 'x':
+                        this.entityList.push(new ForestBlock(this.gameEngine, AM, currentX, currentY));
+                        break;
+                    case '@':
+                        this.spawnX = currentX;
+                        this.spawnY = currentY - 5; //Small drop to avoid spawning into other entities.
+                        console.log(currentX);
+                        console.log(currentY);
+                        break;
                 }
                 currentX += 50;
             }
