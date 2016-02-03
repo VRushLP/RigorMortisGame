@@ -1,10 +1,13 @@
-var ENTITY_WIDTH = 50;
-var ENTITY_HEIGHT = 50;
+var BLOCKS_GLOBALS = {
+    WIDTH: 50,
+    HEIGHT: 50,
+    FRAME_DURATION: 1,
+}
 
 function Block(game, AM, x, y) {
-    this.entity = new Entity(game, x , y, ENTITY_WIDTH, ENTITY_HEIGHT);
+    this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
     
-    var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), 50, 50, 0.10, true);
+    var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
     NormalState.addFrame(0, 0);
     
     this.entity.addAnimation(NormalState);

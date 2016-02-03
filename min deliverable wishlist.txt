@@ -1,0 +1,16 @@
+Move Jump to J
+Implement Attack on K key
+-Collision with enemies
+-Hit boxes for each frame
+--For simplicity, maybe start with one fuckhuge box in front of you
+
+HUD
+-Bar that displays how much health you have
+
+Pause on lost focus or P
+-Only during gameplay, not menus
+
+Options
+-Mute
+-Gamepad
+
