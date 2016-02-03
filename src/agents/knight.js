@@ -61,10 +61,10 @@ function Knight(game, AM, x, y) {
     KnightRestLeft.addFrame(0, 0);
     
     var KnightWalkRight = new Animation(AM.getAsset("./img/knight/knight run draft.png"),
-        KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, FRAME_RUN_DURATION, true);
+        KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, KNIGHT_ANIM.FRAME_RUN_DURATION, true);
     KnightWalkRight.addFrameBatch(0, 0, 8);
     var KnightWalkLeft = new Animation(AM.getAsset("./img/knight/knight run draft flipped.png"),
-        KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, FRAME_RUN_DURATION, true);
+        KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, KNIGHT_ANIM.FRAME_RUN_DURATION, true);
     KnightWalkLeft.addFrameBatch(0, 0, 8);
     
     var KnightJumpRight = new Animation(AM.getAsset("./img/knight/knight jump draft.png"),
