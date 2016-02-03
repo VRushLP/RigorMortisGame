@@ -62,7 +62,7 @@ AM.downloadAll(function () {
     
     gameEngine.addStage(forestStage);
 
-    BGM.forest.play();
+    //BGM.forest.play();
     gameEngine.start();
     gameEngine.requestMove(knight.entity, 0, 0); //Reset camera
 });
