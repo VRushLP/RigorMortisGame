@@ -1,14 +1,17 @@
 var RM_GLOBALS = {
     
     //This should be moved into the forest stage eventually.
-    FOREST_STAGE : {
-        SCROLL_SPEED: 10000,
+    FOREST_STAGE: {
+        SKY_SCROLL_SPEED: 100000,
+        TREE_SCROLL_SPEED: 10000,
         KNIGHT_SPAWN_X: 0,
         KNIGHT_SPAWN_Y: 800,
     },
 }
 
 //This should eventually be moved into the data for an individual level
+//Perhaps these could be passed in to levels as we make them and then we can call <StageVar>.playBGM() ?
+//One area of concern is that the way these currently loaded in to the page. It's probably embedded music in the page queueing and finishing that causes the burst of slowdown.
 var BGM = {
    forest : new Howl({
         urls: ['./snd/bloody_tears.mp3'],
@@ -21,7 +24,7 @@ var BGM = {
     volume: .1,
     loop: true,
     onend: function () {
-        awake.pos(17.925); //Skips the intro
+        BGM.castle.pos(17.925); //Skips the intro
         }
     }),
 }
@@ -47,9 +50,9 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     
-    var forestStage = new Stage(ctx, gameEngine, 0, 350);
-    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), 0);
-    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.SCROLL_SPEED);
+    var forestStage = new Stage(ctx, gameEngine, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y);
+    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
+    forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.TREE_SCROLL_SPEED);
     forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);    
     
     var knight = new Knight(gameEngine, AM, forestStage.spawnX, forestStage.spawnY);
@@ -64,5 +67,5 @@ AM.downloadAll(function () {
 
     //BGM.forest.play();
     gameEngine.start();
-    gameEngine.requestMove(knight.entity, 0, 0); //Reset camera
+    gameEngine.requestMove(knight.entity, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y); //Reset camera
 });
