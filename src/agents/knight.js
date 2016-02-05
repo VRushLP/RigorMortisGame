@@ -247,6 +247,7 @@ Knight.prototype = {
             this.currentX_px = this.checkPointX;
             this.currentY_px = this.checkPointY;
             this.health = GAME_CONSTANT.MAX_HEALTH;
+            this.followers = [];
         }
         Entity.prototype.update.call(this);
     },
