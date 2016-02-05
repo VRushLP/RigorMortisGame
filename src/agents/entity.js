@@ -6,6 +6,7 @@ var GAME_CONSTANT = {
     INJURE_TIME : 2,
     
     ARCHER_HEALTH : 4,
+    SHOOTING_TIME : 2,
     SKELETON_HEALTH : 6,
     
     //Animation Constants

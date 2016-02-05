@@ -2,6 +2,8 @@ function HealingStuff (x, y) {
     Entity.call(this, x, y, 30, 30);
     
     this.health = 8;
+    
+    this.removeFromWorld = false;
 }
 
 HealingStuff.prototype = new Entity();

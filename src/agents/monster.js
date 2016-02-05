@@ -1,5 +1,3 @@
-var SHOOTING_TIME = 2;
-
 function Skeleton (x, y, level) {
     Entity.call(this, x, y, 52, 60);
     this.level = level;
@@ -54,7 +52,7 @@ function Archer (x, y, game, level) {
     this.level = level;
     this.yVelocity = 0;
     this.xVelocity = 0;
-    this.timeDurationNextArrow = SHOOTING_TIME;
+    this.timeDurationNextArrow = GAME_CONSTANT.SHOOTING_TIME;
     
     this.health = 4;
     
@@ -73,7 +71,7 @@ Archer.prototype.update = function (x, y, width, height) {
     // Check if the archer is in the canvas
     if (this.game.camera.xView + this.game.ctx.canvas.width > this.currentX_px &&
         this.currentX_px > this.game.camera.xView) {
-        if (this.timeDurationNextArrow === SHOOTING_TIME) {
+        if (this.timeDurationNextArrow === GAME_CONSTANT.SHOOTING_TIME) {
         var playerCenterX = x + (width / 2);
         var playerCenterY = y + (height / 2);
         
@@ -88,7 +86,7 @@ Archer.prototype.update = function (x, y, width, height) {
         }
         this.timeDurationNextArrow -= this.game.clockTick;
         if (this.timeDurationNextArrow <= 0) {
-            this.timeDurationNextArrow = SHOOTING_TIME;
+            this.timeDurationNextArrow = GAME_CONSTANT.SHOOTING_TIME;
         }
     }
     Entity.prototype.update.call(this);
@@ -135,6 +133,8 @@ Arrow.prototype = {
         } else {
             this.removeFromWorld = true;
         }
+        this.currentX_px = this.centerX;
+        this.currentY_px = this.centerY;
     },
     
     draw : function (ctx, cameraRect, tick) {
@@ -142,5 +142,40 @@ Arrow.prototype = {
         ctx.fillRect(this.centerX - (this.width / 2) - cameraRect.left,
                      this.centerY - (this.height / 2) - cameraRect.top,
                      this.width, this.height);
+    }
+}
+
+function Wisp (x, y) {
+    Entity.call(this, x, y, 44, 50);
+    
+    var wispRight = new Animation(AM.getAsset("./img/enemy/wispChaser mockup.png"), 44, 50, 0.05, true);
+    wispRight.addFrame(44, 0);
+    var wispLeft = new Animation(AM.getAsset("./img/enemy/wispChaser mockup.png"), 44, 50, 0.05, true);
+    wispLeft.addFrame(0, 0);
+    
+    this.animationList.push(wispRight);
+    this.animationList.push(wispLeft);
+    
+    this.isRight = true;
+    this.isFollowing = false;
+    this.removeFromWorld = false;    
+}
+
+Wisp.prototype = {
+    update : function(x, y, width, height) {
+        if (this.isFollowing) {
+            this.currentY_px = y;
+            
+        }
+        Entity.prototype.update.call(this);
+    },
+    
+    draw : function(ctx, cameraRect, tick) {
+        if (this.isRight) {
+            this.currentAnimation = 0;
+        } else {
+            this.currentAnimation = 1;
+        }
+        Entity.prototype.draw.call(this, ctx, cameraRect, tick);
     }
 }

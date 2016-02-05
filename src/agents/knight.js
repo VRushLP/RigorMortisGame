@@ -4,7 +4,7 @@ function Knight (x, y, game, level) {
     this.game = game;
     this.xVelocity = 0;
     this.yVelocity = 0;
-    
+    this.follower = [];
     this.checkPointX = this.currentX_px;
     this.checkPointY = this.currentY_px;
     
@@ -132,11 +132,18 @@ Knight.prototype = {
     },
     
     dealWithMonster : function (monster) {
-        if (monster.type === "health" && this.health < GAME_CONSTANT.MAX_HEALTH) {
+        if (monster.type === "health") {
+            if (this.health < GAME_CONSTANT.MAX_HEALTH) {
+                monster.removeFromWorld = true;
+                this.health += monster.health;
+            } 
+            if (this.health >= GAME_CONSTANT.MAX_HEALTH) {
+                this.health = GAME_CONSTANT.MAX_HEALTH;
+            }
+        } else if (monster instanceof Arrow) {
             monster.removeFromWorld = true;
-            this.health += monster.health;
-            if (this.health > GAME_CONSTANT.MAX_HEALTH) this.health = GAME_CONSTANT.MAX_HEALTH;
-        } else {
+            this.health -= 1;
+        }else {
             if (this.isAttacking) {
                 // TODO deal with the monster attacks at behind.
                 monster.health -= GAME_CONSTANT.DAMAGE;
