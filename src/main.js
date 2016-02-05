@@ -37,6 +37,15 @@ var BGM = {
         BGM.castleLevel.pos(17.93); //Skips the intro
         }
     }),
+
+    hellBossFinal: new Howl({
+        urls: ['./snd/megalovania.mp3'],
+        volume: .15,
+        loop: true,
+        onend: function () {
+            BGM.hellBossFinal.pos(1.966);
+        }
+    }),
 }
 
 var AM = new AssetManager();
@@ -77,7 +86,8 @@ AM.downloadAll(function () {
 
     //BGM.forestLevel.play();
     //BGM.castleLevel.play();
-    BGM.townBoss.play();
+    //BGM.townBoss.play();
+    BGM.hellBossFinal.play();
 
     gameEngine.start();
     gameEngine.requestMove(knight.entity, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y); //Reset camera
