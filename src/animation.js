@@ -1,74 +1,76 @@
-function Animation (source, xStart, yStart, sourceFlip, xStFlip, yStFlip, frameWidth, frameHeight, frames, frameDuration, isFlipped, loop) {
-    this.source = source;
-    this.xStart = xStart;
-    this.yStart = yStart;
-    this.sourceFlip = sourceFlip;
-    this.xStFlip = xStFlip;
-    this.yStFlip = yStFlip;
+/**
+ * Create a new animation.
+ * frameWidth: The width of each frame.
+ * frameHeight: The height of each frame.
+ * frameDuration: The length in time that each frame should last.
+ * loop: Set to true if the animation should repeat once it is over.
+ */
+function Animation(spriteSheet, frameWidth, frameHeight, frameDuration, loop) {
+    this.elapsedTime = 0;   
+    this.frames = [];
+    this.loop = loop;
+    this.spriteSheet = spriteSheet;
     this.frameWidth = frameWidth;
     this.frameHeight = frameHeight;
-    this.frames = frames;
     this.frameDuration = frameDuration;
-    this.totalTime = frameDuration * frames;
-    this.isFlipped = isFlipped;
-    this.loop = loop;
-    this.elapsedTime = 0;
 }
 
 Animation.prototype = {
-    drawFrame : function (ctx, x, y, isFalling) {
-        if (this.loop) {
-            if (this.isDone()) {
-                this.elapsedTime = 0;
-            }
-        } else if (this.isDone()) {
-            return;
-        }
-        var curFrame = this.currentFrame();
-//        console.log(isFalling);
-        if (!this.isFlipped) {
-            if (isFalling === true) {
-//                console.log("Falling, not flipped");
-                ctx.drawImage(this.source, this.xStart + this.frameWidth, this.yStart, 
-                             this.frameWidth, this.frameHeight, x, y,
-                             this.frameWidth, this.frameHeight);
-            } else if (isFalling === false) {
-//                console.log("Jumping, not flipped");
-                ctx.drawImage(this.source, this.xStart, this.yStart, 
-                             this.frameWidth, this.frameHeight, x, y,
-                             this.frameWidth, this.frameHeight);
-            } else {
-                ctx.drawImage(this.source,
-                         this.xStart + (curFrame * this.frameWidth),
-                         this.yStart,
-                         this.frameWidth, this.frameHeight,
-                         x, y,
-                         this.frameWidth, this.frameHeight);
-            }
-        } else {
-            if (isFalling === true) {
-//                console.log("Falling, flipped");
-                ctx.drawImage(this.sourceFlip, this.xStFlip - this.frameWidth, this.yStFlip, 
-                             this.frameWidth, this.frameHeight, x, y,
-                             this.frameWidth, this.frameHeight);
-            } else if (isFalling === false) {
-//                console.log("Jumping, flipped");
-                ctx.drawImage(this.sourceFlip, this.xStFlip, this.yStFlip, 
-                             this.frameWidth, this.frameHeight, x, y,
-                             this.frameWidth, this.frameHeight);
-            } else {
-                ctx.drawImage(this.sourceFlip,
-                         this.xStFlip - (curFrame * this.frameWidth), 
-                         this.yStFlip,
-                         this.frameWidth, this.frameHeight,
-                         x, y,
-                         this.frameWidth, this.frameHeight);
+    /**
+     * Add several frames in a series to the animation 
+     * (will scan forward or backward - Default is forward).
+     * Will automatically skip to the next row if it reaches the end or the start of a column.
+     */
+    addFrame : function (startX, startY, numFrames, scanForward) {
+        var currentX = startX;
+        var currentY = startY;
+        var frames = numFrames || 1;
+        //Scan through the spritesheet, adding frames at each index as we go.
+        //Checks if we are at the end of a column, but not if we are at the end of all rows. TODO?
+        for (var i = 0; i < frames; i += 1) {
+            if (scanForward === false) {
+                if (currentX < 0) {
+                    currentX = this.spriteSheet.width - this.frameWidth;
+                    currentY -= this.frameHeight;
+                }
+                this.frames.push([currentX, currentY]);
+                currentX -= this.frameWidth;
+            } else {    // scan forward
+                if(currentX + this.frameWidth > this.spriteSheet.width) {
+                    currentX = 0;
+                    currentY += this.frameHeight;
+                }
+                this.frames.push([currentX, currentY]);
+                currentX += this.frameWidth;
             }
         }
     },
     
+    drawFrame : function (tick, ctx, x, y) {
+        this.elapsedTime += tick;
+        if (this.isDone()) {
+            if (this.loop) {
+                this.elapsedTime = 0;
+            } else {
+                return;
+            }
+        }
+        var curFrame = this.currentFrame();
+        var xStart = this.frames[curFrame][0];
+        var yStart = this.frames[curFrame][1];
+        ctx.drawImage(this.spriteSheet, 
+                      xStart, yStart, 
+                      this.frameWidth, this.frameHeight,
+                      x, y,
+                      this.frameWidth, this.frameHeight);
+    },
+    
     isDone : function () {
-        return (this.elapsedTime >= this.totalTime);
+        // if (this.loop) {  
+        //     return (this.currentFrame() >= this.frames.length);
+        // } else {
+            return this.currentFrame() === this.frames.length;
+        // }
     },
     
     currentFrame : function () {

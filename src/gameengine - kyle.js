@@ -18,7 +18,8 @@ Timer.prototype.tick = function () {
 var KEY_CODES = {
     65 : 'a',
     68 : 'd',
-    87 : 'w'
+    87 : 'w',
+    74 : 'j'
 };
 
 function GameEngine(ctx) {
@@ -26,7 +27,6 @@ function GameEngine(ctx) {
     this.ctx = ctx;
     this.camera = null;
     this.player = null;
-
     this.keyStatus = {};
     this.keysDown = false;
 }
@@ -88,9 +88,9 @@ GameEngine.prototype = {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.ctx.save();
         for (i = 0; i < this.entities.length; i += 1) {
-            this.entities[i].draw(this.ctx, this.camera.xView, this.camera.yView);
+            this.entities[i].draw(this.ctx, this.camera.viewportRect, this.clockTick);
         }
-        this.player.draw(this.ctx, this.camera.xView, this.camera.yView);
+        this.player.draw(this.ctx, this.camera.viewportRect, this.clockTick);
         this.ctx.restore();
     },
 

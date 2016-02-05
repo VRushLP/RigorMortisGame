@@ -1,0 +1,23 @@
+skeleton mockup.png
+frame width:    52
+frame height:   60
+frame duration: n/a
+num frames:     2
+origin point:   0,0
+init direction: left
+
+skeletonArcher mockup.png
+frame width:    68
+frame height:   60
+frame duration: n/a
+num frames:     2
+origin point:   0,0
+init direction: left
+
+wispChaser mockup.png
+frame width:    44
+frame height:   50
+frame duration: n/a
+num frames:     2
+origin point:   0,0
+init direction: left

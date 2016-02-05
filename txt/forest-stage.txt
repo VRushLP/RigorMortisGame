@@ -1,0 +1,40 @@
+                                    |                                                |
+                                    |                                                |
+                                    |                                                |
+                                    |                                                |
+                                    |                                                |
+                                    |                                                |
+                                    |                                                |
+                                    |        !         !    !         !              |
+                                    |      xxxxxxx   xxxx  xxxx      xxx     !       |
+                                    |        |                              xxxx     |
+                                    |xxx     |                                       |
+                                    |        |                                       |
+                                    |  *                     xxx        xxx          |
+                                    |xxx                xxx       xxx        xx      |
+                                    |                   xo                           |
+                                    |      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx       |
+                                    |   *    |                                     * |
+                                    |   x    |                                    xxx|
+                                    |   xx   |                                       |
+                                    |   xx   |                                       |
+                                    |   xx   |                                       |
+                                    |x  xxx  |x  |xx    xxx    xxxx    xxxxxx    xxxx|
+                                    |        |   |                                   |
+                                    |        |   |                            *      |
+                                    |      xx|   |                            xx     |
+                                    |        |   |                            xx    o|
+                                    |        |   |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+                     x                   xxxx|               |                       |
+                      x                      |               |                       |
+                       x                    o|o                                      |
+               !        x        xxxxxxxxxxxxxxxxxxxxxxxxx                           |
+              xxx                |                       |                           |
+              | |              xxx                       |xxxx                       |
+         xx   | |      *       |                             |                       |
+              | |xxxxxxxxxxxxxxx                             |                       |
+              |                                              |                       |
+@    x       o|                                              |                       |
+xxxxx|xxxxxxxxx                                              |                       |
+                                                             |                       |
+                                                             |xxxxxxxxxxxxxxxxxxxxxxxx
