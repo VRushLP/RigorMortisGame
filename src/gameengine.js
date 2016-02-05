@@ -161,7 +161,6 @@ GameEngine.prototype = {
             var other = this.agents[i].entity;
             if (other === entity) continue; //Prevent an entity from colliding with itself.
             if (!other.collidable) continue;
-
             var xMoveValid = true;
             var yMoveValid = true;
             var adjustedX = 0;
@@ -370,7 +369,30 @@ GameEngine.prototype.draw = function () {
         this.stages[i].drawBackground(this.ctx, this.cameraX);
     }
     for (var i = 0; i < this.agents.length; i++) {
-        this.agents[i].entity.draw(this.cameraX, this.cameraY);
+        if(this.isOnScreen(this.agents[i].entity)) {
+            this.agents[i].entity.draw(this.cameraX, this.cameraY);
+        }        
     }
     this.ctx.restore();
+}
+
+/**
+  * Return true if the current entity is on screen.
+ */
+GameEngine.prototype.isOnScreen = function (entity) {
+    var onCamera = true;
+    
+    if(this.cameraX === 0) {
+        //Camera is in default state.
+        if(entity.x + entity.width < 0) onCamera = false;
+        if(entity.x > this.surfaceWidth) onCamera = false;
+    } else {
+        if(entity.x + entity.width < (-1 * this.cameraX)) onCamera = false;
+        if(entity.x > (-1 * this.cameraX) + this.surfaceWidth) onCamera = false;
+    }
+    
+    if(entity.y + entity.height < this.cameraY) onCamera = false;
+    if(entity.y > this.cameraY + this.surfaceHeight) onCamera = false;
+    
+    return onCamera;
 }
