@@ -12,19 +12,29 @@ var RM_GLOBALS = {
 //This should eventually be moved into the data for an individual level
 //Perhaps these could be passed in to levels as we make them and then we can call <StageVar>.playBGM() ?
 //One area of concern is that the way these currently loaded in to the page. It's probably embedded music in the page queueing and finishing that causes the burst of slowdown.
+//I don't mind the magic numbers so much here, since I think they're only used here and they have particular timestamps, but we could make them globals if enough people hate them.
 var BGM = {
-   forest : new Howl({
+   forestLevel : new Howl({
         urls: ['./snd/bloody_tears.mp3'],
         volume: .1,
         loop: true
-    }),
+   }),
 
-    castle : new Howl({
+   townBoss: new Howl({
+       urls: ['./snd/cornered.mp3'],
+       volume: .1,
+       loop: true,
+       onend: function () {
+           BGM.townBoss.pos(7.27); //Skips the intro
+       }
+   }),
+
+    castleLevel : new Howl({
     urls: ['./snd/awake.mp3'],
     volume: .1,
     loop: true,
     onend: function () {
-        BGM.castle.pos(17.925); //Skips the intro
+        BGM.castleLevel.pos(17.93); //Skips the intro
         }
     }),
 }
@@ -65,7 +75,10 @@ AM.downloadAll(function () {
     
     gameEngine.addStage(forestStage);
 
-    //BGM.forest.play();
+    //BGM.forestLevel.play();
+    //BGM.castleLevel.play();
+    BGM.townBoss.play();
+
     gameEngine.start();
     gameEngine.requestMove(knight.entity, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y); //Reset camera
 });
