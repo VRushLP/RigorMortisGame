@@ -2,7 +2,7 @@ var GAME_CONSTANT = {
     BLOCK_SIZE : 50,
     
     DAMAGE : 2,
-    MAX_HEALTH : 10,
+    MAX_HEALTH : 20,
     INJURE_TIME : 2,
     
     ARCHER_HEALTH : 4,

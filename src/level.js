@@ -46,16 +46,15 @@ Level.prototype = {
                 switch (currentSymbol) {
                     case "x" : 
                         block = new Block(x, y, forestBlock);
-                        block.fieldType = "ground";
                         this.titles.push(block); 
                         break;
                     case "|" : 
                         block = new Block(x, y, wallBlock);
-                        block.fieldType = "wall"; 
                         this.titles.push(block);
                         break;
                     case "!" : this.enemies.push(new Skeleton(x, y, this)); break;
                     case "*" : this.enemies.push(new Archer(x, y, game, this)); break;
+                    case "w" : this.enemies.push(new Wisp(x, y, this)); break;
                     case "o" : this.enemies.push(new HealingStuff(x, y)); break;
                     // case "D" : block = new Door(x,y); this.door.push(block); break;
                     // case "0" : block = "hidden"; foreground.set(x, y); break;
@@ -160,12 +159,12 @@ Level.prototype = {
         for (var y = bottom; y >= top; y -= 1) {
             for (var x = left; x <= right; x += 1) {
                 var fieldType = this.grid[y][x];
-                if (fieldType === "hidden") {continue};
-                if (fieldType === "door") {
-                    for (var i = 0; i < this.door.length; i += 1) {
-                        if (this.door[i].x === x) {return this.door[i]};
-                    }
-                }
+                // if (fieldType === "hidden") {continue};
+                // if (fieldType === "door") {
+                //     for (var i = 0; i < this.door.length; i += 1) {
+                //         if (this.door[i].x === x) {return this.door[i]};
+                //     }
+                // }
                 if (fieldType) {return fieldType;}
             }
         }
@@ -238,7 +237,6 @@ function Door (x, y) {
 
 Door.prototype = new Entity();
 Door.prototype.constructor = Door;
-Door.prototype.fieldType = "door";
 Door.prototype.assignHiddenPlace = function (foreground) {
     if (this.y === foreground.yEnd ||
         this.x + 1 === foreground.xStart ||

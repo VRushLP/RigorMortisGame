@@ -145,8 +145,9 @@ Arrow.prototype = {
     }
 }
 
-function Wisp (x, y) {
+function Wisp (x, y, level) {
     Entity.call(this, x, y, 44, 50);
+    this.level = level;
     
     var wispRight = new Animation(AM.getAsset("./img/enemy/wispChaser mockup.png"), 44, 50, 0.05, true);
     wispRight.addFrame(44, 0);
@@ -156,26 +157,29 @@ function Wisp (x, y) {
     this.animationList.push(wispRight);
     this.animationList.push(wispLeft);
     
-    this.isRight = true;
     this.isFollowing = false;
     this.removeFromWorld = false;    
 }
 
 Wisp.prototype = {
     update : function(x, y, width, height) {
+        if (x > this.currentX_px) {
+            this.currentAnimation = 0;
+        } else {
+            this.currentAnimation = 1;
+        }
         if (this.isFollowing) {
-            this.currentY_px = y;
-            
+            for (var i = 0; i < this.level.enemies.length; i += 1) {
+                if (this.level.enemies[i] === this) {
+                    this.level.enemies.splice(i, 1);
+                    break;
+                }
+            }
         }
         Entity.prototype.update.call(this);
     },
     
     draw : function(ctx, cameraRect, tick) {
-        if (this.isRight) {
-            this.currentAnimation = 0;
-        } else {
-            this.currentAnimation = 1;
-        }
         Entity.prototype.draw.call(this, ctx, cameraRect, tick);
     }
 }

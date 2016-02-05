@@ -24,12 +24,12 @@
                                     |        |   |                            *      |
                                     |      xx|   |                            xx     |
                                     |        |   |                            xx    o|
-                                    |        |   |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+                                    |      w |   |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
                      x                   xxxx|               |                       |
                       x                      |               |                       |
-                       x                    o|o                                      |
-               !        x        xxxxxxxxxxxxxxxxxxxxxxxxx                           |
-              xxx                |                       |                           |
+                       x            w       o|o                                      |
+               w        x        xxxxxxxxxxxxxxxxxxxxxxxxx                           |
+              xxx               w|                       |                           |
               | |              xxx                       |xxxx                       |
          xx   | |      *       |                             |                       |
               | |xxxxxxxxxxxxxxx                             |                       |

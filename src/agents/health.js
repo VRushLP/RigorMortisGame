@@ -9,7 +9,6 @@ function HealingStuff (x, y) {
 HealingStuff.prototype = new Entity();
 HealingStuff.prototype.constructor = HealingStuff;
 
-HealingStuff.prototype.type = "health";
 HealingStuff.prototype.draw = function(ctx, cameraRect, tick) {
     ctx.fillStyle = "Yellow";
     ctx.fillRect(this.currentX_px - cameraRect.left, this.currentY_px - cameraRect.top,

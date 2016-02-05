@@ -4,7 +4,7 @@ function Knight (x, y, game, level) {
     this.game = game;
     this.xVelocity = 0;
     this.yVelocity = 0;
-    this.follower = [];
+    this.followers = [];
     this.checkPointX = this.currentX_px;
     this.checkPointY = this.currentY_px;
     
@@ -65,7 +65,40 @@ function Knight (x, y, game, level) {
 }
 
 Knight.prototype = {
+    updateFollowers : function (x, y) {
+        for (var i = this.followers.length - 1; i > 0; i -= 1) {
+            if (this.isRight) {   
+                this.followers[i].currentX_px = this.followers[i - 1].currentX_px - 25;
+            } else {
+                this.followers[i].currentX_px = this.followers[i - 1].currentX_px + 25;
+            }
+            if (this.yVelocity > 0) {
+                this.followers[i].currentY_px = this.followers[i - 1].currentY_px - 10;    
+            } else if (this.yVelocity < 0) {
+                this.followers[i].currentY_px = this.followers[i - 1].currentY_px + 10;
+            } else {
+                this.followers[i].currentY_px = this.followers[i - 1].currentY_px;
+            }
+            
+        }
+        if (this.followers.length > 0) {
+            if (this.isRight) {
+                this.followers[0].currentX_px = x - 25;
+            } else {
+                this.followers[0].currentX_px = x + 25;
+            }
+            if (this.yVelocity > 0) {
+                this.followers[0].currentY_px = y - 10;    
+            } else if (this.yVelocity < 0) {
+                this.followers[0].currentY_px = y + 10;
+            } else {
+                this.followers[0].currentY_px = y;
+            }
+        }
+    },
+    
     moveX : function () {
+        var oldX = this.currentX_px;
         if (this.controllable) {
             if (this.game.keyStatus["d"])  {
                 this.isRight = true;
@@ -83,26 +116,28 @@ Knight.prototype = {
                     this.currentAnimation = GAME_CONSTANT.REST_LEFT_ANIMATION;
                 }
             }
-            var tempX = this.currentX_px + this.xVelocity;
-            var obstacle = this.level.obstacleAt(tempX, this.currentY_px, this.width, this.height);
+            var newX = this.currentX_px + this.xVelocity;
+            var obstacle = this.level.obstacleAt(newX, this.currentY_px, this.width, this.height);
             if (!obstacle) {
-                this.currentX_px = tempX;
-            } else if (obstacle.fieldType === "door") {
+                this.currentX_px = newX;
+            } else if (obstacle instanceof Door) {
                 this.level.displayHidden(this.currentX_px, this.currentY_px, obstacle);
-                this.currentX_px = tempX;
+                this.currentX_px = newX;
             }
         }
+        return oldX;
     },
     
     moveY : function () {
+        var oldY = this.currentY_px;
         if (this.controllable) {
             if (this.yVelocity < GAME_CONSTANT.TERMINAL_VELOCITY) {
                 this.yVelocity += GAME_CONSTANT.Y_ACCELERATION;
             }
-            var tempY = this.currentY_px + this.yVelocity;
-            var obstacle = this.level.obstacleAt(this.currentX_px, tempY, this.width, this.height);
-            if (!obstacle || obstacle.fieldType === "door") {
-                this.currentY_px = tempY;
+            var newY = this.currentY_px + this.yVelocity;
+            var obstacle = this.level.obstacleAt(this.currentX_px, newY, this.width, this.height);
+            if (!obstacle || obstacle instanceof Door) {
+                this.currentY_px = newY;
             } else {
                 if (this.game.keyStatus["w"] && this.yVelocity === GAME_CONSTANT.Y_ACCELERATION) {
                     this.yVelocity = -GAME_CONSTANT.JUMP_SPEED;
@@ -129,10 +164,11 @@ Knight.prototype = {
                 }
             }
         }
+        return oldY;
     },
     
     dealWithMonster : function (monster) {
-        if (monster.type === "health") {
+        if (monster instanceof HealingStuff) {
             if (this.health < GAME_CONSTANT.MAX_HEALTH) {
                 monster.removeFromWorld = true;
                 this.health += monster.health;
@@ -143,7 +179,17 @@ Knight.prototype = {
         } else if (monster instanceof Arrow) {
             monster.removeFromWorld = true;
             this.health -= 1;
-        }else {
+        } else if (monster instanceof Wisp) {
+            monster.isFollowing = true;
+            monster.currentY_px = this.currentY_px;
+            if (this.isRight) {
+                monster.currentX_px = this.currentX_px - 25 * (this.followers.length + 1);
+            } else {
+                monster.currentX_px = this.currentX_px + 25 * (this.followers.length + 1);
+            }
+            this.followers.push(monster);
+            console.log(monster.currentX_px + " " + monster.currentY_px + " " + this.currentX_px + " " + this.currentY_px);
+        } else {
             if (this.isAttacking) {
                 // TODO deal with the monster attacks at behind.
                 monster.health -= GAME_CONSTANT.DAMAGE;
@@ -161,44 +207,47 @@ Knight.prototype = {
     },
         
     update : function () {
-            var tick = this.game.clockTick;
-            this.moveX();
-            this.moveY();
-            if (this.game.keyStatus['j'] && this.yVelocity === 0) {
-                this.controllable = false;
-                this.isAttacking = true;
-                if (this.isRight) {
-                    this.currentAnimation = GAME_CONSTANT.ATTACKING_RIGHT_ANIMATION;
-                } else {
-                    this.currentAnimation = GAME_CONSTANT.ATTACKING_LEFT_ANIMATION;
-                }
+        var tick = this.game.clockTick;
+        var oldX = this.moveX();
+        var oldY = this.moveY();
+        if (oldX !== this.currentX_px || oldY !== this.currentY_px) {
+            this.updateFollowers(oldX, oldY);
+        }
+        if (this.game.keyStatus['j'] && this.yVelocity === 0) {
+            this.controllable = false;
+            this.isAttacking = true;
+            if (this.isRight) {
+                this.currentAnimation = GAME_CONSTANT.ATTACKING_RIGHT_ANIMATION;
+            } else {
+                this.currentAnimation = GAME_CONSTANT.ATTACKING_LEFT_ANIMATION;
             }
-            if (this.animationList[GAME_CONSTANT.ATTACKING_RIGHT_ANIMATION].isDone() || 
-                this.animationList[GAME_CONSTANT.ATTACKING_LEFT_ANIMATION].isDone()) {
-                this.animationList[GAME_CONSTANT.ATTACKING_RIGHT_ANIMATION].elapsedTime = 0;
-                this.animationList[GAME_CONSTANT.ATTACKING_LEFT_ANIMATION].elapsedTime = 0;
-                this.controllable = true;
-                this.isAttacking = false;
-            }
-            var monster = this.level.enemyAt(this);
-            if (monster) {
-                // console.log(monster);
-                this.dealWithMonster(monster);
-            }
-            if (this.isInjure) {
-                this.injureTime -= tick;
-            }
-            if (this.injureTime <= 0) {
-                this.injureTime = GAME_CONSTANT.INJURE_TIME;
-                this.isInjure = false;
-            }
+        }
+        if (this.animationList[GAME_CONSTANT.ATTACKING_RIGHT_ANIMATION].isDone() || 
+            this.animationList[GAME_CONSTANT.ATTACKING_LEFT_ANIMATION].isDone()) {
+            this.animationList[GAME_CONSTANT.ATTACKING_RIGHT_ANIMATION].elapsedTime = 0;
+            this.animationList[GAME_CONSTANT.ATTACKING_LEFT_ANIMATION].elapsedTime = 0;
+            this.controllable = true;
+            this.isAttacking = false;
+        }
+        var monster = this.level.enemyAt(this);
+        if (monster) {
+            // console.log(monster);
+            this.dealWithMonster(monster);
+        }
+        if (this.isInjure) {
+            this.injureTime -= tick;
+        }
+        if (this.injureTime <= 0) {
+            this.injureTime = GAME_CONSTANT.INJURE_TIME;
+            this.isInjure = false;
+        }
 
-            if (this.health === 0) {
-                // TODO reset a map or go back to the check point
-                this.currentX_px = this.checkPointX;
-                this.currentY_px = this.checkPointY;
-                this.health = GAME_CONSTANT.MAX_HEALTH;
-            }
+        if (this.health <= 0) {
+            // TODO reset a map or go back to the check point
+            this.currentX_px = this.checkPointX;
+            this.currentY_px = this.checkPointY;
+            this.health = GAME_CONSTANT.MAX_HEALTH;
+        }
         Entity.prototype.update.call(this);
     },
     
