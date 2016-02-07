@@ -302,7 +302,7 @@ GameEngine.prototype = {
     checkTopCollision: function (entity) {
         if (!entity.collidable) return false;
 
-        var topCollision = false;
+        var topCollision = [];
 
         for (var i = 0; i < this.agents.length; i++) {
             var other = this.agents[i].entity;
@@ -317,13 +317,20 @@ GameEngine.prototype = {
             if (entity.x + entity.width >= other.x && entity.x + entity.width <= other.x + other.width) {
                 aboveEntity = true;
             }
+            
+            if (entity.x <= other.x && entity.x + entity.width >= other.x + other.width) {
+                aboveEntity = true;
+            }
+            
+            if (entity.x >= other.x && entity.x + entity.width <= other.x + other.width) {
+                aboveEntity = true;
+            }
 
             //If the entity is in the same horizontal plane, check if its top is a pixel below the other entity.
             //If both are true, then the entity is directly below the other.
             if (aboveEntity) {
                 if (entity.y >= other.y && entity.y <= other.y + other.height + 1) {
-                    topCollision = true;
-                    break;
+                    topCollision.push(other);
                 }
             }
         }

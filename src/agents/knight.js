@@ -123,7 +123,7 @@ Knight.prototype.update = function() {
     //If the agent is moving upwards, then it is jumping.
     //However, currently using jump animation whenever knight is in air.
     if(this.velocity < 0) {
-        if (this.entity.game.checkTopCollision(this.entity)) {
+        if (this.entity.game.checkTopCollision(this.entity).length > 0) {
             //If a top collision is detected, then the agent has hit a ceiling and must stop rising.
             this.velocity = 0;
         }

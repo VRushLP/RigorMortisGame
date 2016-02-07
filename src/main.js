@@ -61,11 +61,11 @@ AM.downloadAll(function () {
     forestStage.entityList.push(knight);
     
     var platform = new Platform(gameEngine, AM, 50, 1800, 3, 1);
-    platform.addMovePattern(400, .75, 0, 0);
-    platform.addMovePattern(0, 0, 200, -.75);
-    platform.addMovePattern(400, -.75, 0, 0);
+    platform.addMovePattern(400, 1, 0, 0);
+    platform.addMovePattern(0, 0, 200, -1);
+    platform.addMovePattern(400, -1, 0, 0);
     forestStage.entityList.push(platform);
-    platform.addMovePattern(0, 0, 200, .75);
+    platform.addMovePattern(0, 0, 200, 1);
     
     gameEngine.addStage(forestStage);
 
