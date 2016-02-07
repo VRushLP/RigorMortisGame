@@ -14,6 +14,9 @@ function Animation(spriteSheet, frameWidth, frameHeight, frameDuration, loop) {
     this.frameWidth = frameWidth;
     this.frameHeight = frameHeight;
     this.frameDuration = frameDuration;
+    
+    this.multiframeWidth = 0;
+    this.multiframeHeight = 0;
 }
 
 Animation.prototype = {
@@ -21,8 +24,15 @@ Animation.prototype = {
      * Add an individual frame to the animation.
      */
     addFrame: function (startX, startY) {
+        if(this.multiframeWidth > 1 || this.multiframeHeight > 1) {
+            console.log("Animation Error: Cannot add single frame to multiframe animation.");
+            return;
+        }
         this.frames.push(startX);
         this.frames.push(startY);
+        
+        this.multiframeWidth = 1;
+        this.multiframeHeight = 1;
     },
 
     /**
@@ -30,6 +40,10 @@ Animation.prototype = {
      * Will automatically skip to the next row if it reaches the end of a column.
      */
     addFrameBatch : function (startX, startY, numFrames) {
+        if(this.multiframeWidth > 1 || this.multiframeHeight > 1) {
+            console.log("Animation Error: Cannot add single frame to multiframe animation.");
+            return;
+        }
         var currentX = startX;
         var currentY = startY;
     
@@ -47,6 +61,9 @@ Animation.prototype = {
             this.frames.push(currentY);
             currentX += this.frameWidth;
         }
+        
+        this.multiframeWidth = 1;
+        this.multiframeHeight = 1;
     },
 
 
