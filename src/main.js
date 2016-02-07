@@ -60,6 +60,9 @@ AM.downloadAll(function () {
     knight.entity.respawnable = true;
     forestStage.entityList.push(knight);
     
+    var platform = new Platform(gameEngine, AM, 50, 1925, 3, 1);
+    forestStage.entityList.push(platform);
+    
     gameEngine.addStage(forestStage);
 
     //BGM.forest.play();
