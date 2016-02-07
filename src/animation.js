@@ -8,15 +8,13 @@
 function Animation(spriteSheet, frameWidth, frameHeight, frameDuration, loop) {
     this.elapsedTime = 0;   
     this.frames = [];
+    this.multiframeArray = [];
     
     this.loop = loop;
     this.spriteSheet = spriteSheet;
     this.frameWidth = frameWidth;
     this.frameHeight = frameHeight;
     this.frameDuration = frameDuration;
-    
-    this.multiframeWidth = 0;
-    this.multiframeHeight = 0;
 }
 
 Animation.prototype = {
@@ -24,7 +22,7 @@ Animation.prototype = {
      * Add an individual frame to the animation.
      */
     addFrame: function (startX, startY) {
-        if(this.multiframeWidth > 1 || this.multiframeHeight > 1) {
+        if (this.multiframeArray.length !== 0) {
             console.log("Animation Error: Cannot add single frame to multiframe animation.");
             return;
         }
@@ -40,7 +38,7 @@ Animation.prototype = {
      * Will automatically skip to the next row if it reaches the end of a column.
      */
     addFrameBatch : function (startX, startY, numFrames) {
-        if(this.multiframeWidth > 1 || this.multiframeHeight > 1) {
+        if (this.multiframeArray.length !== 0) {
             console.log("Animation Error: Cannot add single frame to multiframe animation.");
             return;
         }
@@ -64,6 +62,49 @@ Animation.prototype = {
         
         this.multiframeWidth = 1;
         this.multiframeHeight = 1;
+    },
+    
+    /**
+      * Will add a multiframe, which is a sequence of individual frames
+      * stitched together.
+      * frameArrays is at least one array of x and y coordinates of frames.
+      * Each array is a row of frames.
+      */
+    addMultiframe : function (frameArrays) {
+        
+        if (this.frames.length !== 0) {
+            console.log("Animation Error: Cannot add multiframe to single frame animation.");
+            return;
+        }
+        if (!Array.isArray(frameArrays)) {
+            console.log("Animation Error: addMultiframe requires an array.");
+            return;
+        }
+        
+        if (this.multiframeArray.length > 0) {
+            //Check if the frameArray is a 2d array, and check accordingly.
+            if (Array.isArray(frameArrays[0])) {
+                if (frameArrays.length !== this.multiframeArray[0].length) {
+                    console.log("Animation Error: addMultiframe height mismatch.");
+                    return;
+                }
+                if (Array.isArray(this.multiframeArray[0][0]) && this.multiframeArray[0][0].length !== frameArrays[0].length) {
+                    console.log("Animation Error: addMultiframe width mismatch.");
+                    return;
+                }            
+            } else {
+                if (Array.isArray(this.multiframeArray[0][0])) {
+                    console.log("Animation Error: addMultiframe height mismatch.");
+                    return;
+                }
+                if (frameArrays.length !== this.multiframeArray[0].length) {
+                    console.log("Aniamtion Error: addMultiframe width mismatch.");
+                    return;
+                }
+            }
+        }
+            
+        this.multiframeArray.push(frameArrays);
     },
 
 
