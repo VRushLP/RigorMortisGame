@@ -7,6 +7,12 @@ var BLOCKS_GLOBALS = {
 function Platform(game, AM, x, y, width, height) {
     this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH * width, BLOCKS_GLOBALS.HEIGHT * height);
     
+    this.movePatterns = [];
+    this.currentMovePattern = 0;
+    this.loopMovePatterns = true;
+    this.lastMoveOriginX = x;
+    this.lastMoveOriginY = y;
+    
     var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
     var multiframeArray = [];
     
@@ -38,6 +44,35 @@ Platform.prototype = {
     },
     
     update: function () {
-        //Nothing to do.
+        if(this.movePatterns.length > 0) {
+            //Check if we need to restart the movement loop.
+            if (this.currentMovePattern > this.movePatterns.length - 1) {
+                if (this.loopMovePatterns) this.currentMovePattern = 0;
+                else return;
+            }            
+            //Check if the current movement pattern has ended.
+            if (Math.abs(this.lastMoveOriginX - this.entity.x) > this.movePatterns[this.currentMovePattern][0] ||
+                Math.abs(this.lastMoveOriginY - this.entity.y) > this.movePatterns[this.currentMovePattern][2]) {
+                this.currentMovePattern++;
+                this.lastMoveOriginX = this.entity.x;
+                this.lastMoveOriginY = this.entity.y;
+            }
+            //Move the platform by the amount requested by the movement pattern.
+            if (this.currentMovePattern < this.movePatterns.length) {
+                this.entity.game.requestMove(this.entity, 
+                                             this.movePatterns[this.currentMovePattern][1], 
+                                             this.movePatterns[this.currentMovePattern][3]);
+            }
+        }
+    },
+    
+    /**
+      * Add a move pattern to the platform.
+      * A move pattern moves the platform at the velocity requested until it reaches the distance given.
+      * Once a move pattern is over, it will go on to the next move pattern.
+      */
+    addMovePattern: function (amountX, velocityX, amountY, velocityY) {
+        this.entity.moveable = true;
+        this.movePatterns.push([amountX, velocityX, amountY, velocityY]);
     }
 }

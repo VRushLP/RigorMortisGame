@@ -147,8 +147,6 @@ GameEngine.prototype = {
      */
     requestMove: function (entity, amountX, amountY) {
         if (!entity.moveable) return;
-        amountX = Math.floor(amountX);
-        amountY = Math.floor(amountY);
         //Calculate the new sides of the moving entity.
         var newLeft = entity.x + amountX;
         var newRight = newLeft + entity.width;
