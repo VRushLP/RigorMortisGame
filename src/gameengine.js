@@ -223,8 +223,14 @@ GameEngine.prototype = {
              * TODO: If two collisions are possible, this may only detect and adjust for one of them.
              */
             if (!xMoveValid && !yMoveValid) {
-                amountX = adjustedX;
-                amountY = adjustedY;
+                if(other.controllable) {
+                    //If the player is in the way, just move them over.
+                    //TODO: Add movement priorities.
+                    this.requestMove(other, amountX, amountY);
+                } else {
+                    amountX = adjustedX;
+                    amountY = adjustedY;
+                }
                 break;
             }
         }
