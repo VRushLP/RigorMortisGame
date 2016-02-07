@@ -81,8 +81,10 @@ Animation.prototype = {
             return;
         }
         
+        //Unless this is the first multiframe, make sure the new one is compatible.
         if (this.multiframeArray.length > 0) {
-            //Check if the frameArray is a 2d array, and check accordingly.
+  
+            //Run a different set of tests depending on whether or not we are adding a 2d array.
             if (Array.isArray(frameArrays[0])) {
                 if (frameArrays.length !== this.multiframeArray[0].length) {
                     console.log("Animation Error: addMultiframe height mismatch.");
@@ -91,20 +93,25 @@ Animation.prototype = {
                 if (Array.isArray(this.multiframeArray[0][0]) && this.multiframeArray[0][0].length !== frameArrays[0].length) {
                     console.log("Animation Error: addMultiframe width mismatch.");
                     return;
-                }            
+                }  
+                
             } else {
-                if (Array.isArray(this.multiframeArray[0][0])) {
+                if (this.multiframeArray[0].length !== 1) {
                     console.log("Animation Error: addMultiframe height mismatch.");
                     return;
                 }
-                if (frameArrays.length !== this.multiframeArray[0].length) {
+                if (frameArrays.length !== this.multiframeArray[0][0].length) {
                     console.log("Aniamtion Error: addMultiframe width mismatch.");
                     return;
                 }
             }
         }
-            
-        this.multiframeArray.push(frameArrays);
+        
+        if (Array.isArray(frameArrays[0])) {
+            this.multiframeArray.push(frameArrays);
+        } else {
+            this.multiframeArray.push([frameArrays]);
+        }        
     },
 
 
@@ -117,15 +124,30 @@ Animation.prototype = {
             if (this.loop) this.elapsedTime = 0;
         }
         var frame = this.currentFrame();
-        var xStart = this.frames[frame * 2];
-        var yStart = this.frames[frame * 2 + 1];
+        
+        if(this.frames.length > 0) {
+            var xStart = this.frames[frame * 2];
+            var yStart = this.frames[frame * 2 + 1];
 
-        ctx.drawImage(this.spriteSheet,
+            ctx.drawImage(this.spriteSheet,
                      xStart, yStart,  // source from sheet
                      this.frameWidth, this.frameHeight,
                      x, y,
                      this.frameWidth,
                      this.frameHeight);
+        } else {
+            for (var i = 0; i < this.multiframeArray[frame].length; i++) {
+                for (var j = 0; j < this.multiframeArray[frame][i].length; j += 2) {
+                    ctx.drawImage(this.spriteSheet,
+                     this.multiframeArray[frame][i][j], this.multiframeArray[frame][i][j + 1],  // source from sheet
+                     this.frameWidth, this.frameHeight,
+                     x + (j / 2) * this.frameWidth, y + i * this.frameHeight,
+                     this.frameWidth,
+                     this.frameHeight);
+                }
+            }
+        }
+        
     },
 
     //Return the current frame number of the animation based on how much time elapsed.
@@ -135,6 +157,6 @@ Animation.prototype = {
 
     //Return whether or not the animation has finished.
     isDone : function () {
-    return (this.currentFrame() >= this.frames.length / 2);
+        return (this.currentFrame() >= this.frames.length / 2);
     }
 }
