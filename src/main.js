@@ -56,6 +56,8 @@ AM.queueDownload("./img/knight/knight standing.png");
 AM.queueDownload("./img/knight/knight jump draft flipped.png");
 AM.queueDownload("./img/knight/knight run draft flipped.png");
 AM.queueDownload("./img/knight/knight standing flipped.png");
+AM.queueDownload("./img/knight/knight attack draft.png");
+AM.queueDownload("./img/knight/knight attack draft flipped.png");
 AM.queueDownload("./img/forest-stage/forest sky.png");
 AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");

@@ -18,6 +18,8 @@ var KNIGHT_ANIM = {
     JUMPING_LEFT: 5,
     FALLING_RIGHT: 6,
     FALLING_LEFT: 7,
+    ATTACK_RIGHT: 8,
+    ATTACK_LEFT: 9,
     FRAME_DURATION: .1,
     FRAME_RUN_DURATION: .085
 }
@@ -52,6 +54,7 @@ function Knight(game, AM, x, y) {
     this.velocity = 0;
     this.direction = KNIGHT_DIR.RIGHT;
     this.canJump = true;
+    this.canMove = true;
     
     this.invulnerableFrames = 0;
     this.health = 4;
@@ -84,6 +87,11 @@ function Knight(game, AM, x, y) {
         KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
     KnightFallLeft.addFrame(KNIGHT_SIZE.JUMP_WIDTH, 0);
     
+    var KnightAttackRight = new Animation(AM.getAsset("./img/knight/knight attack draft.png"), 90, 64, 0.05, true);
+    KnightAttackRight.addFrameBatch(0, 0, 12);
+    var KnightAttackLeft = new Animation(AM.getAsset("./img/knight/knight attack draft flipped.png"), 90, 64, 0.05, true);
+    KnightAttackLeft.addFrameBatch(0, 0, 12);
+    
     this.entity.addAnimation(KnightRestRight);
     this.entity.addAnimation(KnightRestLeft);
     this.entity.addAnimation(KnightWalkRight);
@@ -92,6 +100,8 @@ function Knight(game, AM, x, y) {
     this.entity.addAnimation(KnightJumpLeft);
     this.entity.addAnimation(KnightFallRight);
     this.entity.addAnimation(KnightFallLeft);
+    this.entity.addAnimation(KnightAttackRight);
+    this.entity.addAnimation(KnightAttackLeft);
 }
 
 Knight.prototype.draw = function () {
@@ -109,6 +119,7 @@ Knight.prototype.update = function() {
         this.health = 4;
         this.entity.game.respawnPlayer(this);
     }
+    
     
     if(this.invulnerableFrames > 0) {
         this.invulnerableFrames--;
@@ -178,9 +189,11 @@ Knight.prototype.jump = function() {
  */
 Knight.prototype.readInput = function(input, modifier) {
     if (input === "down") {
+        if(!this.canMove) return;
         this.entity.game.requestMove(this, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
     } 
     if (input === "up") {
+        if(!this.canMove) return;
         //Add upwards velocity if the player is holding up while jumping.
         if (this.velocity < 0) this.velocity -= KNIGHT_PHYSICS.PRESS_UP_SPEED;
         this.jump();
@@ -191,6 +204,7 @@ Knight.prototype.readInput = function(input, modifier) {
         }
     } 
     if (input === "left") {
+        if(!this.canMove) return;
         this.direction = KNIGHT_DIR.LEFT;
         if(this.entity.game.checkBottomCollision(this.entity)) {
             //An agent should only walk if it is not in the air.
@@ -199,12 +213,21 @@ Knight.prototype.readInput = function(input, modifier) {
         this.entity.game.requestMove(this, -KNIGHT_PHYSICS.RUNNING_SPEED, 0);
     }
     if(input === "right") {
+        if(!this.canMove) return;
         this.direction = KNIGHT_DIR.RIGHT;
         if(this.entity.game.checkBottomCollision(this.entity)) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }
         this.entity.game.requestMove(this, KNIGHT_PHYSICS.RUNNING_SPEED, 0);
+    }
+    if (input === "space") {
+        this.canMove = false;
+        if(this.direction === KNIGHT_DIR.RIGHT) {
+            this.entity.setAnimation(KNIGHT_ANIM.ATTACK_RIGHT);
+        } else {
+            this.entity.setAnimation(KNIGHT_ANIM.ATTACK_LEFT);
+        }
     }
     if (input === "none") {
         if(this.direction === KNIGHT_DIR.RIGHT) {
@@ -227,6 +250,10 @@ Knight.prototype.readInput = function(input, modifier) {
     }
     if (input === "left_released" && this.entity.currentAnimation === KNIGHT_ANIM.WALKING_LEFT) {
         this.readInput("none");
+    }
+    
+    if (input === "space_released") {
+        this.canMove = true;
     }
     
     if (input === "damage") {

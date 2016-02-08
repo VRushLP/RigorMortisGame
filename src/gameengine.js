@@ -85,6 +85,9 @@ GameEngine.prototype = {
                 case 78: //N
                     that.pressN = true;
                     break;
+                case 32: //SPACE
+                    that.pressSpace = true;
+                    break;
             }
             e.preventDefault();
         }, false);
@@ -106,6 +109,9 @@ GameEngine.prototype = {
                     break;
                 case 78: //N
                     that.pressN = false;
+                    break;
+                case 32: //SPACE
+                    that.pressSpace = false;
                     break;
             }
             //console.log(e.which);
@@ -380,12 +386,14 @@ GameEngine.prototype.loop = function () {
             if(this.pressUp) this.agents[i].readInput("up");
             if(this.pressLeft) this.agents[i].readInput("left");
             if(this.pressN) this.agents[i].readInput('n');
+            if(this.pressSpace) this.agents[i].readInput("space");
             
             if(!this.pressUp) this.agents[i].readInput("up_released");
             if(!this.pressLeft) this.agents[i].readInput("left_released");
             if(!this.pressRight) this.agents[i].readInput("right_released");
+            if(!this.pressSpace) this.agents[i].readInput("space_released");
             
-            if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp) this.agents[i].readInput("none");
+            if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput("none");
         }
     }
     
