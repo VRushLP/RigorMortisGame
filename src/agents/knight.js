@@ -52,6 +52,7 @@ function Knight(game, AM, x, y) {
     this.velocity = 0;
     this.direction = KNIGHT_DIR.RIGHT;
     this.canJump = true;
+    this.invulnerableFrames = 0;
 
     var KnightRestRight = new Animation(AM.getAsset("./img/knight/knight standing.png"),
         KNIGHT_SIZE.REST_WIDTH, KNIGHT_SIZE.REST_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
@@ -101,6 +102,11 @@ Knight.prototype.draw = function () {
  * from falling and jumping.
  */
 Knight.prototype.update = function() {
+    
+    if(this.invulnerableFrames > 0) {
+        this.invulnerableFrames--;
+    }
+    
     if(!this.entity.fallable) return;
     
     if (!this.entity.game.checkBottomCollision(this.entity)) {
@@ -217,7 +223,18 @@ Knight.prototype.readInput = function(input, modifier) {
     }
     
     if (input === "damage") {
-        console.log(modifier);
+        if (this.invulnerableFrames === 0) {
+            console.log(modifier);
+            this.invulnerableFrames = 30;
+            
+            if (this.direction === KNIGHT_DIR.LEFT) {
+                this.entity.game.requestMove(this, 40, 0);
+                this.velocity = -5;
+            } else {
+                this.entity.game.requestMove(this, -40, 0);
+                this.velocity = -5;
+            }
+        }
     }
     
     //No-clip activation/deactivation
