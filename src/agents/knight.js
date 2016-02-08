@@ -235,7 +235,12 @@ Knight.prototype.readInput = function(input, modifier) {
         
         if (this.attackFrames <= 0) {
             this.attackFrames = 24;
-            var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width, this.entity.y);
+            if(this.direction === KNIGHT_DIR.RIGHT) {
+                var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width + 1, this.entity.y);
+            } else {
+                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width - 51, this.entity.y);
+            }
+            
             this.entity.game.addAgent(newAttack);
         }
     }
@@ -296,6 +301,7 @@ Knight.prototype.readInput = function(input, modifier) {
 
 function SwordHitbox(game, x, y) {
     this.entity = new Entity(game, x , y, 50, 50);
+    this.entity.moveable = true;
     this.framesRemaining = 24;
 }
 
@@ -308,6 +314,7 @@ SwordHitbox.prototype = {
             var index = this.entity.game.agents.indexOf(this);
             this.entity.game.agents.splice(index, 1);
         }
+        this.entity.game.requestMove(this, 0, 0);
     },
     
     draw: function() {

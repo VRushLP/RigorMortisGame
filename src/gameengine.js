@@ -160,7 +160,6 @@ GameEngine.prototype = {
         var newRight = newLeft + entity.width;
         var newTop = entity.y + amountY;
         var newBottom = newTop + entity.height;
-
         for (var i = 0; i < this.agents.length; i++) {
             if (!entity.collidable) break; //Non-collidable; skip the following collision tests.
 

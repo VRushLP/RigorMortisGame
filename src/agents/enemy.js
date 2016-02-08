@@ -1,7 +1,8 @@
 function Skeleton(game, AM, x, y) {
     this.entity = new Entity(game, x, y, 52, 60);
     
-    this.health = 6;
+    this.health = 3;
+    this.invulnerableFrames = 0;
     this.yVelocity = 0;
     this.xVelocity = 1;
     
@@ -18,6 +19,15 @@ function Skeleton(game, AM, x, y) {
 Skeleton.prototype = {
     
     update: function() {
+        if (this.invulnerableFrames > 0) {
+            this.invulnerableFrames--;
+        }
+        if (this.health <= 0) {
+            var index = this.entity.game.agents.indexOf(this);
+            this.entity.game.agents.splice(index, 1);
+        }
+        
+        
         if (this.xVelocity > 0) {
             this.entity.currentAnimation = 0;
         } else {
@@ -27,6 +37,15 @@ Skeleton.prototype = {
     
     draw: function() {
         this.entity.draw();
+    },
+    
+    readInput: function(input, modifier) {
+        if (input === "damage") {
+            if (this.invulnerableFrames === 0) {
+                this.invulnerableFrames = 30;
+                this.health--;
+            }
+        }
     },
     
     checkListeners: function(agent) {
