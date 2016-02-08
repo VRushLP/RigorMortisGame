@@ -89,8 +89,8 @@ AM.downloadAll(function () {
     platform.addMovePattern(400, 1, 0, 0);
     platform.addMovePattern(0, 0, 200, -1);
     platform.addMovePattern(400, -1, 0, 0);
-    //forestStage.entityList.push(platform);
     platform.addMovePattern(0, 0, 200, 1);
+    forestStage.entityList.push(platform);
     
     var skeleton = new Skeleton(gameEngine, AM, 500, 2040);
     forestStage.entityList.push(skeleton);
