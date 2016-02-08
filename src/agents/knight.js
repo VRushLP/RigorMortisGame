@@ -21,13 +21,19 @@ var KNIGHT_ANIM = {
     ATTACK_RIGHT: 8,
     ATTACK_LEFT: 9,
     FRAME_DURATION: .1,
-    FRAME_RUN_DURATION: .085
+    FRAME_RUN_DURATION: .085,
+    ATTACK_FRAMES: 24,
 }
 
 //Direction Constants
 var KNIGHT_DIR = {
     LEFT: 0,
     RIGHT: 1,
+}
+
+var KNIGHT_ATTR = {
+    STARTING_HEALTH: 4,
+    INVULNERABILITY_FRAMES: 30,
 }
 
 //Physics Constants
@@ -58,7 +64,7 @@ function Knight(game, AM, x, y) {
     
     this.invulnerableFrames = 0;
     this.attackFrames = 0;
-    this.health = 4;
+    this.health = KNIGHT_ATTR.STARTING_HEALTH;
 
     var KnightRestRight = new Animation(AM.getAsset("./img/knight/knight standing.png"),
         KNIGHT_SIZE.REST_WIDTH, KNIGHT_SIZE.REST_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
@@ -117,7 +123,7 @@ Knight.prototype.draw = function () {
 Knight.prototype.update = function() {
     
     if (this.health <= 0) {
-        this.health = 4;
+        this.health = KNIGHT_ATTR.STARTING_HEALTH;
         this.entity.game.respawnPlayer(this);
     }
     if (this.attackFrames > 0) {
@@ -226,6 +232,7 @@ Knight.prototype.readInput = function(input, modifier) {
         this.entity.game.requestMove(this, KNIGHT_PHYSICS.RUNNING_SPEED, 0);
     }
     if (input === "space") {
+        //Prevent the player from moving while attacking.
         this.canMove = false;
         if(this.direction === KNIGHT_DIR.RIGHT) {
             this.entity.setAnimation(KNIGHT_ANIM.ATTACK_RIGHT);
@@ -233,8 +240,9 @@ Knight.prototype.readInput = function(input, modifier) {
             this.entity.setAnimation(KNIGHT_ANIM.ATTACK_LEFT);
         }
         
+        //Create a new sword hitbox if the knight is not currently attacking.
         if (this.attackFrames <= 0) {
-            this.attackFrames = 24;
+            this.attackFrames = KNIGHT_ANIM.ATTACK_FRAMES;
             if(this.direction === KNIGHT_DIR.RIGHT) {
                 var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width + 1, this.entity.y);
             } else {
@@ -276,10 +284,11 @@ Knight.prototype.readInput = function(input, modifier) {
     
     if (input === "damage") {
         if (this.invulnerableFrames === 0) {
-            console.log(modifier);
-            this.invulnerableFrames = 30;
+            this.invulnerableFrames = KNIGHT_ATTR.INVULNERABILITY_FRAMES;
             this.health--;
             
+            //Knock the player back.
+            //TODO: Knock player back based on direction that damage came from.
             if (this.direction === KNIGHT_DIR.LEFT) {
                 this.entity.game.requestMove(this, 40, 0);
                 this.velocity = -5;
@@ -299,10 +308,15 @@ Knight.prototype.readInput = function(input, modifier) {
     }
 }
 
+/**
+  * Create a new sword hitbox.
+  * A sword hitbox is an invisible agent that damages enemies,
+  * and self-destructs after a number of frames.
+  */
 function SwordHitbox(game, x, y) {
     this.entity = new Entity(game, x , y, 50, 50);
     this.entity.moveable = true;
-    this.framesRemaining = 24;
+    this.framesRemaining = KNIGHT_ANIM.ATTACK_FRAMES;
 }
 
 SwordHitbox.prototype = {
@@ -314,6 +328,7 @@ SwordHitbox.prototype = {
             var index = this.entity.game.agents.indexOf(this);
             this.entity.game.agents.splice(index, 1);
         }
+        //Does not move the entity, but simply checks if it is currently colliding.
         this.entity.game.requestMove(this, 0, 0);
     },
     
