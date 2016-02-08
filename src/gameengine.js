@@ -350,6 +350,12 @@ GameEngine.prototype = {
         if (typeof agent.readInput === 'function') {
             agent.readInput(input, modifier);
         }
+    },
+    
+    //TODO: Add the player as a field so that this is parameter-less.
+    respawnPlayer: function (agent) {
+        agent.entity.x = this.stages[this.currentStage].spawnX;
+        agent.entity.y = this.stages[this.currentStage].spawnY;
     }
 }
 
