@@ -57,6 +57,7 @@ function Knight(game, AM, x, y) {
     this.canMove = true;
     
     this.invulnerableFrames = 0;
+    this.attackFrames = 0;
     this.health = 4;
 
     var KnightRestRight = new Animation(AM.getAsset("./img/knight/knight standing.png"),
@@ -115,9 +116,12 @@ Knight.prototype.draw = function () {
  */
 Knight.prototype.update = function() {
     
-    if(this.health <= 0) {
+    if (this.health <= 0) {
         this.health = 4;
         this.entity.game.respawnPlayer(this);
+    }
+    if (this.attackFrames > 0) {
+        this.attackFrames--;
     }
     
     
@@ -228,8 +232,15 @@ Knight.prototype.readInput = function(input, modifier) {
         } else {
             this.entity.setAnimation(KNIGHT_ANIM.ATTACK_LEFT);
         }
+        
+        if (this.attackFrames <= 0) {
+            this.attackFrames = 24;
+            var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width, this.entity.y);
+            this.entity.game.addAgent(newAttack);
+        }
     }
     if (input === "none") {
+        if(this.attackFrames > 0) return;
         if(this.direction === KNIGHT_DIR.RIGHT) {
             this.entity.setAnimation(KNIGHT_ANIM.REST_RIGHT);
         } else {
@@ -253,7 +264,9 @@ Knight.prototype.readInput = function(input, modifier) {
     }
     
     if (input === "space_released") {
-        this.canMove = true;
+        if (this.attackFrames <= 0) {
+            this.canMove = true;
+        }
     }
     
     if (input === "damage") {
@@ -277,6 +290,33 @@ Knight.prototype.readInput = function(input, modifier) {
         if(this.entity.game.DEBUG_MODE === 1) {
             this.entity.fallable = !this.entity.fallable;
             this.entity.collidable = !this.entity.collidable;
+        }
+    }
+}
+
+function SwordHitbox(game, x, y) {
+    this.entity = new Entity(game, x , y, 50, 50);
+    this.framesRemaining = 24;
+}
+
+SwordHitbox.prototype = {
+    
+    update: function() {
+        this.framesRemaining--;
+        if (this.framesRemaining <= 0) {
+            //TODO: Add RemoveFromWorld to gameengine.
+            var index = this.entity.game.agents.indexOf(this);
+            this.entity.game.agents.splice(index, 1);
+        }
+    },
+    
+    draw: function() {
+        this.entity.draw();
+    },
+    
+    checkListeners: function(agent) {
+        if (!agent.entity.controllable) {
+            this.entity.game.requestInputSend(agent, "damage", 1);
         }
     }
 }
