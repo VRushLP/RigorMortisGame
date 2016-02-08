@@ -59,6 +59,7 @@ AM.queueDownload("./img/knight/knight standing flipped.png");
 AM.queueDownload("./img/forest-stage/forest sky.png");
 AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
+AM.queueDownload("./img/enemy/skeletonChaser mockup.png")
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
@@ -88,6 +89,9 @@ AM.downloadAll(function () {
     platform.addMovePattern(400, -1, 0, 0);
     forestStage.entityList.push(platform);
     platform.addMovePattern(0, 0, 200, 1);
+    
+    var skeleton = new Skeleton(gameEngine, AM, 350, 2040);
+    forestStage.entityList.push(skeleton);
     
     gameEngine.addStage(forestStage);
 

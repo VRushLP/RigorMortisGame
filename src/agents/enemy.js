@@ -1,31 +1,31 @@
-var ENEMY_GLOBALS = {
-    WIDTH: 50,
-    HEIGHT: 50,
-    FRAME_DURATION: 1,
-}
-
-function Enemy(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, ENEMY_GLOBALS.WIDTH, ENEMY_GLOBALS.HEIGHT);
-
-    var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), ENEMY_GLOBALS.WIDTH, ENEMY_GLOBALS.HEIGHT, ENEMY_GLOBALS.FRAME_DURATION, true);
-    NormalState.addFrame(0, 0);
-
-    this.entity.addAnimation(NormalState);
+function Skeleton(game, AM, x, y) {
+    this.entity = new Entity(game, x, y, 52, 60);
+    
+    this.health = 6;
+    this.yVelocity = 0;
+    this.xVelocity = 1;
+    
+    var skeletonRight = new Animation(AM.getAsset("./img/enemy/skeletonChaser mockup.png"), 52, 60, 0.05, true);
+    skeletonRight.addFrame(52, 0);
+    var skeletonLeft = new Animation(AM.getAsset("./img/enemy/skeletonChaser mockup.png"), 52, 60, 0.05, true);
+    skeletonLeft.addFrame(0, 0);
+    
+    this.entity.addAnimation(skeletonRight);
+    this.entity.addAnimation(skeletonLeft);
     this.entity.setAnimation(0);
 }
 
-Enemy.prototype = {
-
-    draw: function () {
-        this.entity.draw();
+Skeleton.prototype = {
+    
+    update: function() {
+        if (this.xVelocity > 0) {
+            this.entity.currentAnimation = 0;
+        } else {
+            this.entity.currentAnimation = 1;
+        }
     },
-
-    update: function () {
+    
+    draw: function() {
+        this.entity.draw();
     }
 }
-
-function Skeleton(game, AM, x, y) {
-    Enemy.call(game, AM, x, y);
-}
-
-Skeleton.prototype = Enemy.prototype;

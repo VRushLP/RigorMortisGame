@@ -163,7 +163,7 @@ Knight.prototype.jump = function() {
 /**
  * Request the agent to process an input.
  */
-Knight.prototype.readInput = function(input) {
+Knight.prototype.readInput = function(input, modifier) {
     if (input === "down") {
         this.entity.game.requestMove(this, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
     } 

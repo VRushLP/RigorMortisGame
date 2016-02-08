@@ -235,6 +235,12 @@ GameEngine.prototype = {
                 }
                 break;
             }
+            if (typeof agent.checkListeners === 'function') {
+                agent.checkListeners(this.agents[i]);
+            }
+            if (typeof this.agents[i].checkListeners === 'function') {
+                this.agents[i].checkLIsteners(agent);
+            }
         }
 
         //Move the entity.
