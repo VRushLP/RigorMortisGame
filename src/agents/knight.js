@@ -216,6 +216,10 @@ Knight.prototype.readInput = function(input, modifier) {
         this.readInput("none");
     }
     
+    if (input === "damage") {
+        console.log(modifier);
+    }
+    
     //No-clip activation/deactivation
     if (input === 'n') {
         if(this.entity.game.DEBUG_MODE === 1) {

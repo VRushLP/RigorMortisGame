@@ -27,5 +27,11 @@ Skeleton.prototype = {
     
     draw: function() {
         this.entity.draw();
+    },
+    
+    checkListeners: function(agent) {
+        if (agent.entity.controllable) {
+            this.entity.game.requestInputSend(agent, "damage", 1);
+        }
     }
 }

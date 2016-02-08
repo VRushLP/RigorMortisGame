@@ -233,13 +233,14 @@ GameEngine.prototype = {
                     amountX = adjustedX;
                     amountY = adjustedY;
                 }
+                
+                if (typeof agent.checkListeners === 'function') {
+                    agent.checkListeners(this.agents[i]);
+                }
+                if (typeof this.agents[i].checkListeners === 'function') {
+                    this.agents[i].checkListeners(agent);
+                }
                 break;
-            }
-            if (typeof agent.checkListeners === 'function') {
-                agent.checkListeners(this.agents[i]);
-            }
-            if (typeof this.agents[i].checkListeners === 'function') {
-                this.agents[i].checkLIsteners(agent);
             }
         }
 
@@ -343,6 +344,12 @@ GameEngine.prototype = {
             }
         }
         return topCollision;
+    },
+    
+    requestInputSend: function (agent, input, modifier) {
+        if (typeof agent.readInput === 'function') {
+            agent.readInput(input, modifier);
+        }
     }
 }
 
