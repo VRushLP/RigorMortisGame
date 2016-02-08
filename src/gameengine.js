@@ -145,7 +145,9 @@ GameEngine.prototype = {
      * Move an entity by a requested amount after checking for collision.
      * If a collision is detected, move the entity in a way that a collision does not occur.
      */
-    requestMove: function (entity, amountX, amountY) {
+    requestMove: function (agent, amountX, amountY) {
+        var entity = agent.entity;
+        
         if (!entity.moveable) return;
         //Calculate the new sides of the moving entity.
         var newLeft = entity.x + amountX;
@@ -226,7 +228,7 @@ GameEngine.prototype = {
                 if(other.controllable) {
                     //If the player is in the way, just move them over.
                     //TODO: Add movement priorities.
-                    this.requestMove(other, amountX, amountY);
+                    this.requestMove(this.agents[i], amountX, amountY);
                 } else {
                     amountX = adjustedX;
                     amountY = adjustedY;
@@ -257,7 +259,7 @@ GameEngine.prototype = {
         if (entity.respawnable && entity.y > this.stages[this.currentStage].stageHeight + 100) {
             entity.x = this.stages[this.currentStage].spawnX;
             entity.y = this.stages[this.currentStage].spawnY;
-            this.requestMove(entity, 0, 0); //resets camera
+            this.requestMove(agent, 0, 0); //resets camera
             //This camera reset should put the camera on the player instead.
         }
     },
@@ -330,7 +332,7 @@ GameEngine.prototype = {
             //If both are true, then the entity is directly below the other.
             if (aboveEntity) {
                 if (entity.y >= other.y && entity.y <= other.y + other.height + 1) {
-                    topCollision.push(other);
+                    topCollision.push(this.agents[i]);
                 }
             }
         }

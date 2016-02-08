@@ -131,7 +131,7 @@ Knight.prototype.update = function() {
     
     //If downwards velocity is present, request to move the agent with it.
     if(this.velocity !== 0) {
-        this.entity.game.requestMove(this.entity, 0, this.velocity);
+        this.entity.game.requestMove(this, 0, this.velocity);
         if(this.velocity > 0) {
             if(this.direction === KNIGHT_DIR.RIGHT) {
                 this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
@@ -165,7 +165,7 @@ Knight.prototype.jump = function() {
  */
 Knight.prototype.readInput = function(input) {
     if (input === "down") {
-        this.entity.game.requestMove(this.entity, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
+        this.entity.game.requestMove(this, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
     } 
     if (input === "up") {
         //Add upwards velocity if the player is holding up while jumping.
@@ -174,7 +174,7 @@ Knight.prototype.readInput = function(input) {
         
         //Allows no-clip debugging.
         if(!this.entity.fallable) {
-            this.entity.game.requestMove(this.entity, 0, -10)
+            this.entity.game.requestMove(this, 0, -10)
         }
     } 
     if (input === "left") {
@@ -183,7 +183,7 @@ Knight.prototype.readInput = function(input) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
         }
-        this.entity.game.requestMove(this.entity, -KNIGHT_PHYSICS.RUNNING_SPEED, 0);
+        this.entity.game.requestMove(this, -KNIGHT_PHYSICS.RUNNING_SPEED, 0);
     }
     if(input === "right") {
         this.direction = KNIGHT_DIR.RIGHT;
@@ -191,7 +191,7 @@ Knight.prototype.readInput = function(input) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }
-        this.entity.game.requestMove(this.entity, KNIGHT_PHYSICS.RUNNING_SPEED, 0);
+        this.entity.game.requestMove(this, KNIGHT_PHYSICS.RUNNING_SPEED, 0);
     }
     if (input === "none") {
         if(this.direction === KNIGHT_DIR.RIGHT) {

@@ -97,5 +97,5 @@ AM.downloadAll(function () {
     BGM.hellBossFinal.play();
 
     gameEngine.start();
-    gameEngine.requestMove(knight.entity, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y); //Reset camera
+    gameEngine.requestMove(knight, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y); //Reset camera
 });
