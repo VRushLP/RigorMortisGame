@@ -56,9 +56,12 @@ AM.queueDownload("./img/knight/knight standing.png");
 AM.queueDownload("./img/knight/knight jump draft flipped.png");
 AM.queueDownload("./img/knight/knight run draft flipped.png");
 AM.queueDownload("./img/knight/knight standing flipped.png");
+AM.queueDownload("./img/knight/knight attack draft.png");
+AM.queueDownload("./img/knight/knight attack draft flipped.png");
 AM.queueDownload("./img/forest-stage/forest sky.png");
 AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
+AM.queueDownload("./img/enemy/skeletonChaser mockup.png")
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
@@ -86,8 +89,11 @@ AM.downloadAll(function () {
     platform.addMovePattern(400, 1, 0, 0);
     platform.addMovePattern(0, 0, 200, -1);
     platform.addMovePattern(400, -1, 0, 0);
-    forestStage.entityList.push(platform);
     platform.addMovePattern(0, 0, 200, 1);
+    forestStage.entityList.push(platform);
+    
+    var skeleton = new Skeleton(gameEngine, AM, 500, 2040);
+    forestStage.entityList.push(skeleton);
     
     gameEngine.addStage(forestStage);
 
@@ -97,5 +103,5 @@ AM.downloadAll(function () {
     BGM.hellBossFinal.play();
 
     gameEngine.start();
-    gameEngine.requestMove(knight.entity, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y); //Reset camera
+    gameEngine.requestMove(knight, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y); //Reset camera
 });

@@ -85,6 +85,9 @@ GameEngine.prototype = {
                 case 78: //N
                     that.pressN = true;
                     break;
+                case 32: //SPACE
+                    that.pressSpace = true;
+                    break;
             }
             e.preventDefault();
         }, false);
@@ -106,6 +109,9 @@ GameEngine.prototype = {
                     break;
                 case 78: //N
                     that.pressN = false;
+                    break;
+                case 32: //SPACE
+                    that.pressSpace = false;
                     break;
             }
             //console.log(e.which);
@@ -145,14 +151,15 @@ GameEngine.prototype = {
      * Move an entity by a requested amount after checking for collision.
      * If a collision is detected, move the entity in a way that a collision does not occur.
      */
-    requestMove: function (entity, amountX, amountY) {
+    requestMove: function (agent, amountX, amountY) {
+        var entity = agent.entity;
+        
         if (!entity.moveable) return;
         //Calculate the new sides of the moving entity.
         var newLeft = entity.x + amountX;
         var newRight = newLeft + entity.width;
         var newTop = entity.y + amountY;
         var newBottom = newTop + entity.height;
-
         for (var i = 0; i < this.agents.length; i++) {
             if (!entity.collidable) break; //Non-collidable; skip the following collision tests.
 
@@ -226,10 +233,17 @@ GameEngine.prototype = {
                 if(other.controllable) {
                     //If the player is in the way, just move them over.
                     //TODO: Add movement priorities.
-                    this.requestMove(other, amountX, amountY);
+                    this.requestMove(this.agents[i], amountX, amountY);
                 } else {
                     amountX = adjustedX;
                     amountY = adjustedY;
+                }
+                
+                if (typeof agent.checkListeners === 'function') {
+                    agent.checkListeners(this.agents[i]);
+                }
+                if (typeof this.agents[i].checkListeners === 'function') {
+                    this.agents[i].checkListeners(agent);
                 }
                 break;
             }
@@ -257,7 +271,7 @@ GameEngine.prototype = {
         if (entity.respawnable && entity.y > this.stages[this.currentStage].stageHeight + 100) {
             entity.x = this.stages[this.currentStage].spawnX;
             entity.y = this.stages[this.currentStage].spawnY;
-            this.requestMove(entity, 0, 0); //resets camera
+            this.requestMove(agent, 0, 0); //resets camera
             //This camera reset should put the camera on the player instead.
         }
     },
@@ -330,11 +344,23 @@ GameEngine.prototype = {
             //If both are true, then the entity is directly below the other.
             if (aboveEntity) {
                 if (entity.y >= other.y && entity.y <= other.y + other.height + 1) {
-                    topCollision.push(other);
+                    topCollision.push(this.agents[i]);
                 }
             }
         }
         return topCollision;
+    },
+    
+    requestInputSend: function (agent, input, modifier) {
+        if (typeof agent.readInput === 'function') {
+            agent.readInput(input, modifier);
+        }
+    },
+    
+    //TODO: Add the player as a field so that this is parameter-less.
+    respawnPlayer: function (agent) {
+        agent.entity.x = this.stages[this.currentStage].spawnX;
+        agent.entity.y = this.stages[this.currentStage].spawnY;
     }
 }
 
@@ -359,12 +385,14 @@ GameEngine.prototype.loop = function () {
             if(this.pressUp) this.agents[i].readInput("up");
             if(this.pressLeft) this.agents[i].readInput("left");
             if(this.pressN) this.agents[i].readInput('n');
+            if(this.pressSpace) this.agents[i].readInput("space");
             
             if(!this.pressUp) this.agents[i].readInput("up_released");
             if(!this.pressLeft) this.agents[i].readInput("left_released");
             if(!this.pressRight) this.agents[i].readInput("right_released");
+            if(!this.pressSpace) this.agents[i].readInput("space_released");
             
-            if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp) this.agents[i].readInput("none");
+            if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput("none");
         }
     }
     

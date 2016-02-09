@@ -58,18 +58,18 @@ Platform.prototype = {
                 this.lastMoveOriginY = this.entity.y;
             }
             //Move the platform by the amount requested by the movement pattern.
-            var entitiesToDrag = this.entity.game.checkTopCollision(this.entity);
+            var agentsToDrag = this.entity.game.checkTopCollision(this.entity);
             
             if (this.currentMovePattern < this.movePatterns.length) {
-                this.entity.game.requestMove(this.entity, 
+                this.entity.game.requestMove(this, 
                                              this.movePatterns[this.currentMovePattern][1], 
                                              this.movePatterns[this.currentMovePattern][3]);
                 
                 //Only vertically drag riding entities downwards. Gravity will take care of the rest.
                 var downwardsDrag = Math.max(0, this.movePatterns[this.currentMovePattern][3]);
                 
-                for (var i = 0; i < entitiesToDrag.length; i++) {
-                    this.entity.game.requestMove(entitiesToDrag[i], 
+                for (var i = 0; i < agentsToDrag.length; i++) {
+                    this.entity.game.requestMove(agentsToDrag[i], 
                                              this.movePatterns[this.currentMovePattern][1], 
                                              downwardsDrag);
                 }
