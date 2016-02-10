@@ -49,6 +49,11 @@ function GameEngine() {
     
     this.stages = [];
     this.currentStage;
+    
+    //Initially set by main before game start.
+    this.playerAgent;
+    this.cameraAgent;
+    
     this.DEBUG_MODE = 1;
 }
 
@@ -120,10 +125,6 @@ GameEngine.prototype = {
     },
 
     addAgent : function (agent) {
-        if(agent.entity.controllable) {
-            agent.entity.x = this.stages[this.currentStage].spawnX;
-            agent.entity.y = this.stages[this.currentStage].spawnY;
-        }
         this.agents.push(agent);
     },
 
@@ -134,6 +135,9 @@ GameEngine.prototype = {
     loadStage : function (stageNumber) {
         this.currentStage = stageNumber;
         this.agents = this.stages[this.currentStage].entityList;
+        
+        this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
+        this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
     },
 
     /*********************
@@ -145,6 +149,7 @@ GameEngine.prototype = {
         for (var i = 0; i < this.agents.length; i++) {
             this.agents[i].update();
         }
+        this.focusCamera();
     },
 
     /**
@@ -256,17 +261,6 @@ GameEngine.prototype = {
         //Prevent unit from moving off left side of screen.
         if (entity.x < 0) entity.x = 0;
 
-        if (entity.camerable) {
-            //Only begin moving the camera once the player is halfway across the screen.
-            if (entity.x > (this.surfaceWidth / 2) - (entity.width / 2)) {
-                //Keeps the camera centered on the player.
-                this.cameraX = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
-            } else {
-                this.cameraX = 0;
-            }
-            this.cameraY = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
-        }
-
         //Respawn the player if they fall off the stage.
         if (entity.respawnable && entity.y > this.stages[this.currentStage].stageHeight + 100) {
             entity.x = this.stages[this.currentStage].spawnX;
@@ -280,8 +274,17 @@ GameEngine.prototype = {
         
     },
     
-    focusCamera: function (entity) {
+    focusCamera: function () {
+        var entity = this.cameraAgent.entity;
         
+        //Only begin moving the camera once the player is halfway across the screen.
+        if (entity.x > (this.surfaceWidth / 2) - (entity.width / 2)) {
+            this.cameraX = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
+        } else {
+            this.cameraX = 0;
+        }
+        
+        this.cameraY = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
     },
     
     checkPlayerRespawn: function () {
