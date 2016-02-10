@@ -275,6 +275,18 @@ GameEngine.prototype = {
             //This camera reset should put the camera on the player instead.
         }
     },
+    
+    findNearestCollision: function (entity) {
+        
+    },
+    
+    focusCamera: function (entity) {
+        
+    },
+    
+    checkPlayerRespawn: function () {
+        
+    },
 
     /**
      * Return true if the entity is directly on top of another entity; false otherwise.
