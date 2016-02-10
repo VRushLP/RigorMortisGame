@@ -309,6 +309,12 @@ GameEngine.prototype = {
             
             //Collision detected.
             if (!xMoveValid && !yMoveValid) {
+                //Temporary fix to allow platforms to move the player.
+                if(other.controllable && other.moveable) {
+                    this.requestMove(this.agents[i], amountX, amountY);
+                    break;
+                }
+                
                 //Determine if the colliding entity is the nearest one, and thus the one we should respond to.
                 //Then, determine if this collision is any nearer than previous ones, in respect to X and Y.
                 if (Math.abs(adjustedX) + Math.abs(adjustedY) <= Math.abs(amountX) + Math.abs(amountY)) {
