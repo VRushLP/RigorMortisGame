@@ -149,7 +149,9 @@ GameEngine.prototype = {
         for (var i = 0; i < this.agents.length; i++) {
             this.agents[i].update();
         }
+        
         this.focusCamera();
+        this.checkPlayerRespawn();
     },
 
     /**
@@ -157,20 +159,48 @@ GameEngine.prototype = {
      * If a collision is detected, move the entity in a way that a collision does not occur.
      */
     requestMove: function (agent, amountX, amountY) {
-        var entity = agent.entity;
+        if (!agent.entity.moveable) return;
         
-        if (!entity.moveable) return;
+        //Find the nearest collision and move the entity accordingly.
+        var collisionResults = this.findNearestCollision(agent, amountX, amountY);        
+        agent.entity.x += collisionResults.amountX;
+        agent.entity.y += collisionResults.amountY;
+        
+        //If we collided, request both agents to check their listeners against each other.
+        if (collisionResults.agent !== undefined) {
+            if (typeof agent.checkListeners === 'function') {
+                agent.checkListeners(collisionResults.agent);
+            }
+            if (typeof collisionResults.agent.checkListeners === 'function') {
+                collisionResults.agent.checkListeners(agent);
+            }
+        }
+        
+        //Prevent unit from moving off left side of screen.
+        if (agent.entity.x < 0) agent.entity.x = 0;
+    },
+    
+    /**
+      * Returns the nearest agent that the given one will collide with,
+      * along with the distance that can be travelled before the collision will occur.
+      */
+    findNearestCollision: function (agent, amountX, amountY) {
+        
+        var nearestAgent = undefined;            
         //Calculate the new sides of the moving entity.
+        var entity = agent.entity;
         var newLeft = entity.x + amountX;
         var newRight = newLeft + entity.width;
         var newTop = entity.y + amountY;
         var newBottom = newTop + entity.height;
+        
         for (var i = 0; i < this.agents.length; i++) {
-            if (!entity.collidable) break; //Non-collidable; skip the following collision tests.
-
+            if (!entity.collidable) break; //Skip collision checking if given agent is not collidable.
+    
             var other = this.agents[i].entity;
             if (other === entity) continue; //Prevent an entity from colliding with itself.
-            if (!other.collidable) continue;
+            if (!other.collidable) continue; //Skip if this entity is collidable.
+            
             var xMoveValid = true;
             var yMoveValid = true;
             var adjustedX = 0;
@@ -228,49 +258,28 @@ GameEngine.prototype = {
                 adjustedX = 0;
                 xMoveValid = false;
             }
-
-            /*
-             * If the moving entity will be in the same horizontal and vertical plane as the other,
-             * then a collision will occur. If so, move the entity only as far as it can before a collision.
-             * TODO: If two collisions are possible, this may only detect and adjust for one of them.
-             */
+            
             if (!xMoveValid && !yMoveValid) {
-                if(other.controllable) {
-                    //If the player is in the way, just move them over.
-                    //TODO: Add movement priorities.
-                    this.requestMove(this.agents[i], amountX, amountY);
-                } else {
+                //Determine if the colliding entity is the nearest one, and thus the one we should respond to.
+                //Then, determine if this collision is any nearer than previous ones, in respect to X and Y.
+                if (Math.abs(adjustedX) + Math.abs(adjustedY) <= Math.abs(amountX) + Math.abs(amountY)) {
+                    nearestAgent = this.agents[i];
+                }
+                if (Math.abs(adjustedX) < Math.abs(amountX)) {
                     amountX = adjustedX;
-                    amountY = adjustedY;
                 }
                 
-                if (typeof agent.checkListeners === 'function') {
-                    agent.checkListeners(this.agents[i]);
+                if (Math.abs(adjustedY) < Math.abs(amountY)) {
+                    amountY = adjustedY;
                 }
-                if (typeof this.agents[i].checkListeners === 'function') {
-                    this.agents[i].checkListeners(agent);
-                }
-                break;
             }
         }
-
-        //Move the entity.
-        entity.x += amountX;
-        entity.y += amountY;
-
-        //Prevent unit from moving off left side of screen.
-        if (entity.x < 0) entity.x = 0;
-
-        //Respawn the player if they fall off the stage.
-        if (entity.respawnable && entity.y > this.stages[this.currentStage].stageHeight + 100) {
-            entity.x = this.stages[this.currentStage].spawnX;
-            entity.y = this.stages[this.currentStage].spawnY;
-            this.requestMove(agent, 0, 0); //resets camera
-            //This camera reset should put the camera on the player instead.
+        
+        return {
+            agent:nearestAgent,
+            amountX:amountX,
+            amountY:amountY
         }
-    },
-    
-    findNearestCollision: function (entity) {
         
     },
     
@@ -288,7 +297,13 @@ GameEngine.prototype = {
     },
     
     checkPlayerRespawn: function () {
+        var entity = this.playerAgent.entity;
         
+        if (entity.respawnable && entity.y > this.stages[this.currentStage].stageHeight + 100) {
+            entity.x = this.stages[this.currentStage].spawnX;
+            entity.y = this.stages[this.currentStage].spawnY;
+        }
+        this.focusCamera();
     },
 
     /**
