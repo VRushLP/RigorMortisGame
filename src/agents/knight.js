@@ -137,7 +137,7 @@ Knight.prototype.update = function() {
     
     if(!this.entity.fallable) return;
     
-    if (!this.entity.game.checkBottomCollision(this.entity)) {
+    if (this.entity.game.getBottomCollisions(this.entity).length === 0) {
         //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
         this.velocity += KNIGHT_PHYSICS.Y_ACCELERATION;
         if (this.velocity >= KNIGHT_PHYSICS.TERMINAL_VELOCITY) this.velocity = KNIGHT_PHYSICS.TERMINAL_VELOCITY;
@@ -157,7 +157,7 @@ Knight.prototype.update = function() {
     //If the agent is moving upwards, then it is jumping.
     //However, currently using jump animation whenever knight is in air.
     if(this.velocity < 0) {
-        if (this.entity.game.checkTopCollision(this.entity).length > 0) {
+        if (this.entity.game.getTopCollisions(this.entity).length > 0) {
             //If a top collision is detected, then the agent has hit a ceiling and must stop rising.
             this.velocity = 0;
         }
@@ -187,7 +187,7 @@ Knight.prototype.update = function() {
  */
 Knight.prototype.jump = function() {
     //Allow the jump only if the agent is on the ground.
-    if(this.entity.game.checkBottomCollision(this.entity) && this.canJump) {
+    if(this.entity.game.getBottomCollisions(this.entity).length > 0 && this.canJump) {
         this.velocity = -(KNIGHT_PHYSICS.JUMP_VELOCITY);
     }
     //The player must actively press up to jump, they can't just hold it.
@@ -216,7 +216,7 @@ Knight.prototype.readInput = function(input, modifier) {
     if (input === "left") {
         if(!this.canMove) return;
         this.direction = KNIGHT_DIR.LEFT;
-        if(this.entity.game.checkBottomCollision(this.entity)) {
+        if(this.entity.game.getBottomCollisions(this.entity).length > 0) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
         }
@@ -225,7 +225,7 @@ Knight.prototype.readInput = function(input, modifier) {
     if(input === "right") {
         if(!this.canMove) return;
         this.direction = KNIGHT_DIR.RIGHT;
-        if(this.entity.game.checkBottomCollision(this.entity)) {
+        if(this.entity.game.getBottomCollisions(this.entity).length > 0) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }

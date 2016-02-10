@@ -102,6 +102,8 @@ AM.downloadAll(function () {
     //BGM.townBoss.play();
     BGM.hellBossFinal.play();
 
+    gameEngine.playerAgent = knight;
+    gameEngine.cameraAgent = knight;
+    
     gameEngine.start();
-    gameEngine.requestMove(knight, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y); //Reset camera
 });

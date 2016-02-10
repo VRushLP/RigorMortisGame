@@ -43,6 +43,10 @@ Platform.prototype = {
         this.entity.draw();
     },
     
+    /**
+      * Update the moving platform, which almost entirely involves progressing it upon
+      * the current move pattern, or advancing to the next pattern.
+      */
     update: function () {
         if(this.movePatterns.length > 0) {
             //Check if we need to restart the movement loop.
@@ -58,7 +62,7 @@ Platform.prototype = {
                 this.lastMoveOriginY = this.entity.y;
             }
             //Move the platform by the amount requested by the movement pattern.
-            var agentsToDrag = this.entity.game.checkTopCollision(this.entity);
+            var agentsToDrag = this.entity.game.getTopCollisions(this.entity);
             
             if (this.currentMovePattern < this.movePatterns.length) {
                 this.entity.game.requestMove(this, 
