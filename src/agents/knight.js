@@ -60,24 +60,24 @@ function Knight(game, AM, x, y) {
         KNIGHT_SIZE.REST_WIDTH, KNIGHT_SIZE.REST_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
     KnightRestLeft.addFrame(0, 0);
     
-    var KnightWalkRight = new Animation(AM.getAsset("./img/knight/knight run draft.png"),
+    var KnightWalkRight = new Animation(AM.getAsset("./img/knight/knight run.png"),
         KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, KNIGHT_ANIM.FRAME_RUN_DURATION, true);
     KnightWalkRight.addFrameBatch(0, 0, 8);
-    var KnightWalkLeft = new Animation(AM.getAsset("./img/knight/knight run draft flipped.png"),
+    var KnightWalkLeft = new Animation(AM.getAsset("./img/knight/knight run flipped.png"),
         KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, KNIGHT_ANIM.FRAME_RUN_DURATION, true);
     KnightWalkLeft.addFrameBatch(0, 0, 8);
     
-    var KnightJumpRight = new Animation(AM.getAsset("./img/knight/knight jump draft.png"),
+    var KnightJumpRight = new Animation(AM.getAsset("./img/knight/knight jump.png"),
         KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
     KnightJumpRight.addFrame(0, 0);
-    var KnightJumpLeft = new Animation(AM.getAsset("./img/knight/knight jump draft flipped.png"),
+    var KnightJumpLeft = new Animation(AM.getAsset("./img/knight/knight jump flipped.png"),
         KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
     KnightJumpLeft.addFrame(0, 0);
     
-    var KnightFallRight = new Animation(AM.getAsset("./img/knight/knight jump draft.png"),
+    var KnightFallRight = new Animation(AM.getAsset("./img/knight/knight jump.png"),
         KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
     KnightFallRight.addFrame(KNIGHT_SIZE.JUMP_WIDTH, 0);
-    var KnightFallLeft = new Animation(AM.getAsset("./img/knight/knight jump draft flipped.png"),
+    var KnightFallLeft = new Animation(AM.getAsset("./img/knight/knight jump flipped.png"),
         KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
     KnightFallLeft.addFrame(KNIGHT_SIZE.JUMP_WIDTH, 0);
     
