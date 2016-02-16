@@ -6,8 +6,8 @@ frame duration: n/a
 start point:    0,0
 
 knight run.png
-frame width:    50
-frame height:   55
+frame width:    49
+frame height:   52
 num frames:     8
 frame duration: 0.1 seconds
 start point:    0,0
@@ -21,7 +21,7 @@ start point:    0,0
 
 knight attack.png
 frame width:    90
-frame height:   69
+frame height:   70
 num frames:     8
 frame duration: 0.1 seconds
 start point:    0,0
