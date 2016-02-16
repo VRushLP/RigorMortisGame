@@ -50,11 +50,11 @@ var BGM = {
 
 var AM = new AssetManager();
 
-AM.queueDownload("./img/knight/knight jump draft.png");
-AM.queueDownload("./img/knight/knight run draft.png");
+AM.queueDownload("./img/knight/knight jump.png");
+AM.queueDownload("./img/knight/knight run.png");
 AM.queueDownload("./img/knight/knight standing.png");
-AM.queueDownload("./img/knight/knight jump draft flipped.png");
-AM.queueDownload("./img/knight/knight run draft flipped.png");
+AM.queueDownload("./img/knight/knight jump flipped.png");
+AM.queueDownload("./img/knight/knight run flipped.png");
 AM.queueDownload("./img/knight/knight standing flipped.png");
 AM.queueDownload("./img/knight/knight attack draft.png");
 AM.queueDownload("./img/knight/knight attack draft flipped.png");

@@ -1,0 +1,24 @@
+forest boss background.png
+width: 1150
+height: 600
+NOT ANIMATED (maybe in the future something with the statue)
+
+forest boss platform.png
+width: 150
+height: 500
+
+forest boss spike 50px.png
+width: 50
+height: 500
+
+forest boss spike 100px.png
+width: 100
+height: 500
+
+forest boss spike 150px.png
+width: 150
+height: 500
+
+forest boss weak point.png
+width: 150
+height: 50
