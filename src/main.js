@@ -56,8 +56,8 @@ AM.queueDownload("./img/knight/knight standing.png");
 AM.queueDownload("./img/knight/knight jump flipped.png");
 AM.queueDownload("./img/knight/knight run flipped.png");
 AM.queueDownload("./img/knight/knight standing flipped.png");
-AM.queueDownload("./img/knight/knight attack draft.png");
-AM.queueDownload("./img/knight/knight attack draft flipped.png");
+AM.queueDownload("./img/knight/knight attack.png");
+AM.queueDownload("./img/knight/knight attack flipped.png");
 AM.queueDownload("./img/forest-stage/forest sky.png");
 AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
@@ -100,7 +100,7 @@ AM.downloadAll(function () {
     //BGM.forestLevel.play();
     //BGM.castleLevel.play();
     //BGM.townBoss.play();
-    BGM.hellBossFinal.play();
+    //BGM.hellBossFinal.play();
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;
