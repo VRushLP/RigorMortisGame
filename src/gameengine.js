@@ -1,5 +1,10 @@
 var FOREST_STAGE = 0;
 
+var CAMERA_MODE = {
+    INSTANT: 0,
+    PAN: 1,
+}
+
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -44,8 +49,6 @@ function GameEngine() {
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
-    this.cameraX = 0;
-    this.cameraY = 0;
     
     this.stages = [];
     this.currentStage;
@@ -58,6 +61,15 @@ function GameEngine() {
 }
 
 GameEngine.prototype = {
+    
+    camera: {
+        x: 0,
+        y: 0,
+        speedX: 1,
+        speedY: 1,
+        mode: CAMERA_MODE.INSTANT,
+        frozen: false
+    },
 
     init: function (ctx) {
         console.log("Initializing GameEngine...");
@@ -117,7 +129,7 @@ GameEngine.prototype = {
                 //DEBUG ONLY, allows you to ping your location to the console.
                 case 66: //B
                     console.log("Current Location: " + that.playerAgent.entity.x +", " + that.playerAgent.entity.y);
-                    break
+                    break;
             }
             e.preventDefault();
         }, false);
@@ -162,23 +174,54 @@ GameEngine.prototype = {
             this.agents[i].update();
         }
         
-        this.focusCamera();
+        this.updateCamera();
         this.checkPlayerRespawn();
     },
     
     /**
       * Move the camera to the current position of the focused agent.
       */
-    focusCamera: function () {
-        var entity = this.cameraAgent.entity;
+    updateCamera: function () {
+        //If the camera is frozen, do not update it.
+        if (this.camera.frozen) return;
         
-        //Only begin moving the camera once the player is halfway across the screen.
-        if (entity.x > (this.surfaceWidth / 2) - (entity.width / 2)) {
-            this.cameraX = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
-        } else {
-            this.cameraX = 0;
+        var entity = this.cameraAgent.entity;
+        var cameraAgentX = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
+        var cameraAgentY = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
+        
+        //If the camera is in instant mode, keep it locked on the agent.
+        if (this.camera.mode === CAMERA_MODE.INSTANT) {
+            this.camera.x = cameraAgentX;
+            this.camera.y = cameraAgentY;
+        } 
+        
+        //If the camera is in pan mode, move it towards the agent based on the camera speed.
+        if (this.camera.mode === CAMERA_MODE.PAN) {
+            //If the agent is close enough, snap the camera to it.
+            if (Math.abs(cameraAgentX - this.camera.x) <= this.camera.speedX) {
+                    this.camera.x = cameraAgentX;
+            //Otherwise, move the camera to the left or right, depending on where the agent is.
+            } else if (cameraAgentX > this.camera.x) {
+                this.camera.x += this.camera.speedX;
+            } else {
+                this.camera.x -= this.camera.speedX;
+            }
+            
+            //Use the same logic for moving the camera on the Y axis.
+            if (Math.abs(cameraAgentY - this.camera.Y) <= this.camera.speedY) {
+                    this.camera.y = cameraAgentY;
+            } else if (cameraAgentY > this.camera.y) {
+                this.camera.y += this.camera.speedY;
+            } else {
+                this.camera.y -= this.camera.speedY;
+            }
         }
-        this.cameraY = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
+        
+        //Stay in the default X position unless the camera agent is at least half the screen
+        //away from the left side of the stage.
+        if (entity.x <= (this.surfaceWidth / 2) - (entity.width / 2)) {
+            this.camera.x = 0;
+        }
     },
     
     /**
@@ -191,7 +234,7 @@ GameEngine.prototype = {
         if (entity.respawnable && entity.y > this.stages[this.currentStage].stageHeight + 100) {
             this.respawnPlayer();
         }
-        this.focusCamera();
+        this.updateCamera();
     },
     
     respawnPlayer: function () {
@@ -316,7 +359,20 @@ GameEngine.prototype = {
                 //Temporary fix to allow platforms to move the player.
                 if(other.controllable && other.moveable) {
                     this.requestMove(this.agents[i], amountX, amountY);
-                    break;
+                    continue;
+                }
+                
+                //Temporary fix to allow intangible objects, like camera triggers, to activate,
+                //but not affect the player's movement. Not optimized, as this will activate at any time
+                //the player may have collided with it, even if another entity is closer and blocks them.
+                if (typeof(other.intangible) !== "undefined" && other.intangible) {
+                    if (typeof this.agents[i].checkListeners === 'function') {
+                        this.agents[i].checkListeners(agent);
+                    }
+                    if (typeof agent.checkListeners === 'function') {
+                        agent.checkListeners(this.agents[i]);
+                    }
+                    continue;
                 }
                 
                 //Determine if the colliding entity is the nearest one, and thus the one we should respond to.
@@ -346,13 +402,17 @@ GameEngine.prototype = {
      * Return an array of agents that are colliding with the bottom of the given entity.
      */
     getBottomCollisions: function (entity) {
-        if (!entity.collidable) return false;
 
         var bottomCollisions = [];
+        if (!entity.collidable) return bottomCollisions;
 
-        for (var i = 0; i < this.agents.length; i++) {
+        for (var i = 0; i < this.agents.length; i++) {      
+            
             var other = this.agents[i].entity;
             if (other === entity) continue; //Prevent an entity from detecting itself.
+            
+            //Intangible entities are only for events like triggers, and should not register here.
+            if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
 
             var belowEntity = false;
             //Check if the left side of this entity is within the same plane as the other.
@@ -379,14 +439,18 @@ GameEngine.prototype = {
      * Return an array of agents that are colliding with the top of the given entity.
      */
     getTopCollisions: function (entity) {
-        if (!entity.collidable) return false;
 
         var topCollisions = [];
+        if (!entity.collidable) return topCollisions;
 
         for (var i = 0; i < this.agents.length; i++) {
+            
             var other = this.agents[i].entity;
             if (other === entity) continue; //Prevent the entity from detecting itself.
 
+            //Intangible entities are only for events like triggers, and should not register here.
+            if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            
             var aboveEntity = false;
             //Check if the top side of this entity is within the same plane as the other.
             if (entity.x >= other.x && entity.x <= other.x + other.width) {
@@ -466,11 +530,11 @@ GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
     this.ctx.save(); 
     for (var i = 0; i < this.stages.length; i++) {
-        this.stages[i].drawBackground(this.ctx, this.cameraX);
+        this.stages[i].drawBackground(this.ctx, this.camera.x);
     }
     for (var i = 0; i < this.agents.length; i++) {
         if(this.isOnScreen(this.agents[i].entity)) {
-            this.agents[i].entity.draw(this.cameraX, this.cameraY);
+            this.agents[i].entity.draw(this.camera.x, this.camera.y);
         }        
     }
     this.ctx.restore();
@@ -482,17 +546,17 @@ GameEngine.prototype.draw = function () {
 GameEngine.prototype.isOnScreen = function (entity) {
     var onCamera = true;
     
-    if(this.cameraX === 0) {
+    if(this.camera.x === 0) {
         //Camera is in default state.
         if(entity.x + entity.width < 0) onCamera = false;
         if(entity.x > this.surfaceWidth) onCamera = false;
     } else {
-        if(entity.x + entity.width < (-1 * this.cameraX)) onCamera = false;
+        if(entity.x + entity.width < (-1 * this.camera.x)) onCamera = false;
         if(entity.x > (-1 * this.cameraX) + this.surfaceWidth) onCamera = false;
     }
     
-    if(entity.y + entity.height < this.cameraY) onCamera = false;
-    if(entity.y > this.cameraY + this.surfaceHeight) onCamera = false;
+    if(entity.y + entity.height < this.camera.y) onCamera = false;
+    if(entity.y > this.camera.y + this.surfaceHeight) onCamera = false;
     
     return onCamera;
 }

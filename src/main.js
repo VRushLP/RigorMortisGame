@@ -95,6 +95,11 @@ AM.downloadAll(function () {
     var skeleton = new Skeleton(gameEngine, AM, 500, 2040);
     forestStage.entityList.push(skeleton);
     
+    var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3650, 1900);
+    var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3051, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
+    
+    forestStage.entityList.push(bossCameraTrigger);
+    
     gameEngine.addStage(forestStage);
 
     //BGM.forestLevel.play();
