@@ -4,8 +4,9 @@
  * frameHeight: The height of each frame.
  * frameDuration: The length in time that each frame should last.
  * loop: Set to true if the animation should repeat once it is over.
+ * offsetX/Y: Optional offsets for how the animation is drawn to the screen.
  */
-function Animation(spriteSheet, frameWidth, frameHeight, frameDuration, loop) {
+function Animation(spriteSheet, frameWidth, frameHeight, frameDuration, loop, offsetX, offsetY) {
     this.elapsedTime = 0;   
     this.frames = [];
     this.multiframeArray = [];
@@ -15,6 +16,13 @@ function Animation(spriteSheet, frameWidth, frameHeight, frameDuration, loop) {
     this.frameWidth = frameWidth;
     this.frameHeight = frameHeight;
     this.frameDuration = frameDuration;
+    
+    //Set offsets to 0 if they were not provided.
+    if (offsetX) this.offsetX = offsetX;
+    else this.offsetX = 0;
+    
+    if (offsetY) this.offsetY = offsetY;
+    else this.offsetY = 0;
 }
 
 Animation.prototype = {
@@ -132,7 +140,7 @@ Animation.prototype = {
             ctx.drawImage(this.spriteSheet,
                      xStart, yStart,  // source from sheet
                      this.frameWidth, this.frameHeight,
-                     x, y,
+                     x + this.offsetX, y + this.offsetY,
                      this.frameWidth,
                      this.frameHeight);
         } else {

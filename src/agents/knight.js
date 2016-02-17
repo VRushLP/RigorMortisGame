@@ -94,9 +94,9 @@ function Knight(game, AM, x, y) {
         KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
     KnightFallLeft.addFrame(KNIGHT_SIZE.JUMP_WIDTH, 0);
     
-    var KnightAttackRight = new Animation(AM.getAsset("./img/knight/knight attack.png"), 90, 70, 0.085, true);
+    var KnightAttackRight = new Animation(AM.getAsset("./img/knight/knight attack.png"), 90, 70, 0.085, true, 0, -19);
     KnightAttackRight.addFrameBatch(0, 0, 8);
-    var KnightAttackLeft = new Animation(AM.getAsset("./img/knight/knight attack flipped.png"), 90, 70, 0.085, true);
+    var KnightAttackLeft = new Animation(AM.getAsset("./img/knight/knight attack flipped.png"), 90, 70, 0.085, true, -35, -19);
     KnightAttackLeft.addFrameBatch(0, 0, 8);
     
     this.entity.addAnimation(KnightRestRight);
