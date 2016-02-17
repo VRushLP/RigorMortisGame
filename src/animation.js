@@ -166,5 +166,13 @@ Animation.prototype = {
     //Return whether or not the animation has finished.
     isDone : function () {
         return (this.currentFrame() >= this.frames.length / 2);
-    }
+    },
+    
+    /*
+     * Return whether or not the animation is on its final frame.
+     * This indicates that the next frame animated will need to be from a different source.
+     */
+    isFinalFrame : function () {
+        return (this.currentFrame() + 1 >= this.frames.length / 2);
+}
 }
