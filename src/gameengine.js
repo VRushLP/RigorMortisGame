@@ -65,8 +65,10 @@ GameEngine.prototype = {
     camera: {
         x: 0,
         y: 0,
-        speed: 1,
-        mode: CAMERA_MODE.INSTANT
+        speedX: 1,
+        speedY: 1,
+        mode: CAMERA_MODE.INSTANT,
+        frozen: false
     },
 
     init: function (ctx) {
@@ -168,23 +170,54 @@ GameEngine.prototype = {
             this.agents[i].update();
         }
         
-        this.focusCamera();
+        this.updateCamera();
         this.checkPlayerRespawn();
     },
     
     /**
       * Move the camera to the current position of the focused agent.
       */
-    focusCamera: function () {
-        var entity = this.cameraAgent.entity;
+    updateCamera: function () {
+        //If the camera is frozen, do not update it.
+        if (this.camera.frozen) continue;
         
-        //Only begin moving the camera once the player is halfway across the screen.
-        if (entity.x > (this.surfaceWidth / 2) - (entity.width / 2)) {
-            this.camera.x = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
-        } else {
+        var entity = this.cameraAgent.entity;
+        var cameraAgentX = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
+        var cameraAgentY = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
+        
+        //If the camera is in instant mode, keep it locked on the agent.
+        if (this.camera.mode === CAMERA_MODE.INSTANT) {
+            this.camera.x = cameraAgentX;
+            this.camera.y = cameraAgentY;
+        } 
+        
+        //If the camera is in pan mode, move it towards the agent based on the camera speed.
+        if (this.camera.mode === CAMERA_MODE.PAN) {
+            //If the agent is close enough, snap the camera to it.
+            if (Math.abs(cameraAgentX - this.camera.x) <= this.camera.speedX) {
+                    this.camera.x = cameraAgentX;
+            //Otherwise, move the camera to the left or right, depending on where the agent is.
+            } else if (cameraAgentX > this.camera.x) {
+                this.camera.x += this.camera.speedX;
+            } else {
+                this.camera.x -= this.camera.speedX;
+            }
+            
+            //Use the same logic for moving the camera on the Y axis.
+            if (Math.abs(cameraAgentY - this.camera.Y) <= this.camera.speedY) {
+                    this.camera.y = cameraAgentY;
+            } else if (cameraAgentY > this.camera.y) {
+                this.camera.y += this.camera.speedY;
+            } else {
+                this.camera.y -= this.camera.speedY;
+            }
+        }
+        
+        //Stay in the default X position unless the camera agent is at least half the screen
+        //away from the left side of the stage.
+        if (entity.x <= (this.surfaceWidth / 2) - (entity.width / 2)) {
             this.camera.x = 0;
         }
-        this.camera.y = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
     },
     
     /**
@@ -197,7 +230,7 @@ GameEngine.prototype = {
         if (entity.respawnable && entity.y > this.stages[this.currentStage].stageHeight + 100) {
             this.respawnPlayer();
         }
-        this.focusCamera();
+        this.updateCamera();
     },
     
     respawnPlayer: function () {
