@@ -126,6 +126,10 @@ GameEngine.prototype = {
                 case 32: //SPACE
                     that.pressSpace = true;
                     break;
+                //DEBUG ONLY, allows you to ping your location to the console.
+                case 66: //B
+                    console.log("Current Location: " + that.playerAgent.entity.x +", " + that.playerAgent.entity.y);
+                    break;
             }
             e.preventDefault();
         }, false);
@@ -179,7 +183,7 @@ GameEngine.prototype = {
       */
     updateCamera: function () {
         //If the camera is frozen, do not update it.
-        if (this.camera.frozen) continue;
+        if (this.camera.frozen) return;
         
         var entity = this.cameraAgent.entity;
         var cameraAgentX = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
@@ -363,10 +367,10 @@ GameEngine.prototype = {
                 //the player may have collided with it, even if another entity is closer and blocks them.
                 if (typeof(other.intangible) !== "undefined" && other.intangible) {
                     if (typeof this.agents[i].checkListeners === 'function') {
-                        this.agents[i].checkListeners(collisionResults.agent);
+                        this.agents[i].checkListeners(agent);
                     }
                     if (typeof agent.checkListeners === 'function') {
-                        agent.checkListeners(agent);
+                        agent.checkListeners(this.agents[i]);
                     }
                     continue;
                 }
@@ -398,13 +402,17 @@ GameEngine.prototype = {
      * Return an array of agents that are colliding with the bottom of the given entity.
      */
     getBottomCollisions: function (entity) {
-        if (!entity.collidable) return false;
 
         var bottomCollisions = [];
+        if (!entity.collidable) return bottomCollisions;
 
-        for (var i = 0; i < this.agents.length; i++) {
+        for (var i = 0; i < this.agents.length; i++) {      
+            
             var other = this.agents[i].entity;
             if (other === entity) continue; //Prevent an entity from detecting itself.
+            
+            //Intangible entities are only for events like triggers, and should not register here.
+            if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
 
             var belowEntity = false;
             //Check if the left side of this entity is within the same plane as the other.
@@ -431,14 +439,18 @@ GameEngine.prototype = {
      * Return an array of agents that are colliding with the top of the given entity.
      */
     getTopCollisions: function (entity) {
-        if (!entity.collidable) return false;
 
         var topCollisions = [];
+        if (!entity.collidable) return topCollisions;
 
         for (var i = 0; i < this.agents.length; i++) {
+            
             var other = this.agents[i].entity;
             if (other === entity) continue; //Prevent the entity from detecting itself.
 
+            //Intangible entities are only for events like triggers, and should not register here.
+            if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            
             var aboveEntity = false;
             //Check if the top side of this entity is within the same plane as the other.
             if (entity.x >= other.x && entity.x <= other.x + other.width) {
