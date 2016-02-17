@@ -1,5 +1,10 @@
 var FOREST_STAGE = 0;
 
+var CAMERA_MODE = {
+    INSTANT: 0,
+    PAN: 1,
+}
+
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -44,8 +49,6 @@ function GameEngine() {
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
-    this.cameraX = 0;
-    this.cameraY = 0;
     
     this.stages = [];
     this.currentStage;
@@ -58,6 +61,13 @@ function GameEngine() {
 }
 
 GameEngine.prototype = {
+    
+    camera: {
+        x: 0,
+        y: 0,
+        speed: 1,
+        mode: CAMERA_MODE.INSTANT
+    },
 
     init: function (ctx) {
         console.log("Initializing GameEngine...");
@@ -170,11 +180,11 @@ GameEngine.prototype = {
         
         //Only begin moving the camera once the player is halfway across the screen.
         if (entity.x > (this.surfaceWidth / 2) - (entity.width / 2)) {
-            this.cameraX = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
+            this.camera.x = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
         } else {
-            this.cameraX = 0;
+            this.camera.x = 0;
         }
-        this.cameraY = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
+        this.camera.y = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
     },
     
     /**
@@ -475,11 +485,11 @@ GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
     this.ctx.save(); 
     for (var i = 0; i < this.stages.length; i++) {
-        this.stages[i].drawBackground(this.ctx, this.cameraX);
+        this.stages[i].drawBackground(this.ctx, this.camera.x);
     }
     for (var i = 0; i < this.agents.length; i++) {
         if(this.isOnScreen(this.agents[i].entity)) {
-            this.agents[i].entity.draw(this.cameraX, this.cameraY);
+            this.agents[i].entity.draw(this.camera.x, this.camera.y);
         }        
     }
     this.ctx.restore();
@@ -491,17 +501,17 @@ GameEngine.prototype.draw = function () {
 GameEngine.prototype.isOnScreen = function (entity) {
     var onCamera = true;
     
-    if(this.cameraX === 0) {
+    if(this.camera.x === 0) {
         //Camera is in default state.
         if(entity.x + entity.width < 0) onCamera = false;
         if(entity.x > this.surfaceWidth) onCamera = false;
     } else {
-        if(entity.x + entity.width < (-1 * this.cameraX)) onCamera = false;
+        if(entity.x + entity.width < (-1 * this.camera.x)) onCamera = false;
         if(entity.x > (-1 * this.cameraX) + this.surfaceWidth) onCamera = false;
     }
     
-    if(entity.y + entity.height < this.cameraY) onCamera = false;
-    if(entity.y > this.cameraY + this.surfaceHeight) onCamera = false;
+    if(entity.y + entity.height < this.camera.y) onCamera = false;
+    if(entity.y > this.camera.y + this.surfaceHeight) onCamera = false;
     
     return onCamera;
 }
