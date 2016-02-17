@@ -6,6 +6,8 @@ var KNIGHT_SIZE = {
     WALK_HEIGHT: 52,
     JUMP_WIDTH: 47,
     JUMP_HEIGHT: 55,
+    ATTACK_OFFSET_Y: -19,
+    ATTACK_LEFT_OFFSET_X: -40,
 }
 
 //Animation Constants
@@ -93,9 +95,10 @@ function Knight(game, AM, x, y) {
         KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
     KnightFallLeft.addFrame(KNIGHT_SIZE.JUMP_WIDTH, 0);
     
-    var KnightAttackRight = new Animation(AM.getAsset("./img/knight/knight attack.png"), 90, 70, 0.085, false, 0, -19);
+    var KnightAttackRight = new Animation(AM.getAsset("./img/knight/knight attack.png"), 90, 70, 0.085, false, 0, KNIGHT_SIZE.ATTACK_OFFSET_Y);
     KnightAttackRight.addFrameBatch(0, 0, 8);
-    var KnightAttackLeft = new Animation(AM.getAsset("./img/knight/knight attack flipped.png"), 90, 70, 0.085, false, -40, -19);
+    var KnightAttackLeft = new Animation(AM.getAsset("./img/knight/knight attack flipped.png"), 90, 70, 0.085, false,
+                                         KNIGHT_SIZE.ATTACK_LEFT_OFFSET_X, KNIGHT_SIZE.ATTACK_OFFSET_Y);
     KnightAttackLeft.addFrameBatch(0, 0, 8);
     
     this.entity.addAnimation(KnightRestRight);
@@ -254,7 +257,8 @@ Knight.prototype.readInput = function(input, modifier) {
             if(this.direction === KNIGHT_DIR.RIGHT) {
                 var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width + 1, this.entity.y, this);
             } else {
-                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width - 51, this.entity.y, this);
+                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width - 51,
+                                                this.entity.y, this);
             }
             
             this.entity.game.addAgent(newAttack);
