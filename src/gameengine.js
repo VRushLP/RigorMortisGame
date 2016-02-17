@@ -114,6 +114,10 @@ GameEngine.prototype = {
                 case 32: //SPACE
                     that.pressSpace = true;
                     break;
+                //DEBUG ONLY, allows you to ping your location to the console.
+                case 66: //B
+                    console.log("Current Location: " + that.playerAgent.entity.x +", " + that.playerAgent.entity.y);
+                    break
             }
             e.preventDefault();
         }, false);

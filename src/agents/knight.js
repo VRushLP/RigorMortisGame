@@ -6,6 +6,8 @@ var KNIGHT_SIZE = {
     WALK_HEIGHT: 52,
     JUMP_WIDTH: 47,
     JUMP_HEIGHT: 55,
+    ATTACK_OFFSET_Y: -19,
+    ATTACK_LEFT_OFFSET_X: -40,
 }
 
 //Animation Constants
@@ -22,7 +24,6 @@ var KNIGHT_ANIM = {
     ATTACK_LEFT: 9,
     FRAME_DURATION: .1,
     FRAME_RUN_DURATION: .085,
-    ATTACK_FRAMES: 24,
 }
 
 //Direction Constants
@@ -63,7 +64,7 @@ function Knight(game, AM, x, y) {
     this.canMove = true;
     
     this.invulnerableFrames = 0;
-    this.attackFrames = 0;
+    this.attacking = false;
     this.health = KNIGHT_ATTR.STARTING_HEALTH;
 
     var KnightRestRight = new Animation(AM.getAsset("./img/knight/knight standing.png"),
@@ -94,9 +95,10 @@ function Knight(game, AM, x, y) {
         KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
     KnightFallLeft.addFrame(KNIGHT_SIZE.JUMP_WIDTH, 0);
     
-    var KnightAttackRight = new Animation(AM.getAsset("./img/knight/knight attack.png"), 90, 70, 0.085, true);
+    var KnightAttackRight = new Animation(AM.getAsset("./img/knight/knight attack.png"), 90, 70, 0.085, false, 0, KNIGHT_SIZE.ATTACK_OFFSET_Y);
     KnightAttackRight.addFrameBatch(0, 0, 8);
-    var KnightAttackLeft = new Animation(AM.getAsset("./img/knight/knight attack flipped.png"), 90, 70, 0.085, true);
+    var KnightAttackLeft = new Animation(AM.getAsset("./img/knight/knight attack flipped.png"), 90, 70, 0.085, false,
+                                         KNIGHT_SIZE.ATTACK_LEFT_OFFSET_X, KNIGHT_SIZE.ATTACK_OFFSET_Y);
     KnightAttackLeft.addFrameBatch(0, 0, 8);
     
     this.entity.addAnimation(KnightRestRight);
@@ -126,8 +128,17 @@ Knight.prototype.update = function() {
         this.health = KNIGHT_ATTR.STARTING_HEALTH;
         this.entity.game.respawnPlayer(this);
     }
-    if (this.attackFrames > 0) {
-        this.attackFrames--;
+    
+    this.attacking = false;
+    var currentAnimation = this.entity.currentAnimation;
+    
+    if (currentAnimation === KNIGHT_ANIM.ATTACK_RIGHT ||
+        currentAnimation === KNIGHT_ANIM.ATTACK_LEFT) {
+        if (!this.entity.animationList[currentAnimation].isFinalFrame()) {
+            this.attacking = true;
+        } else {
+            this.readInput("none");
+        }
     }
     
     
@@ -241,19 +252,20 @@ Knight.prototype.readInput = function(input, modifier) {
         }
         
         //Create a new sword hitbox if the knight is not currently attacking.
-        if (this.attackFrames <= 0) {
-            this.attackFrames = KNIGHT_ANIM.ATTACK_FRAMES;
+        if (!this.attacking) {
+            this.attacking = true;
             if(this.direction === KNIGHT_DIR.RIGHT) {
-                var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width + 1, this.entity.y);
+                var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width + 1, this.entity.y, this);
             } else {
-                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width - 51, this.entity.y);
+                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width - 51,
+                                                this.entity.y, this);
             }
             
             this.entity.game.addAgent(newAttack);
         }
     }
     if (input === "none") {
-        if(this.attackFrames > 0) return;
+        if(this.attacking) return;
         if(this.direction === KNIGHT_DIR.RIGHT) {
             this.entity.setAnimation(KNIGHT_ANIM.REST_RIGHT);
         } else {
@@ -277,7 +289,7 @@ Knight.prototype.readInput = function(input, modifier) {
     }
     
     if (input === "space_released") {
-        if (this.attackFrames <= 0) {
+        if (!this.attacking) {
             this.canMove = true;
         }
     }
@@ -313,17 +325,16 @@ Knight.prototype.readInput = function(input, modifier) {
   * A sword hitbox is an invisible agent that damages enemies,
   * and self-destructs after a number of frames.
   */
-function SwordHitbox(game, x, y) {
+function SwordHitbox(game, x, y, source) {
     this.entity = new Entity(game, x , y, 50, 50);
     this.entity.moveable = true;
-    this.framesRemaining = KNIGHT_ANIM.ATTACK_FRAMES;
+    this.source = source;
 }
 
 SwordHitbox.prototype = {
     
     update: function() {
-        this.framesRemaining--;
-        if (this.framesRemaining <= 0) {
+        if (!this.source.attacking) {
             //TODO: Add RemoveFromWorld to gameengine.
             var index = this.entity.game.agents.indexOf(this);
             this.entity.game.agents.splice(index, 1);
