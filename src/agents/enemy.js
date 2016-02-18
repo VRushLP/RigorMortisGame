@@ -47,7 +47,6 @@ Skeleton.prototype = {
             if (this.invulnerableFrames === 0) {
                 this.confused = false;
             }
-
         }
         if (this.health <= 0) {
             var index = this.entity.game.agents.indexOf(this);
@@ -55,6 +54,7 @@ Skeleton.prototype = {
             return;
         }
 
+        //Skeletons should always know if they're falling
         if (this.entity.game.getBottomCollisions(this.entity).length === 0) {
             //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
             this.yVelocity += SKELETON_ATTR.Y_ACCELERATION;
@@ -63,46 +63,49 @@ Skeleton.prototype = {
             //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
             this.yVelocity = 0;
         }
-
-        this.entity.game.requestMove(this, 0, this.yVelocity);
+        if (this.yVelocity !== 0) {
+            this.entity.game.requestMove(this, 0, this.yVelocity);
+        }
 
         var player = this.entity.game.playerAgent.entity;
 
+        //Skeletons should only do math if they are not confused
+        if (!this.confused) {
+            if (this.entity.game.playerAgent.hasOwnProperty('velocity') && this.entity.game.playerAgent.velocity === 0) {
 
-        if (this.entity.game.playerAgent.hasOwnProperty('velocity') && this.entity.game.playerAgent.velocity === 0) {
+                var knightPoint = {
+                    x: (player.x + (player.width) / 2),
+                    y: (player.y + (player.height) / 2)
+                };
 
-            var knightPoint = {
-                x: (player.x + (player.width) / 2),
-                y: (player.y + (player.height) / 2)
-            };
+                var skeletonPoint = {
+                    x: (this.entity.x + (this.entity.width) / 2),
+                    y: (this.entity.y + (this.entity.height) / 2)
+                };
 
-            var skeletonPoint = {
-                x : (this.entity.x + (this.entity.width)/2),
-                y : (this.entity.y + (this.entity.height)/2)
-            };
+                var verticalDistance = skeletonPoint.y - knightPoint.y;
 
-            var verticalDistance = skeletonPoint.y - knightPoint.y;
-
-            if (Math.abs(knightPoint.x - skeletonPoint.x) <= SKELETON_ATTR.ATTENTION_DISTANCE
-                && verticalDistance > SKELETON_ATTR.VERTICAL_TOLERANCE
-                && verticalDistance < 0) {
-                this.xDestination = knightPoint.x;
+                if (Math.abs(knightPoint.x - skeletonPoint.x) <= SKELETON_ATTR.ATTENTION_DISTANCE
+                    && verticalDistance > SKELETON_ATTR.VERTICAL_TOLERANCE
+                    && verticalDistance < 0) {
+                    this.xDestination = knightPoint.x; //The skeleton noticed you
+                }
             }
-        }
-        //else Don't update your destinations.
+            //else Don't update your destinations.
 
-        if (!this.confused && this.entity.x !== this.xDestination) {
-            var distance = this.entity.x - this.xDestination;
-            distance = -1 * distance; //Reassign so negative values are to your left, positive values are to your right
-            
-            if (distance < 0) {
-                this.entity.currentAnimation = SKELETON_ANIM.STANDING_LEFT;
-                this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
-            } else {
-                this.entity.currentAnimation = SKELETON_ANIM.STANDING_RIGHT;
-                this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
+            if (this.entity.x !== this.xDestination) {
+                var distance = this.entity.x - this.xDestination;
+                distance = -1 * distance; //Reassign so negative values are to your left, positive values are to your right
+
+                if (distance < 0) {
+                    this.entity.currentAnimation = SKELETON_ANIM.STANDING_LEFT;
+                    this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
+                } else {
+                    this.entity.currentAnimation = SKELETON_ANIM.STANDING_RIGHT;
+                    this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
+                }
             }
-        }
+        }        
     },
     
     draw: function() {
