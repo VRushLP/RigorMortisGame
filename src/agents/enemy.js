@@ -4,6 +4,8 @@ var SKELETON_ATTR = {
     INVULNERABILITY_FRAMES: 40,
     ATTENTION_DISTANCE : 400,
     VERTICAL_TOLERANCE : -250,
+    Y_ACCELERATION : .5,
+    TERMINAL_VELOCITY : 6
 }
 
 var SKELETON_ANIM = {
@@ -21,7 +23,6 @@ function Skeleton(game, AM, x, y) {
     this.health = SKELETON_ATTR.STARTING_HEALTH;
     this.invulnerableFrames = 0;
     this.yVelocity = 0;
-    this.xVelocity = 1;
     this.xDestination = x;
     this.yDestination = y;
     this.confused = false;
@@ -54,7 +55,19 @@ Skeleton.prototype = {
             return;
         }
 
+        if (this.entity.game.getBottomCollisions(this.entity).length === 0) {
+            //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
+            this.yVelocity += SKELETON_ATTR.Y_ACCELERATION;
+            if (this.yVelocity >= SKELETON_ATTR.TERMINAL_VELOCITY) this.yVelocity = SKELETON_ATTR.TERMINAL_VELOCITY;
+        } else if (this.yVelocity > 0) {
+            //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
+            this.yVelocity = 0;
+        }
+
+        this.entity.game.requestMove(this, 0, this.yVelocity);
+
         var player = this.entity.game.playerAgent.entity;
+
 
         if (this.entity.game.playerAgent.hasOwnProperty('velocity') && this.entity.game.playerAgent.velocity === 0) {
 

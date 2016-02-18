@@ -95,7 +95,7 @@ AM.downloadAll(function () {
     var manySkeletons = [];
     manySkeletons.push(new Skeleton(gameEngine, AM, 600, 2039));
     manySkeletons.push(new Skeleton(gameEngine, AM, 1350, 1889));
-    //manySkeletons.push(new Skeleton(gameEngine, AM, 2140, 1539)); This skeleton makes the level impossible without skeleton gravity
+    manySkeletons.push(new Skeleton(gameEngine, AM, 2199, 1539));
     manySkeletons.push(new Skeleton(gameEngine, AM, 3800, 639));
     manySkeletons.push(new Skeleton(gameEngine, AM, 3425, 1489));
     manySkeletons.push(new Skeleton(gameEngine, AM, 2700, 1489));
