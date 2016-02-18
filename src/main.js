@@ -61,7 +61,7 @@ AM.queueDownload("./img/knight/knight attack flipped.png");
 AM.queueDownload("./img/forest-stage/forest sky.png");
 AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
-AM.queueDownload("./img/enemy/skeletonChaser mockup.png")
+AM.queueDownload("./img/enemy/chaser.png")
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
