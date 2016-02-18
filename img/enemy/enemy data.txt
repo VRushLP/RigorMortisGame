@@ -1,23 +1,69 @@
-skeleton mockup.png
-frame width:    52
-frame height:   60
-frame duration: n/a
-num frames:     2
-origin point:   0,0
-init direction: left
+CTRL-F YOUR DESIRED ENEMY SHEET:
+chaser.png
+archer.png (INCLUDES ARROW)
 
-skeletonArcher mockup.png
-frame width:    68
-frame height:   60
-frame duration: n/a
-num frames:     2
-origin point:   0,0
-init direction: left
+----------
+chaser.png
+----------
+idle sprite size - (31, 59)
 
-wispChaser mockup.png
-frame width:    44
-frame height:   50
-frame duration: n/a
-num frames:     2
-origin point:   0,0
-init direction: left
+idle left
+	0, 0
+	1 frame
+
+idle right
+	31, 0
+	1 frame
+
+run sprite size - (52, 59)
+
+run left
+	0, 59
+	3 frames
+
+run right
+	0, 118
+	3 frames
+----------
+archer.png (INCLUDES ARROW)
+----------
+all sprites - (73, 64)
+idle left
+	0, 0
+	1 frame
+
+idle right
+	73, 0
+	1 frame
+
+arrow left
+	146, 0
+	1 frame
+
+arrow right
+	146, 5	
+	1 frame
+
+attack straight left
+	0, 64
+	3 frames
+
+attack straight right
+	0, 128
+	3 frames
+
+attack down left
+	0, 192
+	3 frames
+
+attack down right
+	0, 256
+	3 frames
+
+attack up left
+	0, 320
+	3 frames
+
+attack up right
+	0, 384
+	3 frames
