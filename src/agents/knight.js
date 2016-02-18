@@ -1,7 +1,7 @@
 //Size constants
 var KNIGHT_SIZE = {
-    REST_WIDTH: 41,
-    REST_HEIGHT: 50,
+    STAND_WIDTH: 41,
+    STAND_HEIGHT: 50,
     WALK_WIDTH: 49,
     WALK_HEIGHT: 52,
     JUMP_WIDTH: 47,
@@ -12,8 +12,8 @@ var KNIGHT_SIZE = {
 
 //Animation Constants
 var KNIGHT_ANIM = {
-    REST_RIGHT: 0,
-    REST_LEFT: 1,
+    STAND_RIGHT: 0,
+    STAND_LEFT: 1,
     WALKING_RIGHT: 2,
     WALKING_LEFT: 3,
     JUMPING_RIGHT: 4,
@@ -67,12 +67,12 @@ function Knight(game, AM, x, y) {
     this.attacking = false;
     this.health = KNIGHT_ATTR.STARTING_HEALTH;
 
-    var KnightRestRight = new Animation(AM.getAsset("./img/knight/knight standing.png"),
-        KNIGHT_SIZE.REST_WIDTH, KNIGHT_SIZE.REST_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
-    KnightRestRight.addFrame(0, 0);
-    var KnightRestLeft = new Animation(AM.getAsset("./img/knight/knight standing flipped.png"),
-        KNIGHT_SIZE.REST_WIDTH, KNIGHT_SIZE.REST_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
-    KnightRestLeft.addFrame(0, 0);
+    var KnightStandRight = new Animation(AM.getAsset("./img/knight/knight standing.png"),
+        KNIGHT_SIZE.STAND_WIDTH, KNIGHT_SIZE.STAND_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
+    KnightStandRight.addFrame(0, 0);
+    var KnightStandLeft = new Animation(AM.getAsset("./img/knight/knight standing flipped.png"),
+        KNIGHT_SIZE.STAND_WIDTH, KNIGHT_SIZE.STAND_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
+    KnightStandLeft.addFrame(0, 0);
     
     var KnightWalkRight = new Animation(AM.getAsset("./img/knight/knight run.png"),
         KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, KNIGHT_ANIM.FRAME_RUN_DURATION, true);
@@ -101,8 +101,8 @@ function Knight(game, AM, x, y) {
                                          KNIGHT_SIZE.ATTACK_LEFT_OFFSET_X, KNIGHT_SIZE.ATTACK_OFFSET_Y);
     KnightAttackLeft.addFrameBatch(0, 0, 8);
     
-    this.entity.addAnimation(KnightRestRight);
-    this.entity.addAnimation(KnightRestLeft);
+    this.entity.addAnimation(KnightStandRight);
+    this.entity.addAnimation(KnightStandLeft);
     this.entity.addAnimation(KnightWalkRight);
     this.entity.addAnimation(KnightWalkLeft);
     this.entity.addAnimation(KnightJumpRight);
@@ -267,9 +267,9 @@ Knight.prototype.readInput = function(input, modifier) {
     if (input === "none") {
         if(this.attacking) return;
         if(this.direction === KNIGHT_DIR.RIGHT) {
-            this.entity.setAnimation(KNIGHT_ANIM.REST_RIGHT);
+            this.entity.setAnimation(KNIGHT_ANIM.STAND_RIGHT);
         } else {
-            this.entity.setAnimation(KNIGHT_ANIM.REST_LEFT);
+            this.entity.setAnimation(KNIGHT_ANIM.STAND_LEFT);
         }
     }
     

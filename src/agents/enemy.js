@@ -9,15 +9,17 @@ var SKELETON_ATTR = {
 }
 
 var SKELETON_ANIM = {
-    STANDING_RIGHT: 0,
-    STANDING_LEFT: 1,
+    STAND_RIGHT: 0,
+    STAND_LEFT: 1,
+    RUN_RIGHT: 2,
+    RUN_LEFT: 3
 }
 
 /**
   * Create a new Normal Skeleton.
   */
 function Skeleton(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, 52, 60);
+    this.entity = new Entity(game, x, y, 52, 59);
     this.entity.moveable = true;
     
     this.health = SKELETON_ATTR.STARTING_HEALTH;
@@ -27,14 +29,20 @@ function Skeleton(game, AM, x, y) {
     this.yDestination = y;
     this.confused = false;
     
-    var skeletonRight = new Animation(AM.getAsset("./img/enemy/skeletonChaser mockup.png"), 52, 60, 0.05, true);
-    skeletonRight.addFrame(52, 0);
-    var skeletonLeft = new Animation(AM.getAsset("./img/enemy/skeletonChaser mockup.png"), 52, 60, 0.05, true);
-    skeletonLeft.addFrame(0, 0);
+    var skeletonIdleRight = new Animation(AM.getAsset("./img/enemy/chaser.png"), 31, 59, 0.05, true);
+    skeletonIdleRight.addFrame(31, 0);
+    var skeletonIdleLeft = new Animation(AM.getAsset("./img/enemy/chaser.png"), 31, 59, 0.05, true);
+    skeletonIdleLeft.addFrame(0, 0);
+    var skeletonRunRight = new Animation(AM.getAsset("./img/enemy/chaser.png"), 52, 59, 0.1, true);
+    skeletonRunRight.addFrameBatch(0, 118, 3);
+    var skeletonRunLeft = new Animation(AM.getAsset("./img/enemy/chaser.png"), 52, 59, 0.1, true);
+    skeletonRunLeft.addFrameBatch(0, 59, 3);
     
-    this.entity.addAnimation(skeletonRight);
-    this.entity.addAnimation(skeletonLeft);
-    this.entity.setAnimation(SKELETON_ANIM.STANDING_RIGHT);
+    this.entity.addAnimation(skeletonIdleRight);
+    this.entity.addAnimation(skeletonIdleLeft);
+    this.entity.addAnimation(skeletonRunRight);
+    this.entity.addAnimation(skeletonRunLeft);
+    this.entity.setAnimation(SKELETON_ANIM.STAND_RIGHT);
 }
 
 Skeleton.prototype = {
@@ -73,6 +81,8 @@ Skeleton.prototype = {
         if (!this.confused) {
             if (this.entity.game.playerAgent.hasOwnProperty('velocity') && this.entity.game.playerAgent.velocity === 0) {
 
+                //We probably want to do this calculation once within Knight.
+                //At the moment it looks like all enemies will want to know this point.
                 var knightPoint = {
                     x: (player.x + (player.width) / 2),
                     y: (player.y + (player.height) / 2)
@@ -98,11 +108,20 @@ Skeleton.prototype = {
                 distance = -1 * distance; //Reassign so negative values are to your left, positive values are to your right
 
                 if (distance < 0) {
-                    this.entity.currentAnimation = SKELETON_ANIM.STANDING_LEFT;
                     this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
-                } else {
-                    this.entity.currentAnimation = SKELETON_ANIM.STANDING_RIGHT;
+                    console.log(this.entity.x, this.xDestination);
+                    if (this.entity.x != this.xDestination) {
+                        this.entity.currentAnimation = SKELETON_ANIM.RUN_LEFT;
+                    } else {
+                        this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
+                    }
+                } else { //distance >= 0
                     this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
+                    if (this.entity.x != this.xDestination) {
+                        this.entity.currentAnimation = SKELETON_ANIM.RUN_RIGHT;
+                    } else {
+                        this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
+                    }
                 }
             }
         }        
