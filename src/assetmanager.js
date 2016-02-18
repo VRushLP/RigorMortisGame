@@ -11,7 +11,7 @@ AssetManager.prototype = {
     queueDownload : function(path) {
         this.downloadQueue.push(path);
     },
-    
+
     queueStageDownload : function(path) {
         this.stageQueue.push(path);
     },
@@ -30,7 +30,7 @@ AssetManager.prototype = {
             var stageContents;
             var client = new XMLHttpRequest();
             var that = this;
-                      
+
             client.onreadystatechange = function() {
                 if(client.readyState === 4 && client.status === 200) {
                     that.cache[stagePath] = client.responseText;
@@ -38,11 +38,11 @@ AssetManager.prototype = {
                     if(that.isDone()) callback();
                 }
             }
-            
-            client.open('GET', './txt/forest-stage.txt');  
+
+            client.open('GET', './txt/forest-stage.txt');
             client.send();
         }
-        
+
         for (var i = 0; i < this.downloadQueue.length; i++) {
             var img = new Image();
             var that = this;

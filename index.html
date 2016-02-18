@@ -1,21 +1,77 @@
 <!DOCTYPE html>
+<style>
+    body {
+        background-color: black;
+    }
+    canvas {
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+        width: 1280px;
+        height: 720px;
+        border: 1px solid black;
+    }
+</style>
+
 <html>
 <head>
     <meta charset="utf-8">
     <title>Rigor Mortis Game</title>
-    <script type="text/javascript" src="./src/camera.js"></script>
+    <script type="text/javascript" src="./src/howler.js"></script>
+    <script type="text/javascript" src="./src/gameengine.js"></script>
     <script type="text/javascript" src="./src/assetmanager.js"></script>
-    <script type="text/javascript" src="./src/agents/entity.js"></script>
-    <script type="text/javascript" src="./src/agents/health.js"></script>
-    <script type="text/javascript" src="./src/agents/block.js"></script>
-    <script type="text/javascript" src="./src/gameengine - kyle.js"></script>
-    <script type="text/javascript" src="./src/agents/knight.js"></script>
-    <script type="text/javascript" src="./src/agents/monster.js"></script>
-    <script type="text/javascript" src="./src/animation.js"></script>
-    <script type="text/javascript" src="./src/level.js"></script>
     <script type="text/javascript" src="./src/main.js"></script>
+    <script type="text/javascript" src="./src/entity.js"></script>
+    <script type="text/javascript" src="./src/animation.js"></script>
+    <script type="text/javascript" src="./src/stage.js"></script>
+    <script type="text/javascript" src="./src/agents/knight.js"></script>
+    <script type="text/javascript" src="./src/agents/block.js"></script>
+    <script type="text/javascript" src="./src/agents/platform.js"></script>
+    <script type="text/javascript" src="./src/agents/enemy.js"></script>
+    <script type="text/javascript" src="./src/agents/trigger.js"></script>
+
+    <link rel="icon" href="./img/icon.png">
 </head>
 <body>
-    <canvas id="gameWorld" tabindex="1" width="1280" height="720" style="border: 1px solid brown; background: lightskyblue"></canvas>
+    <audio src="./snd/bloody_tears.mp3" preload="auto"></audio>
+    <audio src="./snd/awake.mp3" preload="auto"></audio>
+    <audio src="./snd/cornered.mp3" preload="auto"></audio>
+    <audio src="./snd/megalovania.mp3" preload="auto"></audio>
+    <noscript>This game requires JavaScript to play. Please enable JavaScript!</noscript>
+    <canvas id="gameWorld" tabindex="1" width="1280" height="720">Your browser does not support HTML5 Canvas.</canvas>
 </body>
 </html>
+
+<!--
+*Credits*
+Primary Engine Tinkerers
+-Taylor Gorman-
+-Khoa 'Kyle' Doan-
+Engine Optimization Worrywort
+-Robert Ferguson-
+Physics
+-Taylor Gorman-
+Enemy AI
+-Khoa 'Kyle' Doan-
+Level Editor Integration
+-Khoa 'Kyle' Doan-
+-Taylor Gorman-
+Lead Idea Guy
+-Ian Cresse-
+Lead Idea Poo-pooer
+-Robert Ferguson-
+Senior Artist
+-Ian Cresse-
+Background Music Integration
+-Robert Ferguson-
+Soundtrack credits:
+Bloody Tears - Super Castlevania 4
+Arranged by Masanori Adachi and Sotaro Tojima
+Awake - Castlevania: Circle of the Moon
+Originally composed by Sotaro Tojima
+This game uses code created by Seth Ladd during his 2011 Google IO talk. A video of which can be found here: https://www.youtube.com/watch?v=yEocRtn_j9s
+This game uses the Howler.js library, which can be found here: http://goldfirestudios.com/blog/104/howler.js-Modern-Web-Audio-Javascript-Library
+All rights go to their respective copyright holders.
+Thank you for playing!

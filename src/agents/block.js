@@ -1,10 +1,26 @@
-function Block (x, y, blockAnimation) {
-   this.x = x;  // coordinate of the block of the map
-   this.y = y;  // coordinate of the block of the map
-   Entity.call(this, x, y, GAME_CONSTANT.BLOCK_SIZE, GAME_CONSTANT.BLOCK_SIZE);
-   
-   this.animationList.push(blockAnimation);
-}   
+var BLOCKS_GLOBALS = {
+    WIDTH: 50,
+    HEIGHT: 50,
+    FRAME_DURATION: 1,
+}
 
-Block.prototype = new Entity();
-Block.prototype.constructor = Block;
+function Block(game, AM, x, y) {
+    this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
+
+    var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+    NormalState.addFrame(0, 0);
+
+    this.entity.addAnimation(NormalState);
+    this.entity.setAnimation(0);
+}
+
+Block.prototype = {
+
+    draw: function () {
+        this.entity.draw();
+    },
+
+    update: function () {
+        //Nothing to do.
+    }
+}

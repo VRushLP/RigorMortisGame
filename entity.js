@@ -27,12 +27,12 @@ Entity.prototype = {
     /*
      * Request the entity to draw the current animation frame.
      */
-    draw: function (cameraX) {
+    draw: function (cameraX, cameraY) {
         if (this.animationList.length <= 0) {
             return;
         }
         this.animationList[this.currentAnimation]
-            .drawFrame(this.game.clockTick, this.ctx, this.x + cameraX, this.y);
+            .drawFrame(this.game.clockTick, this.ctx, this.x + cameraX, this.y - cameraY);
     },
 
     /*
