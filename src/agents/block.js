@@ -24,3 +24,20 @@ Block.prototype = {
         //Nothing to do.
     }
 }
+
+/*
+ * Invisiblock is to be used for invisible walls/platforms of variable length.
+ */
+function Invisiblock(game, AM, x, y, width, height) {
+    this.entity = new Entity(game, x, y, width, height);
+}
+
+Invisiblock.prototype = {
+    draw: function () {
+        //Nothing to do.
+    },
+    
+    update: function () {
+        //Nothing to do.
+    }
+}
