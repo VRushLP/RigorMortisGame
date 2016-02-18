@@ -37,6 +37,7 @@ CameraTrigger.prototype = {
             game.camera.speedX = this.speedX;
             game.camera.speedY = this.speedY;
             game.camera.frozen = false;
+            this.entity.collidable = false;
         }
     }
 }
@@ -82,7 +83,34 @@ MusicTrigger.prototype = {
             //Only change the music if it is not currently the one playing.
             if (this.entity.game.music !== this.music) {
                 this.entity.game.switchMusic(this.music);
+                this.entity.collidable = false;
             }
+        }
+    }
+}
+
+/*
+ *
+ */
+function SpawnTrigger(game, AM, x, y, width, height, agent) {
+    this.entity = new Entity(game, x, y, width, height);
+    this.spawnAgent = agent;
+    this.entity.intangible = true;
+}
+
+SpawnTrigger.prototype = { 
+    draw: function () {
+        //Nothing to do.
+    },
+    
+    update: function () {
+        //Nothing to do.
+    },
+    
+    checkListeners: function(agent) {
+        if (agent.entity.controllable) {
+            this.entity.game.agents.push(this.spawnAgent);
+            this.entity.collidable = false;
         }
     }
 }

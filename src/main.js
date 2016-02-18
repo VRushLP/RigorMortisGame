@@ -96,11 +96,15 @@ AM.downloadAll(function () {
     forestStage.entityList.push(skeleton);
     
     var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3650, 1900);
-    var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3051, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
-    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3051, 1701, 50, 148, BGM.forestBoss);
+    var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
+    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.forestBoss);
+    
+    var newInvisiwall = new Invisiblock(gameEngine, AM, 3051, 1701, 50, 148);
+    var spawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, newInvisiwall);
     
     forestStage.entityList.push(bossCameraTrigger);
     forestStage.entityList.push(bossMusicTrigger);
+    forestStage.entityList.push(spawnTrigger);
     
     gameEngine.addStage(forestStage);
 
