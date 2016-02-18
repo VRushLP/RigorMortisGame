@@ -38,7 +38,7 @@ var BGM = {
         }
     }),
 
-    hellBossFinal: new Howl({
+    forestBoss: new Howl({
         urls: ['./snd/megalovania.mp3'],
         volume: .15,
         loop: true,
@@ -72,7 +72,7 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     
-    var forestStage = new Stage(ctx, gameEngine, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y);
+    var forestStage = new Stage(ctx, gameEngine, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y, BGM.forestLevel);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.TREE_SCROLL_SPEED);
     forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);    
@@ -97,15 +97,17 @@ AM.downloadAll(function () {
     
     var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3650, 1900);
     var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3051, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
+    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3051, 1701, 50, 148, BGM.forestBoss);
     
     forestStage.entityList.push(bossCameraTrigger);
+    forestStage.entityList.push(bossMusicTrigger);
     
     gameEngine.addStage(forestStage);
 
     //BGM.forestLevel.play();
     //BGM.castleLevel.play();
     //BGM.townBoss.play();
-    //BGM.hellBossFinal.play();
+    //BGM.forestBossFinal.play();
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;

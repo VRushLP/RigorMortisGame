@@ -1,12 +1,16 @@
-function Stage(ctx, gameEngine, spawnX, spawnY) {
+function Stage(ctx, gameEngine, spawnX, spawnY, music) {
     this.entityList = [];
     this.spawnX = spawnX;
     this.spawnY = spawnY;
     this.backgroundList = [];
-    this.stageMusic = null;
     this.canvasX = ctx.canvas.width;
     this.canvasY = ctx.canvas.height;
     this.gameEngine = gameEngine;
+    this.stageMusic = null;
+    
+    if (typeof(music) !== "undefined") {
+        this.stageMusic = music;
+    }
     
     this.stageHeight = 0;
 }

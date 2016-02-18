@@ -52,6 +52,7 @@ function GameEngine() {
     
     this.stages = [];
     this.currentStage;
+    this.currentMusic = null;
     
     //Initially set by main before game start.
     this.playerAgent;
@@ -95,6 +96,16 @@ GameEngine.prototype = {
         
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
         this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+        
+        this.switchMusic(this.stages[this.currentStage].stageMusic);
+    },
+    
+    switchMusic : function (newMusic) {
+        if (this.music !== null && typeof(this.music) !== "undefined") {
+            this.music.stop();
+        }
+        this.music = newMusic;
+        this.music.play();
     },
     
     

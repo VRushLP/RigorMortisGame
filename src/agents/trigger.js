@@ -57,3 +57,32 @@ FocusTrigger.prototype = {
         //Nothing to do.
     }
 }
+
+
+/*
+ * A music trigger causes the game engine to change the current song upon collision.
+ */
+function MusicTrigger(game, AM, x, y, width, height, music) {
+    this.entity = new Entity(game, x, y, width, height);
+    this.music = music;
+    this.entity.intangible = true;
+}
+
+MusicTrigger.prototype = { 
+    draw: function () {
+        //Nothing to do.
+    },
+    
+    update: function () {
+        //Nothing to do.
+    },
+    
+    checkListeners: function(agent) {
+        if (agent.entity.controllable) {
+            //Only change the music if it is not currently the one playing.
+            if (this.entity.game.music !== this.music) {
+                this.entity.game.switchMusic(this.music);
+            }
+        }
+    }
+}
