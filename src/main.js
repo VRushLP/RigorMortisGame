@@ -92,7 +92,7 @@ AM.downloadAll(function () {
     platform.addMovePattern(0, 0, 200, 1);
     forestStage.entityList.push(platform);
     
-    var skeleton = new Skeleton(gameEngine, AM, 500, 2040);
+    var skeleton = new Skeleton(gameEngine, AM, 500, 2039);
     forestStage.entityList.push(skeleton);
     
     var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3650, 1900);
