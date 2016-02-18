@@ -3,7 +3,7 @@ var SKELETON_ATTR = {
     SPEED : 3,
     INVULNERABILITY_FRAMES: 40,
     ATTENTION_DISTANCE : 400,
-    VERTICAL_TOLERANCE : 250,
+    VERTICAL_TOLERANCE : -250,
 }
 
 var SKELETON_ANIM = {
@@ -39,22 +39,49 @@ function Skeleton(game, AM, x, y) {
 Skeleton.prototype = {
     
     update: function () {
+        //compute updates that are independent of player distance
+        if (this.invulnerableFrames > 0) {
+            this.invulnerableFrames--;
+
+            if (this.invulnerableFrames === 0) {
+                this.confused = false;
+            }
+
+        }
+        if (this.health <= 0) {
+            var index = this.entity.game.agents.indexOf(this);
+            this.entity.game.agents.splice(index, 1);
+            return;
+        }
+
         var player = this.entity.game.playerAgent.entity;
 
         if (this.entity.game.playerAgent.hasOwnProperty('velocity') && this.entity.game.playerAgent.velocity === 0) {
-            var xCheck = player.x + (player.width) / 2;
 
-            if (xCheck > this.entity.x - SKELETON_ATTR.ATTENTION_DISTANCE || xCheck < this.entity + SKELETON_ATTR.ATTENTION_DISTANCE) {
-                console.log("Close enough!");
-                this.xDestination = player.x;
+            var knightPoint = {
+                x: (player.x + (player.width) / 2),
+                y: (player.y + (player.height) / 2)
+            };
+
+            var skeletonPoint = {
+                x : (this.entity.x + (this.entity.width)/2),
+                y : (this.entity.y + (this.entity.height)/2)
+            };
+
+            var verticalDistance = skeletonPoint.y - knightPoint.y;
+
+            if (Math.abs(knightPoint.x - skeletonPoint.x) <= SKELETON_ATTR.ATTENTION_DISTANCE
+                && verticalDistance > SKELETON_ATTR.VERTICAL_TOLERANCE
+                && verticalDistance < 0) {
+                this.xDestination = knightPoint.x;
             }
         }
-        //else Don't update your x destinations.
+        //else Don't update your destinations.
 
         if (!this.confused && this.entity.x !== this.xDestination) {
             var distance = this.entity.x - this.xDestination;
             distance = -1 * distance; //Reassign so negative values are to your left, positive values are to your right
-
+            
             if (distance < 0) {
                 this.entity.currentAnimation = SKELETON_ANIM.STANDING_LEFT;
                 this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
@@ -63,26 +90,6 @@ Skeleton.prototype = {
                 this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
             }
         }
-
-        if (this.invulnerableFrames > 0) {
-            this.invulnerableFrames--;
-            if(this.invulnerableFrames === 0)
-            {
-                this.confused = false;
-            }
-
-        }
-        if (this.health <= 0) {
-            var index = this.entity.game.agents.indexOf(this);
-            this.entity.game.agents.splice(index, 1);
-        }
-        
-        
-
-
-
-
-
     },
     
     draw: function() {
