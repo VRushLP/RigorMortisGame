@@ -92,8 +92,19 @@ AM.downloadAll(function () {
     platform.addMovePattern(0, 0, 200, 1);
     forestStage.entityList.push(platform);
     
-    var skeleton = new Skeleton(gameEngine, AM, 500, 2040);
-    forestStage.entityList.push(skeleton);
+    var manySkeletons = [];
+    manySkeletons.push(new Skeleton(gameEngine, AM, 600, 2039));
+    manySkeletons.push(new Skeleton(gameEngine, AM, 1350, 1889));
+    manySkeletons.push(new Skeleton(gameEngine, AM, 2199, 1539));
+    manySkeletons.push(new Skeleton(gameEngine, AM, 3800, 639));
+    manySkeletons.push(new Skeleton(gameEngine, AM, 3425, 1489));
+    manySkeletons.push(new Skeleton(gameEngine, AM, 2700, 1489));
+    manySkeletons.push(new Skeleton(gameEngine, AM, 3501, 2139));
+
+    for (var i = 0; i < manySkeletons.length; i++) {
+        forestStage.entityList.push(manySkeletons[i]);
+        console.log(manySkeletons[i].entity.x, manySkeletons[i].entity.y)
+    }
     
     var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3650, 1900);
     var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
