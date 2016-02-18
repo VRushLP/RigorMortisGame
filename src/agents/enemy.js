@@ -5,7 +5,7 @@ var SKELETON_ATTR = {
     ATTENTION_DISTANCE : 400,
     VERTICAL_TOLERANCE : -250,
     Y_ACCELERATION : .5,
-    TERMINAL_VELOCITY: 6
+    TERMINAL_VELOCITY : 6
 }
 
 var SKELETON_ANIM = {
@@ -81,6 +81,8 @@ Skeleton.prototype = {
         if (!this.confused) {
             if (this.entity.game.playerAgent.hasOwnProperty('velocity') && this.entity.game.playerAgent.velocity === 0) {
 
+                //We probably want to do this calculation once within Knight.
+                //At the moment it looks like all enemies will want to know this point.
                 var knightPoint = {
                     x: (player.x + (player.width) / 2),
                     y: (player.y + (player.height) / 2)
@@ -106,11 +108,20 @@ Skeleton.prototype = {
                 distance = -1 * distance; //Reassign so negative values are to your left, positive values are to your right
 
                 if (distance < 0) {
-                    this.entity.currentAnimation = SKELETON_ANIM.RUN_LEFT;
                     this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
-                } else {
-                    this.entity.currentAnimation = SKELETON_ANIM.RUN_RIGHT;
+                    console.log(this.entity.x, this.xDestination);
+                    if (this.entity.x != this.xDestination) {
+                        this.entity.currentAnimation = SKELETON_ANIM.RUN_LEFT;
+                    } else {
+                        this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
+                    }
+                } else { //distance >= 0
                     this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
+                    if (this.entity.x != this.xDestination) {
+                        this.entity.currentAnimation = SKELETON_ANIM.RUN_RIGHT;
+                    } else {
+                        this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
+                    }
                 }
             }
         }        
