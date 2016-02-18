@@ -174,5 +174,5 @@ Animation.prototype = {
      */
     isFinalFrame : function () {
         return (this.currentFrame() + 1 >= this.frames.length / 2);
-}
+    }
 }
