@@ -40,7 +40,7 @@ var BGM = {
         }
     }),
 
-    hellBossFinal: new Howl({
+    forestBoss: new Howl({
         urls: ['./snd/megalovania.mp3'],
         volume: .15,
         loop: true,
@@ -61,7 +61,8 @@ AM.queueDownload("./img/knight/knight attack flipped.png");
 AM.queueDownload("./img/forest-stage/forest sky.png");
 AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
-AM.queueDownload("./img/enemy/skeletonChaser mockup.png")
+AM.queueDownload("./img/enemy/chaser.png");
+AM.queueDownload("./img/enemy/archer.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
@@ -72,11 +73,10 @@ AM.downloadAll(function () {
     console.log("Initializing world");
     var canvas = document.getElementById('gameWorld');
     var ctx = canvas.getContext('2d');
-    console.log(ctx);
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
 
-    var forestStage = new Stage(ctx, gameEngine, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y);
+    var forestStage = new Stage(ctx, gameEngine, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y, BGM.forestLevel);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.TREE_SCROLL_SPEED);
     forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
@@ -96,18 +96,37 @@ AM.downloadAll(function () {
     platform.addMovePattern(0, 0, 200, 1);
     forestStage.entityList.push(platform);
 
+    // var manySkeletons = [];
+    // manySkeletons.push(new Skeleton(gameEngine, AM, 600, 2039));
+    // manySkeletons.push(new Skeleton(gameEngine, AM, 1350, 1889));
+    // manySkeletons.push(new Skeleton(gameEngine, AM, 2199, 1539));
+    // manySkeletons.push(new Skeleton(gameEngine, AM, 3800, 639));
+    // manySkeletons.push(new Skeleton(gameEngine, AM, 3425, 1489));
+    // manySkeletons.push(new Skeleton(gameEngine, AM, 2700, 1489));
+    // manySkeletons.push(new Skeleton(gameEngine, AM, 3501, 2139));
+    //
+    // for (var i = 0; i < manySkeletons.length; i++) {
+    //     forestStage.entityList.push(manySkeletons[i]);
+    //     console.log(manySkeletons[i].entity.x, manySkeletons[i].entity.y)
+    // }
+
     var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3650, 1900);
-    var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3051, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
+    var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
+    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.forestBoss);
+
+    var newInvisiwall = new Invisiblock(gameEngine, AM, 3051, 1701, 50, 148);
+    var spawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, newInvisiwall);
 
     forestStage.entityList.push(bossCameraTrigger);
+    forestStage.entityList.push(bossMusicTrigger);
+    forestStage.entityList.push(spawnTrigger);
 
     gameEngine.addStage(forestStage);
-    gameEngine.addEnemy(forestStage);
 
     //BGM.forestLevel.play();
     //BGM.castleLevel.play();
     //BGM.townBoss.play();
-    //BGM.hellBossFinal.play();
+    //BGM.forestBossFinal.play();
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;

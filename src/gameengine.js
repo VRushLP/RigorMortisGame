@@ -52,7 +52,7 @@ function GameEngine() {
 
     this.stages = [];
     this.currentStage;
-
+    this.currentMusic = null;
     //Initially set by main before game start.
     this.playerAgent;
     this.cameraAgent;
@@ -89,18 +89,22 @@ GameEngine.prototype = {
         this.stages.push(stage);
     },
 
-    addEnemy : function (stage) {
-        for (var i = 0; i < stage.enemies.length; i++) {
-            this.agents.push(stage.enemies[i]);
-        }
-    }
-
     loadStage : function (stageNumber) {
         this.currentStage = stageNumber;
         this.agents = this.stages[this.currentStage].entityList;
 
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
         this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+
+        this.switchMusic(this.stages[this.currentStage].stageMusic);
+    },
+
+    switchMusic : function (newMusic) {
+        if (this.music !== null && typeof(this.music) !== "undefined") {
+            this.music.stop();
+        }
+        this.music = newMusic;
+        this.music.play();
     },
 
 
@@ -509,7 +513,6 @@ GameEngine.prototype.start = function () {
 //Only entities that respond to inputs should check for input.
 GameEngine.prototype.loop = function () {
     for(var i = 0; i < this.agents.length; i++) {
-
         if(this.agents[i].entity.controllable === true) {
             if(this.pressRight) this.agents[i].readInput("right");
             if(this.pressDown) this.agents[i].readInput("down");

@@ -1,14 +1,16 @@
-function Stage(ctx, gameEngine, spawnX, spawnY) {
+function Stage(ctx, gameEngine, spawnX, spawnY, music) {
     this.entityList = [];
     this.enemies = [];
     this.spawnX = spawnX;
     this.spawnY = spawnY;
     this.backgroundList = [];
-    this.stageMusic = null;
     this.canvasX = ctx.canvas.width;
     this.canvasY = ctx.canvas.height;
     this.gameEngine = gameEngine;
-
+    this.stageMusic = null;
+    if (typeof(music) !== "undefined") {
+        this.stageMusic = music;
+    }
     this.stageHeight = 0;
 }
 
@@ -64,9 +66,17 @@ Stage.prototype = {
                         console.log(currentX);
                         console.log(currentY);
                         break;
-                    case "*" : this.enemies.push(new Archer(currentX, currentY, game, this)); break;
-                    case "w" : this.enemies.push(new Wisp(currentX, currentY, this)); break;
-                    case "o" : this.enemies.push(new HealingStuff(currentX, currentY)); break;
+                    case "!" :
+                        this.enemies.push(new Skeleton(this.gameEngine, AM, currentX, currentY - 10));
+                        this.entityList.push(this.enemies[this.enemies.length - 1]);
+                        break;
+                    case "*" :
+                        this.enemies.push(new Archer(this.gameEngine, currentX, currentY - 10, this));
+                        this.entityList.push(this.enemies[this.enemies.length - 1]);
+                        break;
+                    // case "w" : this.enemies.push(new Wisp(currentX, currentY, this)); break;
+                    // case "o" : this.enemies.push(new HealingStuff(currentX, currentY)); break;
+                    default: break;
                 }
                 currentX += 50;
             }
