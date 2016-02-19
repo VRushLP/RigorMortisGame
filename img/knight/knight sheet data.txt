@@ -5,6 +5,30 @@ num frames:     1
 frame duration: n/a
 start point:    0,0
 
+<<<<<<< HEAD
+knight run draft flipped.png
+frame width:    47
+frame height:   52
+num frames:     8
+frame duration: 0.07 seconds
+start point:    0,0
+
+knight run draft.png
+frame width:    50
+frame height:   55
+num frames:     8
+frame duration: 0.1 seconds
+start point:    0,0
+
+knight jump draft.png
+frame width:    47
+frame height:   55
+num frames:     2
+frame duration: 0.1 seconds
+start point:    0,0
+
+knight jump draft flipped.png
+=======
 knight run.png
 frame width:    49
 frame height:   52
@@ -13,12 +37,37 @@ frame duration: 0.1 seconds
 start point:    0,0
 
 knight jump.png
+>>>>>>> master
 frame width:    47
 frame height:   55
 num frames:     2
 frame duration: 0.1 seconds
 start point:    0,0
 
+<<<<<<< HEAD
+knight attack draft flipped.png
+frame width:    90
+frame height:   64
+num frames:     12
+frame duration: 0.1 seconds?
+start point:   0,0
+
+knight attack draft.png
+frame width:    90
+frame height:   64
+num frames:     12
+frame duration: 0.1 seconds?
+start point:    0,0
+
+knight hit draft.png
+frame width:    48
+frame height:   50
+num frames:     1
+frame duration: n/a
+start point:    0,0
+
+knight hit draft flipped.png
+=======
 knight attack.png
 frame width:    90
 frame height:   70
@@ -27,6 +76,7 @@ frame duration: 0.1 seconds
 start point:    0,0
 
 knight hit.png
+>>>>>>> master
 frame width:    48
 frame height:   50
 num frames:     1
