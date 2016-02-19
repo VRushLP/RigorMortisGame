@@ -40,7 +40,7 @@ var BGM = {
         }
     }),
 
-    forestBoss: new Howl({
+    hellBossFinal: new Howl({
         urls: ['./snd/megalovania.mp3'],
         volume: .15,
         loop: true,
@@ -98,24 +98,10 @@ AM.downloadAll(function () {
     secondPlatform.addMovePattern(450, -1, 0, 0);
     secondPlatform.addMovePattern(450, 1, 0, 0);
     forestStage.entityList.push(secondPlatform);
-
-    var manySkeletons = [];
-    manySkeletons.push(new Skeleton(gameEngine, AM, 600, 2039));
-    manySkeletons.push(new Skeleton(gameEngine, AM, 1350, 1889));
-    manySkeletons.push(new Skeleton(gameEngine, AM, 2199, 1539));
-    manySkeletons.push(new Skeleton(gameEngine, AM, 3800, 639));
-    manySkeletons.push(new Skeleton(gameEngine, AM, 3425, 1489));
-    manySkeletons.push(new Skeleton(gameEngine, AM, 2700, 1489));
-    manySkeletons.push(new Skeleton(gameEngine, AM, 3501, 2139));
-
-    for (var i = 0; i < manySkeletons.length; i++) {
-        forestStage.entityList.push(manySkeletons[i]);
-        console.log(manySkeletons[i].entity.x, manySkeletons[i].entity.y)
-    }
     
-    var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3650, 1900);
+    var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3675, 1900);
     var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
-    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.forestBoss);
+    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.hellBossFinal);
 
     var newInvisiwall = new Invisiblock(gameEngine, AM, 3051, 1701, 50, 148);
     var spawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, newInvisiwall);
@@ -129,7 +115,7 @@ AM.downloadAll(function () {
     //BGM.forestLevel.play();
     //BGM.castleLevel.play();
     //BGM.townBoss.play();
-    //BGM.forestBossFinal.play();
+    //BGM.hellBossFinal.play();
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;

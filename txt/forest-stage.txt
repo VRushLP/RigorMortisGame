@@ -10,11 +10,13 @@
                                     x                                                x
                                     x                                                x
                                     x                                                x
+                                    x                                !               x
+                                    x      xxxxxxx                   xxx             x
                                     x        x                              xxxx     x
                                     xxxx     x                                       x
                                     x        x                                       x
-                                    x                        xxx        xxx          x
-                                    xxxx                xxx       xxx        xx      x
+                                    x                   *    xxx        xxx          x
+                                    xxxx                xxx       xxx        xx      x 
                                     x                   x                            x
                                     x      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx       x
                                     x        x                                       x
@@ -26,18 +28,18 @@
                                     x        x   x                                   x
                                     x        x   x                                   x
                                     x      xxx   x                            xx     x
-                                    x        x   x   !                 !      xx    ox
-                                    x      ! x   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                                    x        x   x     !               !      xx     x
+                                    x     !  x   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                      x                   xxxxx               x                       x
                       x                      x               x                       x
                        x                     x                                       x
-               w        x        xxxxxxxxxxxxxxxxxxxxxxxxx                           x
+                        x        xxxxxxxxxxxxxxxxxxxxxxxxx                           x
               xxx                x                       x                           x
               x x              xxx                       xxxxx                       x
-         xx   x x         !    x                             x                       x
+         xx   x x          !   x                             x                       x
               x xxxxxxxxxxxxxxxx                             x                       x
               x                                              x                       x
-@    x    !   x                                              x                       x
+@    x     !  x                                              x                       x
 xxxxxxxxxxxxxxx                                              x                       x
                                                              x                       x
                                                              xxxxxxxxxxxxxxxxxxxxxxxxx
