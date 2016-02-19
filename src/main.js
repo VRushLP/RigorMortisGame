@@ -85,13 +85,16 @@ AM.downloadAll(function () {
     knight.entity.respawnable = true;
     forestStage.entityList.push(knight);
     
-    var platform = new Platform(gameEngine, AM, 50, 1800, 3, 1);
-    platform.addMovePattern(400, 1, 0, 0);
-    platform.addMovePattern(0, 0, 200, -1);
-    platform.addMovePattern(400, -1, 0, 0);
-    platform.addMovePattern(0, 0, 200, 1);
-    forestStage.entityList.push(platform);
-    
+    var firstPlatform = new Platform(gameEngine, AM, 2650, 650, 4, 1);
+    firstPlatform.addMovePattern(350, 1, 0, 0);
+    firstPlatform.addMovePattern(350, -1, 0, 0);
+    forestStage.entityList.push(firstPlatform);
+
+    var secondPlatform = new Platform(gameEngine, AM, 3200, 1300, 4, 1);
+    secondPlatform.addMovePattern(450, -1, 0, 0);
+    secondPlatform.addMovePattern(450, 1, 0, 0);
+    forestStage.entityList.push(secondPlatform);
+
     var manySkeletons = [];
     manySkeletons.push(new Skeleton(gameEngine, AM, 600, 2039));
     manySkeletons.push(new Skeleton(gameEngine, AM, 1350, 1889));

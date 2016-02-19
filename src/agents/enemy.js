@@ -109,7 +109,6 @@ Skeleton.prototype = {
 
                 if (distance < 0) {
                     this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
-                    console.log(this.entity.x, this.xDestination);
                     if (this.entity.x != this.xDestination) {
                         this.entity.currentAnimation = SKELETON_ANIM.RUN_LEFT;
                     } else {
