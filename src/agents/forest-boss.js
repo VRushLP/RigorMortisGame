@@ -37,7 +37,7 @@ function ForestBoss(game, AM, x, y, stage) {
         stage.entityList.push(this.arms[i]);
     }
     
-    this.core = new ForestBossCore(game, AM, x, y);
+    this.core = new ForestBossCore(game, AM, x, y, this);
     stage.entityList.push(this.core);
     //Attach the core to arm four.
     this.core.arm = this.arms[3];
@@ -73,6 +73,13 @@ ForestBoss.prototype = {
         this.arms[3].speed = 2;
         this.arms[3].restTime = 50;
         this.arms[3].currentState = ARM_STATE.RISING;
+    },
+    
+    retreatPattern: function () {
+        for (var i = 0; i < this.arms.length; i++) {
+            this.arms[i].speed = 8;
+            this.arms[i].currentState = ARM_STATE.FALLING;
+        }
     },
     
     //Return true if the current state of all arms is hidden.
@@ -112,6 +119,13 @@ ForestBoss.prototype = {
             if (i === corePos) this.arms[i].setSize(ANIM.PLATFORM);
             else if (i === supportPlatform) this.arms[i].setSize(ANIM.PLATFORM);
             else this.arms[i].setSize(ANIM.THIN);
+        }
+    },
+    
+    takeDamage: function () {
+        this.health--;
+        for (var i = 0; i < this.arms.length; i++) {
+            this.retreatPattern();
         }
     }
     
@@ -269,10 +283,11 @@ ForestBossArm.prototype = {
  * The Forest Boss Core is a block that is on top of one of the Forest Boss Arms.
  * If the player strikes the core, they do damage to the Forest Boss.
  */
-function ForestBossCore(game, AM, x, y) {
+function ForestBossCore(game, AM, x, y, callback) {
     this.entity = new Entity(game, x, y, 0, 0);
     this.entity.moveable = true;
     this.arm;
+    this.callback = callback;
     
     var normalAnimation = new Animation(AM.getAsset("./img/enemy/forest boss weak point.png"), 50, 0, 1, true);
     normalAnimation.addFrame(50, 0);
@@ -308,5 +323,11 @@ ForestBossCore.prototype = {
     
     draw: function() {
         this.entity.draw();
-    }    
+    },
+    
+    readInput: function(input, modifier) {
+        if (input === "damage") {
+            this.callback.takeDamage();
+        }
+    },
 }
