@@ -100,28 +100,27 @@ Skeleton.prototype = {
                     && Math.abs(knightPoint.x - skeletonPoint.x) <= SKELETON_ATTR.ATTENTION_DISTANCE) {
                     this.xDestination = knightPoint.x; //The skeleton noticed you
                 }
+            }
 
-                if (this.entity.x !== this.xDestination) {
-                    var distance = -(this.entity.x - this.xDestination);                     //Reassign so negative values are to your left, positive values are to your right
+            if (this.entity.x !== this.xDestination) {
+                var distance = -(this.entity.x - this.xDestination);                     //Reassign so negative values are to your left, positive values are to your right
 
-                    if (distance < 0) {
-                        this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
-                        if (this.entity.x != this.xDestination) {
-                            this.entity.currentAnimation = SKELETON_ANIM.RUN_LEFT;
-                        } else {
-                            this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
-                        }
-                    } else { //distance >= 0
-                        this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
-                        if (this.entity.x != this.xDestination) {
-                            this.entity.currentAnimation = SKELETON_ANIM.RUN_RIGHT;
-                        } else {
-                            this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
-                        }
+                if (distance < 0) {
+                    this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
+                    if (this.entity.x != this.xDestination) {
+                        this.entity.currentAnimation = SKELETON_ANIM.RUN_LEFT;
+                    } else {
+                        this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
+                    }
+                } else { //distance >= 0
+                    this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
+                    if (this.entity.x != this.xDestination) {
+                        this.entity.currentAnimation = SKELETON_ANIM.RUN_RIGHT;
+                    } else {
+                        this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
                     }
                 }
             }
-            //else Don't update your destinations.
         } else {
             if (this.entity.currentAnimation === SKELETON_ANIM.RUN_LEFT) {
                 this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
