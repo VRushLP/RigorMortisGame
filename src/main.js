@@ -67,6 +67,7 @@ AM.queueDownload("./img/enemy/forest boss spike 50px.png");
 AM.queueDownload("./img/enemy/forest boss spike 100px.png");
 AM.queueDownload("./img/enemy/forest boss spike 150px.png");
 AM.queueDownload("./img/enemy/forest boss platform.png");
+AM.queueDownload("./img/enemy/forest boss weak point.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 

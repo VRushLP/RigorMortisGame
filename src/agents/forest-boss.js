@@ -87,6 +87,8 @@ ForestBoss.prototype = {
     //two platforms adjacent to the other, and one containing the core.
     setNormalDistro: function () {
         var corePos = Math.floor(Math.random() * 4);
+        this.core.arm = this.arms[corePos];
+        
         var supportPlatform;
         
         switch (corePos) {
@@ -269,17 +271,42 @@ ForestBossArm.prototype = {
  */
 function ForestBossCore(game, AM, x, y) {
     this.entity = new Entity(game, x, y, 0, 0);
+    this.entity.moveable = true;
     this.arm;
+    
+    var normalAnimation = new Animation(AM.getAsset("./img/enemy/forest boss weak point.png"), 50, 0, 1, true);
+    normalAnimation.addFrame(50, 0);
+    this.entity.addAnimation(normalAnimation);
 }
 
 ForestBossCore.prototype = {
     
     update: function () {
+        var animation = this.entity.animationList[this.entity.currentAnimation];
+        this.entity.x = this.arm.entity.x + 100;
         
+        //Emerge if the arm has reached its apex.
+        if (this.arm.currentState === ARM_STATE.RESTING) { 
+            if (animation.frameHeight === 0) {
+                this.entity.y = this.arm.entity.y - 1;
+            }
+            
+            var moveUp = Math.min(10, 50 - animation.frameHeight);            
+            animation.frameHeight += moveUp;
+            this.entity.game.requestMove(this, 0, -1 * moveUp);
+            this.entity.height += moveUp;
+        } else {
+            var moveDown = Math.min(10, animation.frameHeight);
+            animation.frameHeight -= moveDown;
+            this.entity.game.requestMove(this, 0, moveDown);
+            this.entity.height -= moveDown;
+        }
+        
+        if (this.entity.height > 0) this.entity.collidable = true;
+        else this.entity.collidable = false;
     },
     
     draw: function() {
         this.entity.draw();
-    },
-    
+    }    
 }
