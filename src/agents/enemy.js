@@ -62,11 +62,6 @@ Skeleton.prototype = {
                 this.confused = false;
             }
         }
-        if (this.health <= 0) {
-            var index = this.entity.game.agents.indexOf(this);
-            this.entity.game.agents.splice(index, 1);
-            return;
-        }
 
         //Skeletons should always know if they're falling
         if (this.entity.game.getBottomCollisions(this.entity).length === 0) {
@@ -81,11 +76,10 @@ Skeleton.prototype = {
             this.entity.game.requestMove(this, 0, this.yVelocity);
         }
 
-        var player = this.entity.game.playerAgent.entity;
-
         //Skeletons should only do math if they are not confused
         if (!this.confused) {
-            if (this.entity.game.playerAgent.hasOwnProperty('velocity') && this.entity.game.playerAgent.velocity === 0) {
+            var player = this.entity.game.playerAgent.entity;
+            if (this.entity.game.playerAgent.velocity === 0) {
 
                 //We probably want to do this calculation once within Knight.
                 //At the moment it looks like all enemies will want to know this point.
@@ -101,17 +95,15 @@ Skeleton.prototype = {
 
                 var verticalDistance = skeletonPoint.y - knightPoint.y;
 
-                if (Math.abs(knightPoint.x - skeletonPoint.x) <= SKELETON_ATTR.ATTENTION_DISTANCE
-                    && verticalDistance > SKELETON_ATTR.VERTICAL_TOLERANCE
-                    && verticalDistance < 0) {
+                if (verticalDistance > SKELETON_ATTR.VERTICAL_TOLERANCE
+                    && verticalDistance < 0
+                    && Math.abs(knightPoint.x - skeletonPoint.x) <= SKELETON_ATTR.ATTENTION_DISTANCE) {
                     this.xDestination = knightPoint.x; //The skeleton noticed you
                 }
             }
-            //else Don't update your destinations.
 
             if (this.entity.x !== this.xDestination) {
-                var distance = this.entity.x - this.xDestination;
-                distance = -1 * distance; //Reassign so negative values are to your left, positive values are to your right
+                var distance = -(this.entity.x - this.xDestination);                     //Reassign so negative values are to your left, positive values are to your right
 
                 if (distance < 0) {
                     this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
@@ -129,6 +121,12 @@ Skeleton.prototype = {
                     }
                 }
             }
+        } else {
+            if (this.entity.currentAnimation === SKELETON_ANIM.RUN_LEFT) {
+                this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
+            } else if (this.entity.currentAnimation === SKELETON_ANIM.RUN_RIGHT) {
+                this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
+            }
         }
     },
 
@@ -141,7 +139,12 @@ Skeleton.prototype = {
             if (this.invulnerableFrames === 0) {
                 this.invulnerableFrames = SKELETON_ATTR.INVULNERABILITY_FRAMES;
                 this.health--;
-                this.confused = true;
+                if (this.health <= 0) {
+                    var index = this.entity.game.agents.indexOf(this);
+                    this.entity.game.agents.splice(index, 1);
+                } else {
+                    this.confused = true;
+                }
             }
         }
     },
