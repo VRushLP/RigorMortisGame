@@ -111,7 +111,7 @@ AM.downloadAll(function () {
     forestStage.entityList.push(bossMusicTrigger);
     forestStage.entityList.push(spawnTrigger);
     
-    forestBoss = new ForestBoss(gameEngine, AM, 3101, 2201, forestStage);
+    forestBoss = new ForestBoss(gameEngine, AM, 3101, 2200, forestStage);
     forestStage.entityList.push(forestBoss);
 
     gameEngine.addStage(forestStage);
