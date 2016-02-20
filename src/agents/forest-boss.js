@@ -8,7 +8,8 @@ var ARM_STATE = {
 var ANIM = {
     THIN: 0,
     NORMAL: 1,
-    WIDE: 2
+    WIDE: 2,
+    PLATFORM: 3
 }
 
 var ARM_MAX_HEIGHT = 500;
@@ -30,7 +31,9 @@ function ForestBoss(game, AM, x, y, stage) {
     }
     
     this.core = new ForestBossCore(game, AM, x, y);
-    //stage.entityList.push(this.core);
+    stage.entityList.push(this.core);
+    this.core.arm = this.arms[3];
+    
     this.neutralPattern();
 }
 
@@ -53,10 +56,12 @@ ForestBoss.prototype = {
         
         this.arms[2].speed = 1;
         this.arms[2].currentState = ARM_STATE.RISING;
+        this.arms[2].setSize(ANIM.PLATFORM);
         
         this.arms[3].speed = 3;
         this.arms[3].restTime = 50;
         this.arms[3].currentState = ARM_STATE.RISING;
+        this.arms[3].setSize(ANIM.PLATFORM);
     }
     
 }
@@ -76,6 +81,18 @@ function ForestBossArm(game, AM, x, y) {
     var thinAnimation = new Animation(AM.getAsset("./img/enemy/forest boss spike 50px.png"), 50, 500, 1, true);
     thinAnimation.addFrame(0, 0);
     this.entity.addAnimation(thinAnimation);
+    
+    var normalAnimation = new Animation(AM.getAsset("./img/enemy/forest boss spike 100px.png"), 100, 500, 1, true);
+    normalAnimation.addFrame(0, 0);
+    this.entity.addAnimation(normalAnimation);
+    
+    var wideAnimation = new Animation(AM.getAsset("./img/enemy/forest boss spike 150px.png"), 150, 500, 1, true);
+    wideAnimation.addFrame(0, 0);
+    this.entity.addAnimation(wideAnimation);
+    
+    var platformAnimation = new Animation(AM.getAsset("./img/enemy/forest boss platform.png"), 150, 500, 1, true);
+    platformAnimation.addFrame(0, 0);
+    this.entity.addAnimation(platformAnimation);
 }
 
 ForestBossArm.prototype = {
@@ -155,6 +172,9 @@ ForestBossArm.prototype = {
         if (size === ANIM.WIDE) {
             this.entity.width = 150;
         }
+        if (size === ANIM.PLATFORM) {
+            this.entity.width = 150;
+        }
         
         this.entity.setAnimation(size);
     }
@@ -163,6 +183,7 @@ ForestBossArm.prototype = {
     
 function ForestBossCore(game, AM, x, y) {
     this.entity = new Entity(game, x, y, 0, 0);
+    this.arm;
 }
 
 ForestBossCore.prototype = {
