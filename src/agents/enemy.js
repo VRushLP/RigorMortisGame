@@ -33,12 +33,14 @@ var WISP_ATTR = {
     SPEED: 2,
     ATTENTION_DISTANCE: 500,
     TOUCH_DISTANCE : 40,
-    FLEE_TIME : 90
+    FLEE_TIME: 45,
+    FLEE_ACCELERATION: 4
+    //This should be true: SPEED*FLEE_TIME*FLEE_ACCELERATION < ATTENTINO_DISTANCE
 }
 
 var WISP_ANIM = {
-    FLOATING_LEFT: 0,
-    FLOATING_RIGHT : 1
+    FLOATING_RIGHT: 0,
+    FLOATING_LEFT : 1
 }
 
 /**
@@ -208,37 +210,50 @@ Wisp.prototype = {
         var distanceToKnight = getDistance(wispPoint, knightPoint)
         if (distanceToKnight <= WISP_ATTR.ATTENTION_DISTANCE) {
 
-            if (distanceToKnight < WISP_ATTR.TOUCH_DISTANCE && !this.struckRecently)
-            {
-                this.struckRecently = true;
-                this.timeToStrikeAgain = WISP_ATTR.FLEE_TIME;
-                this.entity.game.requestInputSend(this.entity.game.playerAgent, "damage", 1);
-            }
-
             if (wispPoint.x - knightPoint.x !== 0) {
                 var movementVector = getNormalizedSlope(wispPoint, knightPoint, distanceToKnight);
+
                 if (this.struckRecently) {
-                    this.entity.game.requestMove(this, movementVector.x * WISP_ATTR.SPEED * 2,
-                       movementVector.y * WISP_ATTR.SPEED * 2);
+                    this.entity.game.requestMove(this, movementVector.x * WISP_ATTR.SPEED * 4,
+                       movementVector.y * WISP_ATTR.SPEED * 4);
+
+                    if(movementVector.x > 0) {
+                        this.entity.currentAnimation = WISP_ANIM.FLOATING_RIGHT;
+                    }
+                    else{
+                        this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
+                    }
                 }
                 else {
                     this.entity.game.requestMove(this, -movementVector.x * WISP_ATTR.SPEED,
                         -movementVector.y * WISP_ATTR.SPEED);
+
+                    if (movementVector.x < 0) {
+                        this.entity.currentAnimation = WISP_ANIM.FLOATING_RIGHT;
+                    }
+                    else {
+                        this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
+                    }
                 }
             } else {
                 //Wisp is right above the knight! Don't divide by 0!
                 if(wispPoint.y > knightPoint)
                 {
                     //Wisp is below the knight
-                    this.entity.y -= WISP_ATTR.SPEED;
+                    this.entity.game.requestMove(this, 0, -WISP_ATTR.SPEED)
                 } else {
                     //Wisp is above the knight
-                    this.entity.y += WISP_ATTR.SPEED;
+                    this.entity.game.requestMove(this, 0, WISP_ATTR.SPEED)
                 }
 
             }
         }
 
+        if (distanceToKnight < WISP_ATTR.TOUCH_DISTANCE) {
+            this.struckRecently = true;
+            this.timeToStrikeAgain = WISP_ATTR.FLEE_TIME;
+            this.entity.game.requestInputSend(this.entity.game.playerAgent, "damage", 1);
+        }
     },
 
     readInput: function (input, modifier) {
