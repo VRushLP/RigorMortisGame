@@ -27,6 +27,8 @@ var FB_ATTR = {
     LEFT_SIDE_BUFFER: 100,
     //The distance between each arm.
     ARM_STRIDE: 250,
+    //The absolute maximum height that an arm should ever reach.
+    ARM_MAX_HEIGHT: 500,
     
     //The forest boss transitions between phases based on its health.
     //Phases increase speed and width of spikes.
@@ -34,12 +36,29 @@ var FB_ATTR = {
     PHASE_1_HEALTH: 6,
     PHASE_2_HEALTH: 3,
     
-    PHASE_2_SPEED_BUFF: 2,
-    PHASE_1_SPEED_BUFF: 1
+    //Phase Number: Added Speed
+    PHASE_SPEED_BUFF: {
+        0: 0,
+        1: 1,
+        2: 2
+    },
+    
+    //Phase Number: Rest Time
+    PHASE_REST_TIME: {
+        0: 125,
+        1: 100,
+        2: 75
+    },
+    
+    NEUTRAL_BASE_SPEED: 2,
+    RETREAT_BASE_SPEED: 8,
+    ATTACK_BASE_SPEED: {
+        0: 4,
+        1: 4.5,
+        2: 5,
+        3: 6
+    }
 }
-
-//The maximum height of all forest boss arms.
-var FB_ARM_MAX_HEIGHT = 500;
 
 /*
  * The Forest Boss features four arms and a core.
@@ -112,8 +131,8 @@ ForestBoss.prototype = {
     neutralPattern: function () {
         this.pattern = FB_PATTERN.NEUTRAL;
         for (var i = 0; i < this.arms.length; i++) {
-            this.arms[i].speed = 2 + this.phase;
-            this.arms[i].restTime = 125 - (this.phase * 25);
+            this.arms[i].speed = FB_ATTR.NEUTRAL_BASE_SPEED + FB_ATTR.PHASE_SPEED_BUFF[this.phase];
+            this.arms[i].restTime = FB_ATTR.PHASE_REST_TIME[this.phase];
             this.arms[i].currentState = FB_ARM_STATE.RISING;
         }
     },
@@ -122,7 +141,7 @@ ForestBoss.prototype = {
     retreatPattern: function () {
         this.pattern = FB_PATTERN.RETREAT;
         for (var i = 0; i < this.arms.length; i++) {
-            this.arms[i].speed = 8;
+            this.arms[i].speed = FB_ATTR.RETREAT_BASE_SPEED;
             this.arms[i].currentState = FB_ARM_STATE.FALLING;
         }
     },
@@ -130,19 +149,14 @@ ForestBoss.prototype = {
     //The attack pattern shuffles the arms and raises them at varying speeds.
     attackPattern: function () {
         this.pattern = FB_PATTERN.ATTACK;
-        this.shuffleArms();
         
-        this.arms[0].speed = 4 + this.phase;
-        this.arms[1].speed = 4.5 + this.phase;
-        this.arms[2].speed = 5 + this.phase;
-        this.arms[3].speed = 6 + this.phase;
-        
-        this.unshuffleArms();
-        
+        this.shuffleArms();        
         for (var i = 0; i < this.arms.length; i++) {
+            this.arms[i].speed = FB_ATTR.ATTACK_BASE_SPEED[i] + FB_ATTR.PHASE_SPEED_BUFF[this.phase];
             this.arms[i].restTime = 0;
             this.arms[i].currentState = FB_ARM_STATE.RISING;
-        }
+        }        
+        this.unshuffleArms();
     },
     
     
@@ -253,7 +267,7 @@ ForestBoss.prototype = {
             if (this.arms[i].currentState !== FB_ARM_STATE.HIDING) return false;
         }
         return true;
-    }    
+    }
 }
 
 
@@ -274,6 +288,7 @@ function ForestBossArm(game, AM, x, y) {
     this.size = FB_ANIM.THIN;
     //Original Position is relative to the arms, and is used when unshuffling them.
     this.originalPos = 0;
+    this.maxHeight = FB_ATTR.ARM_MAX_HEIGHT;
     
     //Determines how long the arm waits between rising to its peak and then falling.
     this.restTime = 0;
@@ -313,9 +328,9 @@ ForestBossArm.prototype = {
         
         //If the arm is rising, increase its height by its speed.
         if (this.currentState === FB_ARM_STATE.RISING) {
-            if (FB_ARM_MAX_HEIGHT - this.getHeight() <= this.speed) {
+            if (this.maxHeight - this.getHeight() <= this.speed) {
                 //The arm would exceed its max height.
-                this.entity.game.requestMove(this, 0, -1 * (FB_ARM_MAX_HEIGHT - this.getHeight()) );
+                this.entity.game.requestMove(this, 0, -1 * (this.maxHeight - this.getHeight()) );
             } else {
                 this.entity.game.requestMove(this, 0, -1 * this.speed);
             }
@@ -358,7 +373,7 @@ ForestBossArm.prototype = {
         anim.frameHeight = this.getHeight();
         
         //An arm begins resting after reaching its max height while rising.
-        if (this.getHeight() === FB_ARM_MAX_HEIGHT && this.currentState === FB_ARM_STATE.RISING) {
+        if (this.getHeight() === this.maxHeight && this.currentState === FB_ARM_STATE.RISING) {
             this.currentState = FB_ARM_STATE.RESTING;
             this.currentRest = this.restTime;
         }
