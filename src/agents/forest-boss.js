@@ -18,6 +18,11 @@ var PATTERN = {
     ATTACK: 2
 }
 
+var ATTR = {
+    PHASE_1_HEALTH: 6,
+    PHASE_2_HEALTH: 3
+}
+
 var ARM_MAX_HEIGHT = 500;
 
 
@@ -34,7 +39,8 @@ function ForestBoss(game, AM, x, y, stage) {
     this.pattern = PATTERN.NEUTRAL;
     
     this.speed = 0;
-    this.health = 4;
+    this.health = 9;
+    this.phase = 0;
     
     //Initialize the boss' arms and core.
     this.arms = [];
@@ -83,11 +89,10 @@ ForestBoss.prototype = {
     
     //The neutral pattern raises all arms at the same speed.
     neutralPattern: function () {
-        this.unshuffleArms();
         this.pattern = PATTERN.NEUTRAL;
         for (var i = 0; i < this.arms.length; i++) {
-            this.arms[i].speed = 2;
-            this.arms[i].restTime = 125;
+            this.arms[i].speed = 2 + this.phase;
+            this.arms[i].restTime = 125 - (this.phase * 25);
             this.arms[i].currentState = ARM_STATE.RISING;
         }
     },
@@ -104,10 +109,12 @@ ForestBoss.prototype = {
         this.pattern = PATTERN.ATTACK;
         this.shuffleArms();
         
-        this.arms[0].speed = 4;
-        this.arms[1].speed = 4.5;
-        this.arms[2].speed = 5;
-        this.arms[3].speed = 6;
+        this.arms[0].speed = 4 + this.phase;
+        this.arms[1].speed = 4.5 + this.phase;
+        this.arms[2].speed = 5 + this.phase;
+        this.arms[3].speed = 6 + this.phase;
+        
+        this.unshuffleArms();
         
         for (var i = 0; i < this.arms.length; i++) {
             this.arms[i].restTime = 0;
@@ -167,8 +174,12 @@ ForestBoss.prototype = {
         for (var i = 0; i < this.arms.length; i++) {
             this.retreatPattern();
         }
+        
+        if (this.health === ATTR.PHASE_1_HEALTH) this.phase = 1;
+        if (this.health === ATTR.PHASE_2_HEALTH) this.phase = 2;
     },
     
+    //Shuffle the arms array into a new random order.
     shuffleArms: function () {
         for (var i = this.arms.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
@@ -178,12 +189,20 @@ ForestBoss.prototype = {
         }
     },
     
+    //Resets the arms array to its original order.
     unshuffleArms: function () {
+        //Create a copy of the arms array called newArms.
         var newArms = [];
+        for (var i = 0; i < this.arms.length; i++) {
+            newArms.push(this.arms[i]);
+        }        
+        //Re-arrange newArms into the original order.
         for (var i = 0; i < this.arms.length; i++) {
             newArms[this.arms[i].originalPos] = this.arms[i];
         }
+        //Set the arms array to be the sorted newArms.
         this.arms = newArms;
+
     },
     
     selfDestruct: function () {
