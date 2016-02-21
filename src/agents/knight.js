@@ -113,8 +113,8 @@ function Knight(game, AM, x, y) {
     this.entity.addAnimation(KnightAttackLeft);
 }
 
-Knight.prototype.draw = function (cameraX, cameraY) {
-    this.entity.draw(cameraX, cameraY);
+Knight.prototype.draw = function () {
+    this.entity.draw();
 }
 
 /**
@@ -343,8 +343,8 @@ SwordHitbox.prototype = {
         this.entity.game.requestMove(this, 0, 0);
     },
 
-    draw: function(cameraX, cameraY) {
-        this.entity.draw(cameraX, cameraY);
+    draw: function() {
+        this.entity.draw();
     },
 
     checkListeners: function(agent) {

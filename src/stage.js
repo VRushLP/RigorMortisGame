@@ -71,7 +71,7 @@ Stage.prototype = {
                         this.entityList.push(this.enemies[this.enemies.length - 1]);
                         break;
                     case "*" :
-                        this.enemies.push(new Archer(this.gameEngine, currentX, currentY, this));
+                        this.enemies.push(new Archer(this.gameEngine, currentX, currentY - 10, this));
                         this.entityList.push(this.enemies[this.enemies.length - 1]);
                         break;
                     // case "w" : this.enemies.push(new Wisp(currentX, currentY, this)); break;
