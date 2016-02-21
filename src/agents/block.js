@@ -16,8 +16,8 @@ function Block(game, AM, x, y) {
 
 Block.prototype = {
 
-    draw: function () {
-        this.entity.draw();
+    draw: function (cameraX, cameraY) {
+        this.entity.draw(cameraX, cameraY);
     },
 
     update: function () {

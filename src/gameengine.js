@@ -181,7 +181,8 @@ GameEngine.prototype = {
     //Entities should check for input when updated here
     update : function () {
         for (var i = 0; i < this.agents.length; i++) {
-            this.agents[i].update();
+            this.agents[i].update(this.clockTick, this.playerAgent.entity.x,
+                this.playerAgent.entity.y, this.playerAgent.entity.width, this.playerAgent.entity.height);
         }
 
         this.updateCamera();
@@ -543,7 +544,7 @@ GameEngine.prototype.draw = function () {
     }
     for (var i = 0; i < this.agents.length; i++) {
         if(this.isOnScreen(this.agents[i].entity)) {
-            this.agents[i].entity.draw(this.camera.x, this.camera.y);
+            this.agents[i].draw(this.camera.x, this.camera.y);
         }
     }
     this.ctx.restore();

@@ -16,9 +16,20 @@ var SKELETON_ANIM = {
 }
 
 var ARCHER_ATTR = {
-    RANGE : 450,
-    STARTING_HEALTH : 3,
-    SHOOTING_TIME : 2
+    IDLE_LEFT : 0,
+    IDLE_RIGHT : 1,
+    ATK_STRAIGHT_LEFT : 2,
+    ATK_STRAIGHT_RIGHT : 3,
+    ATK_DOWN_LEFT : 4,
+    ATK_DOWN_RIGHT : 5,
+    ATK_UP_LEFT : 6,
+    ATK_UP_RIGHT : 7,
+
+    VISION_RADIUS : 550,
+    STARTING_HEALTH : 4,
+    SHOOTING_TIME : 2,
+
+    ARROW_SPEED : 7
 }
 
 /**
@@ -130,8 +141,8 @@ Skeleton.prototype = {
         }
     },
 
-    draw: function() {
-        this.entity.draw();
+    draw: function(cameraX, cameraY) {
+        this.entity.draw(cameraX, cameraY);
     },
 
     readInput: function(input, modifier) {
@@ -157,112 +168,152 @@ Skeleton.prototype = {
 }
 
 
-function Archer (game, x, y, stage) {
-    this.entity = new Entity(game, x, y, 68, 60);
+function Archer (game, x, y, level) {
+    this.entity = new Entity(game, x, y, 73, 64);
+    this.entity.y -= 14;
     // this.entity.moveable = false;
 
-    this.stage = stage;
+    this.level = level;
     this.timeDurationNextArrow = ARCHER_ATTR.SHOOTING_TIME;
 
     this.health = ARCHER_ATTR.STARTING_HEALTH;
     this.invulnerableFrames = 0;
-    this.vision = ARCHER_ATTR.RANGE;
+    this.vision = ARCHER_ATTR.VISION_RADIUS;
 
-    var archerRight = new Animation(AM.getAsset("./img/enemy/archer.png"), 73, 64, 0.05, true);
+    var archerImg = AM.getAsset("./img/enemy/archer.png");
+    var archerRight = new Animation(archerImg, 73, 64, 0.05, true);
+    var archerLeft = new Animation(archerImg, 73, 64, 0.05, true);
+    var archerLeftShooting = new Animation(archerImg, 73, 64, 0.2, false);
+    var archerRightShooting = new Animation(archerImg, 73, 64, 0.2, false);
+    var archerLeftShootingDown = new Animation(archerImg, 73, 64, 0.2, false);
+    var archerRightShootingDown = new Animation(archerImg, 73, 64, 0.2, false);
+    var archerLeftShootingUp = new Animation(archerImg, 73, 64, 0.2, false);
+    var archerRightShootingUp = new Animation(archerImg, 73, 64, 0.2, false);
     archerRight.addFrame(73, 0);
-    var archerLeft = new Animation(AM.getAsset("./img/enemy/archer.png"), 68, 60, 0.05, true);
     archerLeft.addFrame(0, 0);
+    archerLeftShooting.addFrame(0, 64, 3);
+    archerRightShooting.addFrame(0, 128, 3);
+    archerLeftShootingDown.addFrame(0, 192, 3);
+    archerRightShootingDown.addFrame(0, 256, 3);
+    archerLeftShootingUp.addFrame(0, 320, 3);
+    archerRightShootingUp.addFrame(0, 384, 3);
 
-    this.entity.animationList.push(archerRight);
     this.entity.animationList.push(archerLeft);
+    this.entity.animationList.push(archerRight);
+    this.entity.animationList.push(archerLeftShooting);
+    this.entity.animationList.push(archerRightShooting);
+    this.entity.animationList.push(archerLeftShootingDown);
+    this.entity.animationList.push(archerRightShootingDown);
+    this.entity.animationList.push(archerLeftShootingUp);
+    this.entity.animationList.push(archerRightShootingUp);
 
     this.removeFromWorld = false;
 }
 
-function distance(me, other) {
-    return Math.sqrt(Math.pow((me.x - other.x), 2) + Math.pow((me.y - other.y), 2));
+Archer.prototype = {
+    setAnimationFromAngle : function (angle) {
+        if (angle >= Math.PI / (-6) && angle <= Math.PI / 6) {   // [-30, 30] degree
+            this.entity.currentAnimation = ARCHER_ATTR.ATK_STRAIGHT_RIGHT;
+        } else if (angle > Math.PI / 6 && angle <= Math.PI / 2) {   // (30, 90] degree
+            this.entity.currentAnimation = ARCHER_ATTR.ATK_UP_RIGHT;
+        } else if (angle > Math.PI / 2 && angle < 5 * Math.PI / 6) {   // (90, 150) degree
+            this.entity.currentAnimation = ARCHER_ATTR.ATK_UP_LEFT;
+        } else if (angle >= 5 * Math.PI / 6 || angle <= (-5) * Math.PI / 6) {
+            this.entity.currentAnimation = ARCHER_ATTR.ATK_STRAIGHT_LEFT;
+        } else if (angle > (-5) * Math.PI / 6 && angle <= Math.PI / (-2)) {    // (-150, -90] degree
+            this.entity.currentAnimation = ARCHER_ATTR.ATK_DOWN_LEFT;
+        } else {
+            this.entity.currentAnimation = ARCHER_ATTR.ATK_DOWN_RIGHT;
+        }
+    },
+
+    update : function (tick, posX, posY, width, height) {
+        var playerCenter = {
+            x : posX + Math.floor(width / 2),
+            y : posY + Math.floor(height / 2)
+        };
+
+        var archerCenter = {
+            x : this.entity.x + Math.floor(this.entity.width / 2),
+            y : this.entity.y + Math.floor(this.entity.height / 2)
+        };
+
+        var distanceX = playerCenter.x - archerCenter.x;
+        var distanceY = playerCenter.y - archerCenter.y;
+        var angle = Math.atan2(-distanceY, distanceX);
+        var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        // check if the knight is in the vision radius (450 px), count down the shooting time.
+        if (distance < this.vision) {
+            if (this.timeDurationNextArrow === ARCHER_ATTR.SHOOTING_TIME) {
+                this.setAnimationFromAngle(angle);
+            }
+            this.timeDurationNextArrow -= tick;
+            if (this.timeDurationNextArrow <= 0) {
+                this.timeDurationNextArrow = ARCHER_ATTR.SHOOTING_TIME;
+            }
+        }
+        if (this.entity.currentAnimation !== ARCHER_ATTR.IDLE_LEFT && this.entity.currentAnimation !== ARCHER_ATTR.IDLE_RIGHT) {
+            if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
+                this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
+                var arrow = new Arrow(archerCenter.x, archerCenter.y, distanceX, distanceY, angle, this.level, this.entity.game);
+                this.level.enemies.push(arrow);
+                this.entity.game.addAgent(arrow);
+                if (posX > this.entity.x) {
+                    this.entity.currentAnimation = ARCHER_ATTR.IDLE_RIGHT;
+                } else {
+                    this.entity.currentAnimation = ARCHER_ATTR.IDLE_LEFT;
+                }
+            }
+        }
+    },
+
+    draw : function (cameraX, cameraY) {
+        this.entity.draw(cameraX, cameraY);
+    }
 }
 
-Archer.prototype.update = function () {
-    if (this.invulnerableFrames > 0) {
-        this.invulnerableFrames--;
-    }
-
-    if (this.health <= 0) {
-        this.removeFromWorld = true;
-        var index = this.stage.entityList.indexOf(this);
-        this.stage.entityList.splice(index, 1);
-        index = this.stage.enemies.indexOf(this);
-        this.stage.enemies.splice(index, 1);
-        return;
-    }
-
-    if (distance(this.entity.game.playerAgent.entity, this.entity) <= this.vision) {
-        if (this.timeDurationNextArrow === ARCHER_ATTR.SHOOTING_TIME) {
-        var playerCenterX = this.entity.game.playerAgent.entity.x + (this.entity.game.playerAgent.entity.width / 2);
-        var playerCenterY = this.entity.game.playerAgent.entity.y + (this.entity.game.playerAgent.entity.height / 2);
-
-        var archerCenterX = this.entity.x + Math.floor(this.width / 2);
-        var archerCenterY = this.entity.y + Math.floor(this.height / 2);
-
-        var distanceX = playerCenterX - archerCenterX;
-        var distanceY = playerCenterY - archerCenterY;
-        var arrow = new Arrow(archerCenterX, archerCenterY, distanceX, distanceY, this.entity.game);
-        this.stage.enemies.push(arrow);
-        this.stage.entityList.push(arrow);
-        this.entity.game.addAgent(arrow);
-        }
-        this.timeDurationNextArrow -= this.entity.game.clockTick;
-        if (this.timeDurationNextArrow <= 0) {
-            this.timeDurationNextArrow = ARCHER_ATTR.SHOOTING_TIME;
-        }
-    }
-};
-
-Archer.prototype.draw = function (ctx, cameraRect, tick) {
-    if (this.entity.game.playerAgent.x > this.x) {
-        this.currentAnimation = 0;
-    } else {
-        this.currentAnimation = 1;
-    }
-    Entity.prototype.draw.call(this);
-}
-
-function Arrow (x, y, xVel, yVel, game) {
-    this.entity = new Entity(game, x, y, 24, 5);
+function Arrow (x, y, distanceX, distanceY, angle, level, game) {
+    this.entity = new Entity(game, x, y, 25, 5);
+    this.entity.x = x - Math.ceil(25 / 2);
+    this.entity.y = y - Math.ceil(5 / 2);
     this.centerX = x;
     this.centerY = y;
-    this.maxVel = 7;
-    var scale = this.maxVel / Math.sqrt(xVel * xVel + yVel * yVel)
-    this.xVel = xVel * scale;
-    this.yVel = yVel * scale;
-    this.width = 6;
-    this.height = 6;
-    this.removeFromWorld = false;
+    this.level = level;
+    this.maxVel = ARCHER_ATTR.ARROW_SPEED;
+    var scale = this.maxVel / Math.sqrt(distanceX * distanceX + distanceY * distanceY)
+    this.xVel = distanceX * scale;
+    this.yVel = distanceY * scale;
+    this.angle = angle;
+    var arrowRight = new Animation(AM.getAsset("./img/enemy/archer.png"), this.entity.width, this.entity.height, 0.2, true);
+    arrowRight.addFrame(146, 5);
+
+    this.entity.animationList.push(arrowRight);
 }
 
 Arrow.prototype = {
     update : function () {
-        // var tempX = this.centerX + this.xVel;
-        // var tempY = this.centerY + this.yVel;
-        // if (this.game.getBottomCollisions(this).length > 0) {
-        //
-        // }
-        // if (!this.level.obstacleAt(tempX - (this.width / 2), tempY - (this.height / 2),
-        //         this.width, this.height)) {
-        //     this.centerX = tempX;
-        //     this.centerY = tempY;
+        var tempX = this.centerX + this.xVel;
+        var tempY = this.centerY + this.yVel;
+        // if (this.entity.game.getBottomCollisions(this.entity).length === 0) {
+            //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
+            this.centerX = tempX;
+            this.centerY = tempY;
         // } else {
-        //     this.removeFromWorld = true;
+        //     var i = this.level.enemies.indexOf(this);
+        //     this.level.enemies.splice(i, 1);
+        //     i = this.entity.game.agents.indexOf(this);
+        //     this.entity.game.agents.splice(i, 1);
         // }
-        // this.currentX_px = this.centerX;
-        // this.currentY_px = this.centerY;
+        this.entity.x = this.centerX - Math.ceil(25 / 2);
+        this.entity.y = this.centerY - Math.ceil(25 / 2);
     },
 
-    draw : function (ctx, cameraRect, tick) {
-        // ctx.fillStyle = "White";
-        // ctx.fillRect(this.centerX - (this.width / 2) - cameraRect.left,
-        //              this.centerY - (this.height / 2) - cameraRect.top,
-        //              this.width, this.height);
+    draw : function (cameraX, cameraY) {
+        this.entity.ctx.save();
+        this.entity.ctx.translate(this.entity.x + cameraX, this.entity.y - cameraY + 10);
+        this.entity.ctx.rotate(-this.angle);
+        this.entity.animationList[this.entity.currentAnimation].drawFrame(this.entity.game.clockTick,
+                            this.entity.ctx, 0, 0);
+        this.entity.ctx.restore();
     }
 }
