@@ -52,6 +52,7 @@ var FB_ATTR = {
     
     NEUTRAL_BASE_SPEED: 2,
     RETREAT_BASE_SPEED: 8,
+    //Each arm has a different attack speed.
     ATTACK_BASE_SPEED: {
         0: 4,
         1: 4.5,
@@ -245,6 +246,9 @@ ForestBoss.prototype = {
         
         if (this.health === FB_ATTR.PHASE_1_HEALTH) this.phase = 1;
         if (this.health === FB_ATTR.PHASE_2_HEALTH) this.phase = 2;
+        
+        if (this.phase === 1) this.currentAttackAnim = FB_ANIM.NORMAL;
+        if (this.phase === 2) this.currentAttackAnim = FB_ANIM.WIDE;
     },
     
     //Remove the Forest Boss arms, core, and the controller from the game engine.
