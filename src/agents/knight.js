@@ -57,7 +57,13 @@ var KNIGHT_PHYSICS = {
  * and also attach to it all animations.
  */
 function Knight(game, AM, x, y) {
-    this.entity = new Entity(game, x , y, 48, 50);
+    this.entity = new Entity(game, x, y, 48, 50);
+
+    this.centerPoint = {
+        x: (this.entity.x + (this.entity.width) / 2),
+        y: (this.entity.y + (this.entity.height) / 2)
+    }
+
     this.velocity = 0;
     this.direction = KNIGHT_DIR.RIGHT;
     this.canJump = true;
@@ -113,8 +119,11 @@ function Knight(game, AM, x, y) {
     this.entity.addAnimation(KnightAttackLeft);
 }
 
-Knight.prototype.draw = function () {
-    this.entity.draw();
+Knight.prototype.findYourCenter = function () {
+    this.centerPoint = {
+        x: (this.entity.x + (this.entity.width) / 2),
+        y: (this.entity.y + (this.entity.height) / 2)
+    }
 }
 
 /**
@@ -141,6 +150,7 @@ Knight.prototype.update = function() {
         }
     }
 
+    this.findYourCenter();
 
     if(this.invulnerableFrames > 0) {
         this.invulnerableFrames--;
@@ -318,6 +328,10 @@ Knight.prototype.readInput = function(input, modifier) {
             this.entity.collidable = !this.entity.collidable;
         }
     }
+}
+
+Knight.prototype.draw = function () {
+    this.entity.draw();
 }
 
 /**
