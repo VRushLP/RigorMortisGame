@@ -12,6 +12,12 @@ var ANIM = {
     PLATFORM: 3
 }
 
+var PATTERN = {
+    NEUTRAL: 0,
+    RETREAT: 1,
+    ATTACK: 2
+}
+
 var ARM_MAX_HEIGHT = 500;
 
 
@@ -25,6 +31,7 @@ var ARM_MAX_HEIGHT = 500;
 function ForestBoss(game, AM, x, y, stage) {
     this.entity = new Entity(game, x, y, 0, 0);
     this.entity.collidable = false;
+    this.pattern = PATTERN.NEUTRAL;
     
     this.speed = 0;
     this.health = 4;
@@ -34,6 +41,7 @@ function ForestBoss(game, AM, x, y, stage) {
     for (var i = 0; i < 4; i++) {
         this.arms.push(new ForestBossArm(game, AM, x + 100 + 250 * i, y));
         this.arms[i].setSize(ANIM.THIN);
+        this.arms[i].originalPos = i;
         stage.entityList.push(this.arms[i]);
     }
     
@@ -41,14 +49,31 @@ function ForestBoss(game, AM, x, y, stage) {
     stage.entityList.push(this.core);
     //Attach the core to arm four.
     this.core.arm = this.arms[3];
+    
+    this.setNormalDistro();
+    this.neutralPattern();
 }
 
 ForestBoss.prototype = {
     
-    update: function () {
+    update: function () {       
+        
         if (this.allArmsHidden()) {
-            this.setNormalDistro();            
-            this.neutralPattern();
+            if (this.pattern === PATTERN.RETREAT) {
+                if (this.health <= 0) {
+                    this.selfDestruct();
+                    return;
+                }
+                
+                this.setAttackDistro();
+                this.attackPattern();
+            } else if (this.pattern === PATTERN.ATTACK) {
+                this.setNormalDistro();
+                this.neutralPattern();
+            } else if (this.pattern === PATTERN.NEUTRAL) {
+                this.setNormalDistro();            
+                this.neutralPattern();
+            }
         }
     },
     
@@ -58,27 +83,35 @@ ForestBoss.prototype = {
     
     //The neutral pattern raises all arms at the same speed.
     neutralPattern: function () {
-        this.arms[0].speed = 2;
-        this.arms[0].restTime = 50;
-        this.arms[0].currentState = ARM_STATE.RISING;
-        
-        this.arms[1].speed = 2;
-        this.arms[1].restTime = 50;
-        this.arms[1].currentState = ARM_STATE.RISING;
-        
-        this.arms[2].speed = 2;
-        this.arms[2].restTime = 50;
-        this.arms[2].currentState = ARM_STATE.RISING;
-        
-        this.arms[3].speed = 2;
-        this.arms[3].restTime = 50;
-        this.arms[3].currentState = ARM_STATE.RISING;
+        this.unshuffleArms();
+        this.pattern = PATTERN.NEUTRAL;
+        for (var i = 0; i < this.arms.length; i++) {
+            this.arms[i].speed = 2;
+            this.arms[i].restTime = 125;
+            this.arms[i].currentState = ARM_STATE.RISING;
+        }
     },
     
     retreatPattern: function () {
+        this.pattern = PATTERN.RETREAT;
         for (var i = 0; i < this.arms.length; i++) {
             this.arms[i].speed = 8;
             this.arms[i].currentState = ARM_STATE.FALLING;
+        }
+    },
+    
+    attackPattern: function () {
+        this.pattern = PATTERN.ATTACK;
+        this.shuffleArms();
+        
+        this.arms[0].speed = 4;
+        this.arms[1].speed = 4.5;
+        this.arms[2].speed = 5;
+        this.arms[3].speed = 6;
+        
+        for (var i = 0; i < this.arms.length; i++) {
+            this.arms[i].restTime = 0;
+            this.arms[i].currentState = ARM_STATE.RISING;
         }
     },
     
@@ -122,11 +155,48 @@ ForestBoss.prototype = {
         }
     },
     
+    setAttackDistro: function () {
+        this.core.arm = null;
+        for (var i = 0; i < this.arms.length; i++) {
+            this.arms[i].setSize(ANIM.THIN);
+        }
+    },
+    
     takeDamage: function () {
         this.health--;
         for (var i = 0; i < this.arms.length; i++) {
             this.retreatPattern();
         }
+    },
+    
+    shuffleArms: function () {
+        for (var i = this.arms.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = this.arms[i];
+            this.arms[i] = this.arms[j];
+            this.arms[j] = temp;
+        }
+    },
+    
+    unshuffleArms: function () {
+        var newArms = [];
+        for (var i = 0; i < this.arms.length; i++) {
+            newArms[this.arms[i].originalPos] = this.arms[i];
+        }
+        this.arms = newArms;
+    },
+    
+    selfDestruct: function () {
+        for (var i = 0; i < this.arms.length; i++) {
+            var index = this.entity.game.agents.indexOf(this.arms[i]);
+            this.entity.game.agents.splice(index, 1);
+        }
+        
+        var index = this.entity.game.agents.indexOf(this.core);
+        this.entity.game.agents.splice(index, 1);
+        
+        index = this.entity.game.agents.indexOf(this);
+        this.entity.game.agents.splice(index, 1);
     }
     
 }
@@ -146,6 +216,7 @@ function ForestBossArm(game, AM, x, y) {
     this.originY = y;
     this.speed = 0;
     this.size = ANIM.THIN;
+    this.originalPos = 0;
     
     //Determines how long the arm waits between rising to its peak and then falling.
     this.restTime = 0;
@@ -297,6 +368,9 @@ function ForestBossCore(game, AM, x, y, callback) {
 ForestBossCore.prototype = {
     
     update: function () {
+        //The arm being set to null means that the core will not spawn.
+        if (this.arm === null) return;
+        
         var animation = this.entity.animationList[this.entity.currentAnimation];
         this.entity.x = this.arm.entity.x + 100;
         
@@ -327,7 +401,9 @@ ForestBossCore.prototype = {
     
     readInput: function(input, modifier) {
         if (input === "damage") {
-            this.callback.takeDamage();
+            if (this.callback.pattern !== PATTERN.RETREAT) {
+                this.callback.takeDamage();
+            }
         }
     },
 }
