@@ -58,7 +58,9 @@ var FB_ATTR = {
         1: 4.5,
         2: 5,
         3: 6
-    }
+    },
+    
+    SPAWN_TIME: 150
 }
 
 /*
@@ -75,6 +77,7 @@ function ForestBoss(game, AM, x, y, stage) {
     //Set the default states of the forest boss.
     this.speed = 0;
     this.phase = 0;
+    this.spawnTimeRemaining = FB_ATTR.SPAWN_TIME;
     this.health = FB_ATTR.MAX_HEALTH;
     this.pattern = FB_PATTERN.NEUTRAL;    
     this.currentAttackAnim = FB_ANIM.THIN;
@@ -100,7 +103,14 @@ ForestBoss.prototype = {
     
     //The Forest Boss waits for all of its arms to return to the hidden state
     //before determining which distribution and pattern they should assume next.
-    update: function () {               
+    update: function () {    
+        
+        //If the Forest Boss has not spawned yet, do not do anything.
+        if (this.spawnTimeRemaining > 0) {
+            this.spawnTimeRemaining--;
+            return;
+        }
+        
         if (this.allArmsHidden()) {
 
             if (this.pattern === FB_PATTERN.RETREAT) {
