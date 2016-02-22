@@ -60,7 +60,8 @@ var FB_ATTR = {
         3: 6
     },
     
-    SPAWN_TIME: 150
+    SPAWN_TIME: 150,
+    HELPER_PLATFORM_HEIGHT: 350
 }
 
 /*
@@ -201,8 +202,15 @@ ForestBoss.prototype = {
         }
         
         for (var i = 0; i < 4; i++) {
+            //Reset platform height
+            this.arms[i].maxHeight = FB_ATTR.ARM_MAX_HEIGHT;
+            
             if (i === corePos) this.arms[i].setSize(FB_ANIM.PLATFORM);
-            else if (i === supportPlatform) this.arms[i].setSize(FB_ANIM.PLATFORM);
+            else if (i === supportPlatform) {
+                this.arms[i].setSize(FB_ANIM.PLATFORM);
+                this.arms[i].maxHeight = FB_ATTR.HELPER_PLATFORM_HEIGHT;
+                console.log(this.arms[i].maxHeight);
+            } 
             else this.arms[i].setSize(this.currentAttackAnim);
         }
     },
@@ -211,6 +219,9 @@ ForestBoss.prototype = {
     setAttackDistro: function () {
         this.core.arm = null;
         for (var i = 0; i < this.arms.length; i++) {
+            //Reset platform height
+            this.arms[i].maxHeight = FB_ATTR.ARM_MAX_HEIGHT;
+            
             this.arms[i].setSize(this.currentAttackAnim);
         }
     },
@@ -273,6 +284,9 @@ ForestBoss.prototype = {
         
         index = this.entity.game.agents.indexOf(this);
         this.entity.game.agents.splice(index, 1);
+        
+        var originalBGM = this.entity.game.stages[this.entity.game.currentStage].stageMusic;
+        this.entity.game.switchMusic(originalBGM);
     },
     
     //Return true if the current state of all arms is hidden.
