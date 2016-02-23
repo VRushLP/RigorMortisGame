@@ -95,8 +95,8 @@ AM.downloadAll(function () {
     forestStage.entityList.push(knight);
     
     var firstPlatform = new Platform(gameEngine, AM, 2650, 650, 4, 1);
-    firstPlatform.addMovePattern(350, 1, 0, 0);
-    firstPlatform.addMovePattern(350, -1, 0, 0);
+    firstPlatform.addMovePattern(350, 2, 0, 0);
+    firstPlatform.addMovePattern(350, -2, 0, 0);
     forestStage.entityList.push(firstPlatform);
 
     var secondPlatform = new Platform(gameEngine, AM, 3200, 1300, 4, 1);
