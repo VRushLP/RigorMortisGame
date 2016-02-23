@@ -63,6 +63,11 @@ AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
 AM.queueDownload("./img/enemy/chaser.png");
 AM.queueDownload("./img/enemy/archer.png");
+AM.queueDownload("./img/enemy/forest boss spike 50px.png");
+AM.queueDownload("./img/enemy/forest boss spike 100px.png");
+AM.queueDownload("./img/enemy/forest boss spike 150px.png");
+AM.queueDownload("./img/enemy/forest boss platform.png");
+AM.queueDownload("./img/enemy/forest boss weak point.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
@@ -109,6 +114,10 @@ AM.downloadAll(function () {
     forestStage.entityList.push(bossCameraTrigger);
     forestStage.entityList.push(bossMusicTrigger);
     forestStage.entityList.push(spawnTrigger);
+    
+    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2200, forestStage);
+    var bossSpawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, forestBoss);
+    forestStage.entityList.push(bossSpawnTrigger);
 
     gameEngine.addStage(forestStage);
 
