@@ -140,8 +140,7 @@ Skeleton.prototype = {
                 this.invulnerableFrames = SKELETON_ATTR.INVULNERABILITY_FRAMES;
                 this.health--;
                 if (this.health <= 0) {
-                    var index = this.entity.game.agents.indexOf(this);
-                    this.entity.game.agents.splice(index, 1);
+                    this.entity.removeFromWorld = true;
                 } else {
                     this.confused = true;
                 }
@@ -189,11 +188,7 @@ Archer.prototype.update = function () {
     }
 
     if (this.health <= 0) {
-        this.removeFromWorld = true;
-        var index = this.stage.entityList.indexOf(this);
-        this.stage.entityList.splice(index, 1);
-        index = this.stage.enemies.indexOf(this);
-        this.stage.enemies.splice(index, 1);
+        this.entity.removeFromWorld = true;
         return;
     }
 

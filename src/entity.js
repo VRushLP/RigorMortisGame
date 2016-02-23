@@ -20,6 +20,8 @@ function Entity(game, x, y, width, height) {
     this.camerable = false;
     this.respawnable = false;
     this.collidable = true;
+    
+    this.removeFromWorld = false;
 }
 
 Entity.prototype = {

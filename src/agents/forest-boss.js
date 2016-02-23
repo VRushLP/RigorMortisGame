@@ -272,18 +272,13 @@ ForestBoss.prototype = {
         if (this.phase === 2) this.currentAttackAnim = FB_ANIM.WIDE;
     },
     
-    //Remove the Forest Boss arms, core, and the controller from the game engine.
+    //Remove the Forest Boss arms, core, and the controller from world and switch the music back..
     selfDestruct: function () {
         for (var i = 0; i < this.arms.length; i++) {
-            var index = this.entity.game.agents.indexOf(this.arms[i]);
-            this.entity.game.agents.splice(index, 1);
+            this.arms[i].entity.removeFromWorld = true;
         }
-        
-        var index = this.entity.game.agents.indexOf(this.core);
-        this.entity.game.agents.splice(index, 1);
-        
-        index = this.entity.game.agents.indexOf(this);
-        this.entity.game.agents.splice(index, 1);
+        this.core.entity.removeFromWorld = true;
+        this.entity.removeFromWorld = true;
         
         var originalBGM = this.entity.game.stages[this.entity.game.currentStage].stageMusic;
         this.entity.game.switchMusic(originalBGM);
