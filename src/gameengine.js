@@ -181,6 +181,10 @@ GameEngine.prototype = {
     //Entities should check for input when updated here
     update : function () {
         for (var i = 0; i < this.agents.length; i++) {
+            if (this.agents[i].entity.removeFromWorld) {
+                this.agents.splice(i, 1);
+                continue;
+            }
             this.agents[i].update();
         }
 
