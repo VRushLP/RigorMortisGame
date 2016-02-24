@@ -1,0 +1,42 @@
+///statue details
+all the files are the same size. this is to make layering them on top of each other very easy.
+the idle animation will show before you enter, then changes into the active statue.
+the active statue is actually 4 images on top of each other in this order, from first to last:
+forest boss statue arm1 (despawn after 2 hits)
+forest boss statue arm2 (despawn after 4 hits)
+forest boss statue chest (despawn after 6 hits)
+forest boss statue base (always there)
+
+forest boss statue image sizes:
+width: 673
+height: 496
+
+placement (with respect to the position the background would be placed at)
+243 pixels right.
+58 pixels down.
+//this is just compared to my mockup image. anywhere works really, as long as it's sort of in the center.
+ 
+///other details
+forest boss background.png
+width: 1150
+height: 600
+
+forest boss platform.png
+width: 150
+height: 500
+
+forest boss spike 50px.png
+width: 50
+height: 500
+
+forest boss spike 100px.png
+width: 100
+height: 500
+
+forest boss spike 150px.png
+width: 150
+height: 500
+
+forest boss weak point.png
+width: 150
+height: 50

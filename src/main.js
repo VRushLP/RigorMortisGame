@@ -22,6 +22,15 @@ var BGM = {
         loop: true
    }),
 
+   forestBoss: new Howl({
+       urls: ['./snd/stronger_monsters.mp3'],
+       volume: .1,
+       loop: true,
+       onend: function () {
+           BGM.forestBoss.pos(10.322); //Skips the intro
+       }
+   }),
+
    townBoss: new Howl({
        urls: ['./snd/cornered.mp3'],
        volume: .1,
@@ -63,11 +72,11 @@ AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
 AM.queueDownload("./img/enemy/chaser.png");
 AM.queueDownload("./img/enemy/archer.png");
-AM.queueDownload("./img/enemy/forest boss spike 50px.png");
-AM.queueDownload("./img/enemy/forest boss spike 100px.png");
-AM.queueDownload("./img/enemy/forest boss spike 150px.png");
-AM.queueDownload("./img/enemy/forest boss platform.png");
-AM.queueDownload("./img/enemy/forest boss weak point.png");
+AM.queueDownload("./img/enemy/boss/forest boss spike 50px.png");
+AM.queueDownload("./img/enemy/boss/forest boss spike 100px.png");
+AM.queueDownload("./img/enemy/boss/forest boss spike 150px.png");
+AM.queueDownload("./img/enemy/boss/forest boss platform.png");
+AM.queueDownload("./img/enemy/boss/forest boss weak point.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
@@ -106,7 +115,7 @@ AM.downloadAll(function () {
     
     var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3675, 1900);
     var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
-    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.hellBossFinal);
+    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.forestBoss);
 
     var newInvisiwall = new Invisiblock(gameEngine, AM, 3051, 1701, 50, 148);
     var spawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, newInvisiwall);
@@ -120,11 +129,6 @@ AM.downloadAll(function () {
     forestStage.entityList.push(bossSpawnTrigger);
 
     gameEngine.addStage(forestStage);
-
-    //BGM.forestLevel.play();
-    //BGM.castleLevel.play();
-    //BGM.townBoss.play();
-    //BGM.hellBossFinal.play();
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;
