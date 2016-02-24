@@ -228,7 +228,11 @@ Archer.prototype = {
         }
     },
 
-    update : function (tick, posX, posY, width, height) {
+    update: function (tick, posX, posY, width, height) {
+
+        if (this.invulnerableFrames > 0) {
+            this.invulnerableFrames--;
+        }
         var playerCenter = {
             x : posX + Math.floor(width / 2),
             y : posY + Math.floor(height / 2)
