@@ -28,6 +28,7 @@ var ARCHER_ATTR = {
     VISION_RADIUS : 550,
     STARTING_HEALTH : 4,
     SHOOTING_TIME : 2,
+    INVULNERABILITY_FRAMES: 40,
 
     ARROW_SPEED : 7
 }
@@ -255,7 +256,7 @@ Archer.prototype = {
         if (this.entity.currentAnimation !== ARCHER_ATTR.IDLE_LEFT && this.entity.currentAnimation !== ARCHER_ATTR.IDLE_RIGHT) {
             if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
                 this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
-                var arrow = new Arrow(archerCenter.x, archerCenter.y, distanceX, distanceY, angle, this.level, this.entity.game);
+                var arrow = new Arrow(this, archerCenter.x, archerCenter.y, distanceX, distanceY, angle, this.level, this.entity.game);
                 this.level.enemies.push(arrow);
                 this.entity.game.addAgent(arrow);
                 if (posX > this.entity.x) {
@@ -269,10 +270,30 @@ Archer.prototype = {
 
     draw : function (cameraX, cameraY) {
         this.entity.draw(cameraX, cameraY);
+    },
+
+    readInput : function(input, modifier) {
+        if (input === "damage") {
+            if (this.invulnerableFrames === 0) {
+                this.invulnerableFrames = ARCHER_ATTR.INVULNERABILITY_FRAMES;
+                this.health--;
+                if (this.health <= 0) {
+                    var index = this.entity.game.agents.indexOf(this);
+                    this.entity.game.agents.splice(index, 1);
+                }
+            }
+        }
+    },
+
+    checkListeners: function(agent) {
+        if (agent.entity.controllable) {
+            this.entity.game.requestInputSend(agent, "damage", 1);
+        }
     }
 }
 
-function Arrow (x, y, distanceX, distanceY, angle, level, game) {
+function Arrow (source, x, y, distanceX, distanceY, angle, level, game) {
+    this.source = source;
     this.entity = new Entity(game, x, y, 25, 5);
     this.entity.x = x - Math.ceil(25 / 2);
     this.entity.y = y - Math.ceil(5 / 2);
@@ -291,19 +312,36 @@ function Arrow (x, y, distanceX, distanceY, angle, level, game) {
 }
 
 Arrow.prototype = {
+    obstacleAt : function (x, y) {
+        for (var i = 0; i < this.entity.game.agents.length; i += 1) {
+            var obstacle = this.entity.game.agents[i];
+            if (this !== obstacle && this.source !== obstacle) {
+                if (x + this.entity.width > obstacle.entity.x &&
+                    x < obstacle.entity.x + obstacle.entity.width &&
+                    y + this.entity.height > obstacle.entity.y &&
+                    y < obstacle.entity.y + obstacle.entity.height) {
+                        return obstacle;
+                    }
+            }
+        }
+    },
+
     update : function () {
         var tempX = this.centerX + this.xVel;
         var tempY = this.centerY + this.yVel;
-        // if (this.entity.game.getBottomCollisions(this.entity).length === 0) {
-            //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
+        var obstacle = this.obstacleAt(tempX, tempY);
+        if (!obstacle) {
             this.centerX = tempX;
             this.centerY = tempY;
-        // } else {
-        //     var i = this.level.enemies.indexOf(this);
-        //     this.level.enemies.splice(i, 1);
-        //     i = this.entity.game.agents.indexOf(this);
-        //     this.entity.game.agents.splice(i, 1);
-        // }
+        } else {
+            // if (obstacle instanceof Knight) {
+            //     obstacle.health--;
+            // }
+            var i = this.level.enemies.indexOf(this);
+            this.level.enemies.splice(i, 1);
+            i = this.entity.game.agents.indexOf(this);
+            this.entity.game.agents.splice(i, 1);
+        }
         this.entity.x = this.centerX - Math.ceil(25 / 2);
         this.entity.y = this.centerY - Math.ceil(25 / 2);
     },
@@ -315,5 +353,11 @@ Arrow.prototype = {
         this.entity.animationList[this.entity.currentAnimation].drawFrame(this.entity.game.clockTick,
                             this.entity.ctx, 0, 0);
         this.entity.ctx.restore();
+    },
+
+    checkListeners: function(agent) {
+        if (agent.entity.controllable) {
+            this.entity.game.requestInputSend(agent, "damage", 1);
+        }
     }
 }
