@@ -35,7 +35,7 @@ var WISP_ATTR = {
     TOUCH_DISTANCE : 40,
     FLEE_TIME: 45,
     FLEE_ACCELERATION: 4
-    //This should be true: SPEED*FLEE_TIME*FLEE_ACCELERATION < ATTENTINO_DISTANCE
+    //This should be true: SPEED*FLEE_TIME*FLEE_ACCELERATION < ATTENTION_DISTANCE
 }
 
 var WISP_ANIM = {
@@ -178,9 +178,11 @@ Skeleton.prototype = {
 function Wisp(game, AM, x, y) {
     this.entity = new Entity(game, x, y, 44, 50);
     this.entity.moveable = true;
-    this.entity.collidable = false;
     this.struckRecently = false;
     this.timeToStrikeAgain = 0;
+
+    this.health = WISP_ATTR.STARTING_HEALTH;
+    this.invulnerableFrames = 0;
 
     var wispRight = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.05, true);
     wispRight.addFrame(44, 0);
@@ -199,6 +201,10 @@ Wisp.prototype = {
             this.struckRecently = false;
         }
 
+        if (this.invulnerableFrames > 0) {
+            this.invulnerableFrames--;
+        }
+
         var knightPoint = this.entity.game.playerAgent.centerPoint;
 
         var wispPoint = {
@@ -214,38 +220,29 @@ Wisp.prototype = {
                 var movementVector = getNormalizedSlope(wispPoint, knightPoint, distanceToKnight);
 
                 if (this.struckRecently) {
-                    this.entity.game.requestMove(this, movementVector.x * WISP_ATTR.SPEED * 4,
-                       movementVector.y * WISP_ATTR.SPEED * 4);
+                    //this.entity.game.requestMove(this, movementVector.x * WISP_ATTR.SPEED * 4,
+                    //   movementVector.y * WISP_ATTR.SPEED * 4);
+                    this.entity.x += movementVector.x * WISP_ATTR.SPEED * WISP_ATTR.FLEE_ACCELERATION;
+                    this.entity.y += movementVector.y * WISP_ATTR.SPEED * WISP_ATTR.FLEE_ACCELERATION;
 
-                    if(movementVector.x > 0) {
-                        this.entity.currentAnimation = WISP_ANIM.FLOATING_RIGHT;
-                    }
-                    else{
-                        this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
-                    }
-                }
-                else {
-                    this.entity.game.requestMove(this, -movementVector.x * WISP_ATTR.SPEED,
-                        -movementVector.y * WISP_ATTR.SPEED);
-
-                    if (movementVector.x < 0) {
+                    if (movementVector.x > 0) {
                         this.entity.currentAnimation = WISP_ANIM.FLOATING_RIGHT;
                     }
                     else {
                         this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
                     }
-                }
-            } else {
-                //Wisp is right above the knight! Don't divide by 0!
-                if(wispPoint.y > knightPoint)
-                {
-                    //Wisp is below the knight
-                    this.entity.game.requestMove(this, 0, -WISP_ATTR.SPEED)
                 } else {
-                    //Wisp is above the knight
-                    this.entity.game.requestMove(this, 0, WISP_ATTR.SPEED)
-                }
+                    //this.entity.game.requestMove(this, -movementVector.x * WISP_ATTR.SPEED,
+                    //    -movementVector.y * WISP_ATTR.SPEED);
+                    this.entity.x -= movementVector.x * WISP_ATTR.SPEED;
+                    this.entity.y -= movementVector.y * WISP_ATTR.SPEED;
 
+                    if (movementVector.x < 0) {
+                        this.entity.currentAnimation = WISP_ANIM.FLOATING_RIGHT;
+                    } else {
+                        this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
+                    }
+                }
             }
         }
 
@@ -262,8 +259,7 @@ Wisp.prototype = {
                 this.invulnerableFrames = WISP_ATTR.INVULNERABILITY_FRAMES;
                 this.health--;
                 if (this.health <= 0) {
-                    var index = this.entity.game.agents.indexOf(this);
-                    this.entity.game.agents.splice(index, 1);
+                    this.entity.removeFromWorld = true;
                 }
             }
         }
