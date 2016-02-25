@@ -26,7 +26,7 @@ var ARCHER_ATTR = {
     ATK_UP_RIGHT : 7,
 
     VISION_RADIUS : 550,
-    STARTING_HEALTH : 4,
+    STARTING_HEALTH : 1,
     SHOOTING_TIME : 2,
     INVULNERABILITY_FRAMES: 40,
 
@@ -178,7 +178,6 @@ function Archer (game, x, y, level) {
     this.timeDurationNextArrow = ARCHER_ATTR.SHOOTING_TIME;
 
     this.health = ARCHER_ATTR.STARTING_HEALTH;
-    this.invulnerableFrames = 0;
     this.vision = ARCHER_ATTR.VISION_RADIUS;
 
     var archerImg = AM.getAsset("./img/enemy/archer.png");
@@ -228,11 +227,7 @@ Archer.prototype = {
         }
     },
 
-    update: function (tick, posX, posY, width, height) {
-
-        if (this.invulnerableFrames > 0) {
-            this.invulnerableFrames--;
-        }
+    update : function (tick, posX, posY, width, height) {
         var playerCenter = {
             x : posX + Math.floor(width / 2),
             y : posY + Math.floor(height / 2)
@@ -278,13 +273,10 @@ Archer.prototype = {
 
     readInput : function(input, modifier) {
         if (input === "damage") {
-            if (this.invulnerableFrames === 0) {
-                this.invulnerableFrames = ARCHER_ATTR.INVULNERABILITY_FRAMES;
-                this.health--;
-                if (this.health <= 0) {
-                    var index = this.entity.game.agents.indexOf(this);
-                    this.entity.game.agents.splice(index, 1);
-                }
+            this.health--;
+            if (this.health <= 0) {
+                var index = this.entity.game.agents.indexOf(this);
+                this.entity.game.agents.splice(index, 1);
             }
         }
     },
@@ -338,9 +330,6 @@ Arrow.prototype = {
             this.centerX = tempX;
             this.centerY = tempY;
         } else {
-            // if (obstacle instanceof Knight) {
-            //     obstacle.health--;
-            // }
             var i = this.level.enemies.indexOf(this);
             this.level.enemies.splice(i, 1);
             i = this.entity.game.agents.indexOf(this);
