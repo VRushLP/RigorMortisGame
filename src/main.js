@@ -22,6 +22,15 @@ var BGM = {
         loop: true
    }),
 
+   forestBoss: new Howl({
+       urls: ['./snd/stronger_monsters.mp3'],
+       volume: .1,
+       loop: true,
+       onend: function () {
+           BGM.forestBoss.pos(10.322); //Skips the intro
+       }
+   }),
+
    townBoss: new Howl({
        urls: ['./snd/cornered.mp3'],
        volume: .1,
@@ -63,6 +72,12 @@ AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
 AM.queueDownload("./img/enemy/chaser.png");
 AM.queueDownload("./img/enemy/archer.png");
+AM.queueDownload("./img/enemy/wisp.png");
+AM.queueDownload("./img/enemy/boss/forest boss spike 50px.png");
+AM.queueDownload("./img/enemy/boss/forest boss spike 100px.png");
+AM.queueDownload("./img/enemy/boss/forest boss spike 150px.png");
+AM.queueDownload("./img/enemy/boss/forest boss platform.png");
+AM.queueDownload("./img/enemy/boss/forest boss weak point.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
@@ -90,18 +105,18 @@ AM.downloadAll(function () {
     forestStage.entityList.push(knight);
     
     var firstPlatform = new Platform(gameEngine, AM, 2650, 650, 4, 1);
-    firstPlatform.addMovePattern(350, 1, 0, 0);
-    firstPlatform.addMovePattern(350, -1, 0, 0);
+    firstPlatform.addMovePattern(350, 2, 0, 0);
+    firstPlatform.addMovePattern(350, -2, 0, 0);
     forestStage.entityList.push(firstPlatform);
 
     var secondPlatform = new Platform(gameEngine, AM, 3200, 1300, 4, 1);
-    secondPlatform.addMovePattern(450, -1, 0, 0);
-    secondPlatform.addMovePattern(450, 1, 0, 0);
+    secondPlatform.addMovePattern(450, -3, 0, 0);
+    secondPlatform.addMovePattern(450, 3, 0, 0);
     forestStage.entityList.push(secondPlatform);
     
     var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3675, 1900);
     var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
-    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.hellBossFinal);
+    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.forestBoss);
 
     var newInvisiwall = new Invisiblock(gameEngine, AM, 3051, 1701, 50, 148);
     var spawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, newInvisiwall);
@@ -109,13 +124,12 @@ AM.downloadAll(function () {
     forestStage.entityList.push(bossCameraTrigger);
     forestStage.entityList.push(bossMusicTrigger);
     forestStage.entityList.push(spawnTrigger);
+    
+    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2200, forestStage);
+    var bossSpawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, forestBoss);
+    forestStage.entityList.push(bossSpawnTrigger);
 
     gameEngine.addStage(forestStage);
-
-    //BGM.forestLevel.play();
-    //BGM.castleLevel.play();
-    //BGM.townBoss.play();
-    //BGM.hellBossFinal.play();
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;

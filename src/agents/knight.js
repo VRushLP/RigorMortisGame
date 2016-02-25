@@ -57,7 +57,13 @@ var KNIGHT_PHYSICS = {
  * and also attach to it all animations.
  */
 function Knight(game, AM, x, y) {
-    this.entity = new Entity(game, x , y, 48, 50);
+    this.entity = new Entity(game, x, y, 48, 50);
+
+    this.centerPoint = {
+        x: (this.entity.x + (this.entity.width) / 2),
+        y: (this.entity.y + (this.entity.height) / 2)
+    }
+
     this.velocity = 0;
     this.direction = KNIGHT_DIR.RIGHT;
     this.canJump = true;
@@ -129,6 +135,13 @@ Knight.prototype.draw = function (cameraX, cameraY) {
     ctx.fillRect(20, 20, 500 * percent, 30);
 };
 
+Knight.prototype.findYourCenter = function () {
+    this.centerPoint = {
+        x: (this.entity.x + (this.entity.width) / 2),
+        y: (this.entity.y + (this.entity.height) / 2)
+    }
+}
+
 /**
  * Update the Knight agent.
  * As of right now, this only includes accounting for velocity and movement
@@ -153,6 +166,7 @@ Knight.prototype.update = function() {
         }
     }
 
+    this.findYourCenter();
 
     if(this.invulnerableFrames > 0) {
         this.invulnerableFrames--;
@@ -332,6 +346,10 @@ Knight.prototype.readInput = function(input, modifier) {
     }
 }
 
+Knight.prototype.draw = function () {
+    this.entity.draw();
+}
+
 /**
   * Create a new sword hitbox.
   * A sword hitbox is an invisible agent that damages enemies,
@@ -340,6 +358,7 @@ Knight.prototype.readInput = function(input, modifier) {
 function SwordHitbox(game, x, y, source) {
     this.entity = new Entity(game, x , y, 50, 50);
     this.entity.moveable = true;
+    this.entity.intangible = true;
     this.source = source;
 }
 
@@ -355,8 +374,8 @@ SwordHitbox.prototype = {
         this.entity.game.requestMove(this, 0, 0);
     },
 
-    draw: function(cameraX, cameraY) {
-        this.entity.draw(cameraX, cameraY);
+    draw: function() {
+        this.entity.draw();
     },
 
     checkListeners: function(agent) {

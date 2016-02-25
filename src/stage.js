@@ -63,18 +63,19 @@ Stage.prototype = {
                     case '@':
                         this.spawnX = currentX;
                         this.spawnY = currentY - 5; //Small drop to avoid spawning into other entities.
-                        console.log(currentX);
-                        console.log(currentY);
                         break;
                     case "!" :
                         this.enemies.push(new Skeleton(this.gameEngine, AM, currentX, currentY - 10));
                         this.entityList.push(this.enemies[this.enemies.length - 1]);
                         break;
                     case "*" :
-                        this.enemies.push(new Archer(this.gameEngine, currentX, currentY, this));
+                        this.enemies.push(new Archer(this.gameEngine, AM, currentX, currentY - 10));
                         this.entityList.push(this.enemies[this.enemies.length - 1]);
                         break;
-                    // case "w" : this.enemies.push(new Wisp(currentX, currentY, this)); break;
+                    case "w":
+                        this.enemies.push(new Wisp(this.gameEngine, AM, currentX, currentY));
+                        this.entityList.push(this.enemies[this.enemies.length - 1]);
+                        break;
                     // case "o" : this.enemies.push(new HealingStuff(currentX, currentY)); break;
                     default: break;
                 }
