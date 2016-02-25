@@ -158,8 +158,7 @@ Skeleton.prototype = {
                 this.invulnerableFrames = SKELETON_ATTR.INVULNERABILITY_FRAMES;
                 this.health--;
                 if (this.health <= 0) {
-                    var index = this.entity.game.agents.indexOf(this);
-                    this.entity.game.agents.splice(index, 1);
+                    this.entity.removeFromWorld = true;
                 } else {
                     this.confused = true;
                 }
@@ -298,6 +297,11 @@ Archer.prototype = {
 
         if (this.invulnerableFrames > 0) {
             this.invulnerableFrames--;
+
+        if (this.health <= 0) {
+            this.entity.removeFromWorld = true;
+            return;
+        }
 
             if (this.invulnerableFrames === 0) {
                 this.confused = false;

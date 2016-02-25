@@ -118,6 +118,10 @@ Animation.prototype = {
         if (this.isDone()) {
             if (this.loop) this.elapsedTime = 0;
         }
+        
+        //Drawing with a height or width of zero throws an IndexSizeError.
+        if (this.frameWidth <= 0 || this.frameHeight <= 0) return;
+        
         var frame = this.currentFrame();
 
         if(this.frames.length > 0) {

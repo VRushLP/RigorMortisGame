@@ -1,0 +1,27 @@
+the mockup image contains some details of potential attack patterns.
+
+there are plans for different orientations of the skull's face when it's about to attack (leaning forward to charge, grimacing before the fist slams down, etc). 
+
+i've included the upper skull and spine to be separate images if you want to mess with those. I was thinking of a potential bite attack or even the giant puking out smaller, regular skeletons but I'm not too bothered if all the giant does is charge you and slam his fist.
+
+giant body.png
+width: 819
+height: 250
+
+giant fist.png
+width: 150
+height: 150
+
+////these files are less vital, just alternate versions of the same thing////
+
+giant arm.png
+width: 450
+height: 150
+
+giant jaw.png
+width: 801
+height: 67
+
+giant skull.png
+width: 241
+height: 214

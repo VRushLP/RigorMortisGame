@@ -342,6 +342,7 @@ Knight.prototype.draw = function () {
 function SwordHitbox(game, x, y, source) {
     this.entity = new Entity(game, x , y, 50, 50);
     this.entity.moveable = true;
+    this.entity.intangible = true;
     this.source = source;
 }
 
