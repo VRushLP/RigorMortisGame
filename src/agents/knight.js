@@ -33,7 +33,7 @@ var KNIGHT_DIR = {
 }
 
 var KNIGHT_ATTR = {
-    STARTING_HEALTH: 4,
+    STARTING_HEALTH: 5,
     INVULNERABILITY_FRAMES: 30,
 }
 
@@ -117,7 +117,23 @@ function Knight(game, AM, x, y) {
     this.entity.addAnimation(KnightFallLeft);
     this.entity.addAnimation(KnightAttackRight);
     this.entity.addAnimation(KnightAttackLeft);
-}
+};
+
+Knight.prototype.draw = function (cameraX, cameraY) {
+    this.entity.draw(cameraX, cameraY);
+    var percent = this.health / KNIGHT_ATTR.STARTING_HEALTH;
+    var ctx = this.entity.game.ctx;
+    ctx.fillStyle = "#8B3E31";
+    ctx.fillRect(10, 10, 520, 50);
+    ctx.fillStyle = "black";
+    ctx.fillRect(20, 20, 500, 30);
+    if (percent > 0.4) {
+        ctx.fillStyle = "green";
+    } else {
+        ctx.fillStyle = "red";
+    }
+    ctx.fillRect(20, 20, 500 * percent, 30);
+};
 
 Knight.prototype.findYourCenter = function () {
     this.centerPoint = {
