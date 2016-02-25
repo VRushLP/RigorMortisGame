@@ -7,71 +7,62 @@
  * offsetX/Y: Optional offsets for how the animation is drawn to the screen.
  */
 function Animation(spriteSheet, frameWidth, frameHeight, frameDuration, loop, offsetX, offsetY) {
-    this.elapsedTime = 0;   
+    this.elapsedTime = 0;
     this.frames = [];
     this.multiframeArray = [];
-    
     this.loop = loop;
     this.spriteSheet = spriteSheet;
     this.frameWidth = frameWidth;
     this.frameHeight = frameHeight;
     this.frameDuration = frameDuration;
-    
+
     //Set offsets to 0 if they were not provided.
     if (offsetX) this.offsetX = offsetX;
     else this.offsetX = 0;
-    
+
     if (offsetY) this.offsetY = offsetY;
     else this.offsetY = 0;
 }
 
 Animation.prototype = {
     /**
-     * Add an individual frame to the animation.
+     * Add several frames in a series to the animation
+     * (will scan forward or backward - Default is forward).
+     * Will automatically skip to the next row if it reaches the end or the start of a column.
      */
-    addFrame: function (startX, startY) {
-        if (this.multiframeArray.length !== 0) {
-            console.log("Animation Error: Cannot add single frame to multiframe animation.");
-            return;
-        }
-        this.frames.push(startX);
-        this.frames.push(startY);
-        
-        this.multiframeWidth = 1;
-        this.multiframeHeight = 1;
-    },
-
-    /**
-     * Add several frames in a series to the animation.
-     * Will automatically skip to the next row if it reaches the end of a column.
-     */
-    addFrameBatch : function (startX, startY, numFrames) {
+    addFrame : function (startX, startY, numFrames, scanForward) {
         if (this.multiframeArray.length !== 0) {
             console.log("Animation Error: Cannot add single frame to multiframe animation.");
             return;
         }
         var currentX = startX;
         var currentY = startY;
-    
+        var frames = numFrames || 1;
         //Scan through the spritesheet, adding frames at each index as we go.
         //Checks if we are at the end of a column, but not if we are at the end of all rows. TODO?
-        for (var i = 0; i < numFrames; i++) {
-            if(currentX + this.frameWidth > this.spriteSheet.width) {
-                currentX = 0;
-                currentY += this.frameHeight;
+        for (var i = 0; i < frames; i += 1) {
+            if (scanForward === false) {
+                if (currentX < 0) {
+                    currentX = this.spriteSheet.width - this.frameWidth;
+                    currentY -= this.frameHeight;
+                }
+                this.frames.push(currentX)
+                this.frames.push(currentY);
+                currentX -= this.frameWidth;
+            } else {    // scan forward
+                if(currentX + this.frameWidth > this.spriteSheet.width) {
+                    currentX = 0;
+                    currentY += this.frameHeight;
+                }
+                this.frames.push(currentX)
+                this.frames.push(currentY);
+                currentX += this.frameWidth;
             }
-        
-            var newFrame = [];
-        
-            this.frames.push(currentX);
-            this.frames.push(currentY);
-            currentX += this.frameWidth;
         }
-        
         this.multiframeWidth = 1;
         this.multiframeHeight = 1;
     },
-    
+
     /**
       * Will add a multiframe, which is a sequence of individual frames
       * stitched together.
@@ -79,7 +70,7 @@ Animation.prototype = {
       * Each array is a row of frames.
       */
     addMultiframe : function (frameArrays) {
-        
+
         if (this.frames.length !== 0) {
             console.log("Animation Error: Cannot add multiframe to single frame animation.");
             return;
@@ -88,10 +79,10 @@ Animation.prototype = {
             console.log("Animation Error: addMultiframe requires an array.");
             return;
         }
-        
+
         //Unless this is the first multiframe, make sure the new one is compatible.
         if (this.multiframeArray.length > 0) {
-  
+
             //Run a different set of tests depending on whether or not we are adding a 2d array.
             if (Array.isArray(frameArrays[0])) {
                 if (frameArrays.length !== this.multiframeArray[0].length) {
@@ -101,8 +92,8 @@ Animation.prototype = {
                 if (Array.isArray(this.multiframeArray[0][0]) && this.multiframeArray[0][0].length !== frameArrays[0].length) {
                     console.log("Animation Error: addMultiframe width mismatch.");
                     return;
-                }  
-                
+                }
+
             } else {
                 if (this.multiframeArray[0].length !== 1) {
                     console.log("Animation Error: addMultiframe height mismatch.");
@@ -114,25 +105,25 @@ Animation.prototype = {
                 }
             }
         }
-        
+
         if (Array.isArray(frameArrays[0])) {
             this.multiframeArray.push(frameArrays);
         } else {
             this.multiframeArray.push([frameArrays]);
-        }        
+        }
     },
 
-
-    /**
-     * Request the animation to draw its current frame.
-     */
     drawFrame : function (tick, ctx, x, y) {
         this.elapsedTime += tick;
         if (this.isDone()) {
             if (this.loop) this.elapsedTime = 0;
         }
-        var frame = this.currentFrame();
         
+        //Drawing with a height or width of zero throws an IndexSizeError.
+        if (this.frameWidth <= 0 || this.frameHeight <= 0) return;
+        
+        var frame = this.currentFrame();
+
         if(this.frames.length > 0) {
             var xStart = this.frames[frame * 2];
             var yStart = this.frames[frame * 2 + 1];
@@ -155,10 +146,8 @@ Animation.prototype = {
                 }
             }
         }
-        
     },
 
-    //Return the current frame number of the animation based on how much time elapsed.
     currentFrame : function () {
         return Math.floor(this.elapsedTime / this.frameDuration);
     },
@@ -167,7 +156,7 @@ Animation.prototype = {
     isDone : function () {
         return (this.currentFrame() >= this.frames.length / 2);
     },
-    
+
     /*
      * Return whether or not the animation is on its final frame.
      * This indicates that the next frame animated will need to be from a different source.

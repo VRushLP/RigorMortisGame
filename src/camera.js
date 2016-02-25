@@ -40,12 +40,12 @@ Rectangle.prototype = {
                 r.bottom >= this.bottom);
     },
     
-//    overlap : function (r) {
-//        return (this.left < r.right && 
-//                r.left < this.right && 
-//                this.top < r.bottom &&
-//                r.top < this.bottom);
-//    }
+   overlap : function (r) {
+       return (this.left < r.right && 
+               r.left < this.right && 
+               this.top < r.bottom &&
+               r.top < this.bottom);
+   }
 };
 
 // Camera constructor
@@ -103,8 +103,7 @@ Camera.prototype = {
                 }
             }						
 
-        }		
-
+        }
         // update viewportRect
         this.viewportRect.set(this.xView, this.yView);
 
@@ -119,5 +118,7 @@ Camera.prototype = {
             if(this.viewportRect.bottom > this.worldRect.bottom)					
                 this.yView = this.worldRect.bottom - this.hView;
         }
+        // update viewportRect
+        this.viewportRect.set(this.xView, this.yView);
     },
 }

@@ -9,31 +9,28 @@ function AssetManager() {
 AssetManager.prototype = {
 
     queueDownload : function(path) {
-        console.log("Queueing " + path);
         this.downloadQueue.push(path);
     },
-    
+
     queueStageDownload : function(path) {
-        console.log("Queueing Stage " + path);
         this.stageQueue.push(path);
     },
 
     isDone : function () {
-    return this.downloadQueue.length + this.stageQueue.length === this.successCount + this.errorCount;
+        return this.downloadQueue.length + this.stageQueue.length === this.successCount + this.errorCount;
     },
 
     getAsset : function (path) {
-    return this.cache[path];
+        return this.cache[path];
     },
 
     downloadAll : function (callback) {
-        
         for (var i = 0; i < this.stageQueue.length; i++) {
             var stagePath = this.stageQueue[i];
             var stageContents;
             var client = new XMLHttpRequest();
             var that = this;
-                      
+
             client.onreadystatechange = function() {
                 if(client.readyState === 4 && client.status === 200) {
                     that.cache[stagePath] = client.responseText;
@@ -41,11 +38,11 @@ AssetManager.prototype = {
                     if(that.isDone()) callback();
                 }
             }
-            
-            client.open('GET', './txt/forest-stage.txt');  
+
+            client.open('GET', './txt/forest-stage.txt');
             client.send();
         }
-        
+
         for (var i = 0; i < this.downloadQueue.length; i++) {
             var img = new Image();
             var that = this;
@@ -54,7 +51,6 @@ AssetManager.prototype = {
             console.log(path);
 
             img.addEventListener("load", function () {
-                console.log("Loaded " + this.src);
                 that.successCount++;
                 if(that.isDone()) callback();
             });
