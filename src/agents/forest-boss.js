@@ -24,7 +24,7 @@ var FB_PATTERN = {
 
 var FB_ATTR = {
     //The amount of room reserved to the left of the forest boss.
-    LEFT_SIDE_BUFFER: 100,
+    LEFT_SIDE_BUFFER: 50,
     //The distance between each arm.
     ARM_STRIDE: 250,
     //The absolute maximum height that an arm should ever reach.

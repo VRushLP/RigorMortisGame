@@ -120,7 +120,6 @@ function Knight(game, AM, x, y) {
 };
 
 Knight.prototype.draw = function (cameraX, cameraY) {
-    this.entity.draw(cameraX, cameraY);
     var percent = this.health / KNIGHT_ATTR.STARTING_HEALTH;
     var ctx = this.entity.game.ctx;
     ctx.fillStyle = "#8B3E31";
