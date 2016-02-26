@@ -340,6 +340,7 @@ ForestBossArm.prototype = {
     update: function () {        
         //If the arm is hiding, its entity is practically removed from the game temporarily.
         if (this.currentState === FB_ARM_STATE.HIDING) {
+            console.log("HIDING");
             this.entity.height = 0;
             this.entity.y = this.originY;
             //Set to be non-collidable to avoid catching the player on the invisible entity.
@@ -371,7 +372,7 @@ ForestBossArm.prototype = {
         //If the arm is falling, decrease its height by its speed, and drag any entities with it.
         if (this.currentState === FB_ARM_STATE.FALLING) {
             //Determine which agents are on top of the platform before moving.
-            var agentsToDrag = this.entity.game.getTopCollisions(this.entity);
+            var agentsToDrag = this.entity.game.getTopCollisions(this);
             
             if (this.getHeight() <= this.speed) {
                 //The arm would fall past its base.

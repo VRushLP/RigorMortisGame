@@ -415,7 +415,8 @@ GameEngine.prototype = {
     /**
      * Return an array of agents that are colliding with the bottom of the given entity.
      */
-    getBottomCollisions: function (entity) {
+    getBottomCollisions: function (agent) {
+        var entity = agent.entity;
 
         var bottomCollisions = [];
         if (!entity.collidable) return bottomCollisions;
@@ -427,6 +428,8 @@ GameEngine.prototype = {
 
             //Intangible entities are only for events like triggers, and should not register here.
             if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            //An entity must be collidable to count as a collision.
+            if (!other.collidable) continue;
 
             var belowEntity = false;
             //Check if the left side of this entity is within the same plane as the other.
@@ -439,10 +442,17 @@ GameEngine.prototype = {
             }
 
             //If the entity is in the same vertical plane, check if its bottom is a pixel above the other entity.
-            //If both are true, then the entity is directly on top of the other.
+            //If both are true, then the entity is directly on top of the other, and then call listeners.
             if (belowEntity) {
                 if (entity.y + entity.height >= other.y - 1 && entity.y + entity.height <= other.y + other.height) {
                     bottomCollisions.push(this.agents[i]);
+                    
+                    if (typeof this.agents[i].checkListeners === 'function') {
+                        this.agents[i].checkListeners(agent);
+                    }
+                    if (typeof agent.checkListeners === 'function') {
+                        agent.checkListeners(this.agents[i]);
+                    }
                 }
             }
         }
@@ -452,7 +462,8 @@ GameEngine.prototype = {
     /**
      * Return an array of agents that are colliding with the top of the given entity.
      */
-    getTopCollisions: function (entity) {
+    getTopCollisions: function (agent) {
+        var entity = agent.entity;
 
         var topCollisions = [];
         if (!entity.collidable) return topCollisions;
@@ -464,6 +475,8 @@ GameEngine.prototype = {
 
             //Intangible entities are only for events like triggers, and should not register here.
             if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            //An entity must be collidable to count as a collision.
+            if (!other.collidable) continue;
 
             var aboveEntity = false;
             //Check if the top side of this entity is within the same plane as the other.
@@ -484,10 +497,17 @@ GameEngine.prototype = {
             }
 
             //If the entity is in the same horizontal plane, check if its top is a pixel below the other entity.
-            //If both are true, then the entity is directly below the other.
+            //If both are true, then the entity is directly below the other, and then call listeners.
             if (aboveEntity) {
                 if (entity.y >= other.y && entity.y <= other.y + other.height + 1) {
                     topCollisions.push(this.agents[i]);
+                    
+                    if (typeof this.agents[i].checkListeners === 'function') {
+                        this.agents[i].checkListeners(agent);
+                    }
+                    if (typeof agent.checkListeners === 'function') {
+                        agent.checkListeners(this.agents[i]);
+                    }
                 }
             }
         }

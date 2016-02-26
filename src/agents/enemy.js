@@ -94,7 +94,7 @@ Skeleton.prototype = {
         }
 
         //Skeletons should always know if they're falling
-        if (this.entity.game.getBottomCollisions(this.entity).length === 0) {
+        if (this.entity.game.getBottomCollisions(this).length === 0) {
             //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
             this.yVelocity += SKELETON_ATTR.Y_ACCELERATION;
             if (this.yVelocity >= SKELETON_ATTR.TERMINAL_VELOCITY) this.yVelocity = SKELETON_ATTR.TERMINAL_VELOCITY;
