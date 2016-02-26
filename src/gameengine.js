@@ -103,10 +103,17 @@ GameEngine.prototype = {
     resetStage : function () {
         //Re-add removed agents to the game.
         for (var i = 0; i < this.removedAgents.length; i++) {
+            if (typeof this.removedAgents[i].readInput === 'function') {
+                this.removedAgents[i].readInput("reset");
+            }
             this.agents.push(this.removedAgents[i]);
         }
-        //Reset the positions of all agents.
+        //Reset all agents.
         for (var i = 0; i < this.agents.length; i++) {
+            if (typeof this.agents[i].readInput === 'function') {
+                this.agents[i].readInput("reset");
+                console.log("Reset Agent");
+            }
             this.agents[i].entity.x = this.agents[i].entity.originX;
             this.agents[i].entity.y = this.agents[i].entity.originY;
         }

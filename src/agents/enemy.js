@@ -163,11 +163,17 @@ Skeleton.prototype = {
                 this.health--;
                 if (this.health <= 0) {
                     this.entity.removeFromWorld = true;
-                    this.health = SKELETON_ATTR.STARTING_HEALTH;
                 } else {
                     this.confused = true;
                 }
             }
+        }
+        if (input === "reset") {
+            this.health = SKELETON_ATTR.STARTING_HEALTH;
+            this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
+            this.yVelocity = 0;
+            this.xDestination = this.entity.originX;
+            this.yDestination = this.entity.originY;
         }
     },
 
@@ -265,9 +271,11 @@ Wisp.prototype = {
                 this.health--;
                 if (this.health <= 0) {
                     this.entity.removeFromWorld = true;
-                    this.health = WISP_ATTR.STARTING_HEALTH;
                 }
             }
+        }
+        if (input === "reset") {
+            this.health = WISP_ATTR.STARTING_HEALTH;
         }
     },
 }
@@ -353,8 +361,10 @@ Archer.prototype = {
             this.health--;
             if (this.health <= 0) {
                 this.entity.removeFromWorld = true;
-                this.health = ARCHER_ATTR.STARTING_HEALTH;
             }
+        }
+        if (input === "reset") {
+            this.health = ARCHER_ATTR.STARTING_HEALTH;
         }
     },
 

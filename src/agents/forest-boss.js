@@ -290,6 +290,12 @@ ForestBoss.prototype = {
             if (this.arms[i].currentState !== FB_ARM_STATE.HIDING) return false;
         }
         return true;
+    },
+    
+    readInput: function(input, modifier) {
+        if (input === "reset") {
+            this.health = FB_ATTR.MAX_HEALTH;
+        }
     }
 }
 
@@ -494,5 +500,5 @@ ForestBossCore.prototype = {
                 this.callback.takeDamage();
             }
         }
-    },
+    }
 }
