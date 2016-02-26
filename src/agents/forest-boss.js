@@ -317,19 +317,19 @@ function ForestBossArm(game, AM, x, y) {
     this.restTime = 0;
     this.currentRest = 0;
     
-    var thinAnimation = new Animation(AM.getAsset("./img/enemy/boss/forest boss spike 50px.png"), 50, 500, 1, true);
+    var thinAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss spike 50px.png"), 50, 500, 1, true);
     thinAnimation.addFrame(0, 0);
     this.entity.addAnimation(thinAnimation);
     
-    var normalAnimation = new Animation(AM.getAsset("./img/enemy/boss/forest boss spike 100px.png"), 100, 500, 1, true);
+    var normalAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss spike 100px.png"), 100, 500, 1, true);
     normalAnimation.addFrame(0, 0);
     this.entity.addAnimation(normalAnimation);
     
-    var wideAnimation = new Animation(AM.getAsset("./img/enemy/boss/forest boss spike 150px.png"), 150, 500, 1, true);
+    var wideAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss spike 150px.png"), 150, 500, 1, true);
     wideAnimation.addFrame(0, 0);
     this.entity.addAnimation(wideAnimation);
     
-    var platformAnimation = new Animation(AM.getAsset("./img/enemy/boss/forest boss platform.png"), 150, 500, 1, true);
+    var platformAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss platform.png"), 150, 500, 1, true);
     platformAnimation.addFrame(0, 0);
     this.entity.addAnimation(platformAnimation);
 }
@@ -446,7 +446,7 @@ function ForestBossCore(game, AM, x, y, callback) {
     this.callback = callback;
     
     //The core is hidden by default, so set its initial height to zero.
-    var normalAnimation = new Animation(AM.getAsset("./img/enemy/boss/forest boss weak point.png"), 50, 0, 1, true);
+    var normalAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss weak point.png"), 50, 0, 1, true);
     normalAnimation.addFrame(50, 0);
     this.entity.addAnimation(normalAnimation);
 }
