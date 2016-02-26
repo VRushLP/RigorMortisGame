@@ -24,7 +24,7 @@ var FB_PATTERN = {
 
 var FB_ATTR = {
     //The amount of room reserved to the left of the forest boss.
-    LEFT_SIDE_BUFFER: 50,
+    LEFT_SIDE_BUFFER: 100,
     //The distance between each arm.
     ARM_STRIDE: 250,
     //The absolute maximum height that an arm should ever reach.
@@ -35,6 +35,8 @@ var FB_ATTR = {
     MAX_HEALTH: 9,
     PHASE_1_HEALTH: 6,
     PHASE_2_HEALTH: 3,
+
+    CORE_BUFFER : 50,
     
     //Phase Number: Added Speed
     PHASE_SPEED_BUFF: {
@@ -459,7 +461,7 @@ ForestBossCore.prototype = {
         
         var animation = this.entity.animationList[this.entity.currentAnimation];
         //Spawn the core on the right side of the platform.
-        this.entity.x = this.arm.entity.x + 100;
+        this.entity.x = this.arm.entity.x + FB_ATTR.CORE_BUFFER;
         
         //Emerge if the arm has reached its apex.
         if (this.arm.currentState === FB_ARM_STATE.RESTING) { 

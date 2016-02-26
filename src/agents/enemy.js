@@ -187,10 +187,10 @@ function Wisp(game, AM, x, y) {
     this.health = WISP_ATTR.STARTING_HEALTH;
     this.invulnerableFrames = 0;
 
-    var wispRight = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.05, true);
-    wispRight.addFrame(44, 0);
-    var wispLeft = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.05, true);
-    wispLeft.addFrame(0, 0);
+    var wispRight = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.17, true);
+    wispRight.addFrame(0, 50, 4);
+    var wispLeft = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.17, true);
+    wispLeft.addFrame(0, 0, 4);
 
     this.entity.addAnimation(wispRight);
     this.entity.addAnimation(wispLeft);
