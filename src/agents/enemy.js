@@ -163,6 +163,7 @@ Skeleton.prototype = {
                 this.health--;
                 if (this.health <= 0) {
                     this.entity.removeFromWorld = true;
+                    this.health = SKELETON_ATTR.STARTING_HEALTH;
                 } else {
                     this.confused = true;
                 }
@@ -264,6 +265,7 @@ Wisp.prototype = {
                 this.health--;
                 if (this.health <= 0) {
                     this.entity.removeFromWorld = true;
+                    this.health = WISP_ATTR.STARTING_HEALTH;
                 }
             }
         }
@@ -350,8 +352,8 @@ Archer.prototype = {
         if (input === "damage") {
             this.health--;
             if (this.health <= 0) {
-                var index = this.entity.game.agents.indexOf(this);
-                this.entity.game.agents.splice(index, 1);
+                this.entity.removeFromWorld = true;
+                this.health = ARCHER_ATTR.STARTING_HEALTH;
             }
         }
     },

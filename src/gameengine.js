@@ -53,6 +53,7 @@ function GameEngine() {
     this.stages = [];
     this.currentStage;
     this.currentMusic = null;
+    this.removedAgents = [];
     //Initially set by main before game start.
     this.playerAgent;
     this.cameraAgent;
@@ -98,10 +99,36 @@ GameEngine.prototype = {
 
         this.switchMusic(this.stages[this.currentStage].stageMusic);
     },
+    
+    resetStage : function () {
+        //Re-add removed agents to the game.
+        for (var i = 0; i < this.removedAgents.length; i++) {
+            this.agents.push(this.removedAgents[i]);
+        }
+        //Reset the positions of all agents.
+        for (var i = 0; i < this.agents.length; i++) {
+            this.agents[i].entity.x = this.agents[i].entity.originX;
+            this.agents[i].entity.y = this.agents[i].entity.originY;
+        }
+        
+        //Rest the player's position.
+        this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
+        this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+        
+        //Reset the camera.
+        this.camera.frozen = true;
+        this.cameraAgent = this.playerAgent;
+        this.camera.mode = CAMERA_MODE.INSTANT;
+        this.camera.frozen = false;
+        
+        //Request to switch to the stage music.
+        this.switchMusic(this.stages[this.currentStage].stageMusic);
+    },
 
     switchMusic : function (newMusic) {
         if (this.music !== null && typeof(this.music) !== "undefined") {
-            this.music.stop();
+            if (this.music === newMusic) return; //Do not restart if the song is already playing.
+            else this.music.stop();
         }
         this.music = newMusic;
         this.music.play();
@@ -182,7 +209,10 @@ GameEngine.prototype = {
     update : function () {
         for (var i = 0; i < this.agents.length; i++) {
             if (this.agents[i].entity.removeFromWorld) {
-                this.agents.splice(i, 1);
+                var removedAgent = this.agents.splice(i, 1)[0];
+                //Save the removed agent for when the level restarts.
+                this.removedAgents.push(removedAgent);
+                removedAgent.entity.removeFromWorld = false;
                 continue;
             }
             this.agents[i].update();
@@ -252,8 +282,9 @@ GameEngine.prototype = {
     },
 
     respawnPlayer: function () {
-        this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
-        this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+        this.resetStage();
+        //this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
+        //this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
     },
 
 

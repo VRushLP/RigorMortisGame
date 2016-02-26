@@ -6,6 +6,9 @@
 function Entity(game, x, y, width, height) {
     this.animationList = [];
     this.currentAnimation = 0;
+    //Used for respawning the entity.
+    this.originX = x;
+    this.originY = y;
     
     this.x = x;
     this.y = y;

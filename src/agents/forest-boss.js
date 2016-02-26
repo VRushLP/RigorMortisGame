@@ -340,7 +340,6 @@ ForestBossArm.prototype = {
     update: function () {        
         //If the arm is hiding, its entity is practically removed from the game temporarily.
         if (this.currentState === FB_ARM_STATE.HIDING) {
-            console.log("HIDING");
             this.entity.height = 0;
             this.entity.y = this.originY;
             //Set to be non-collidable to avoid catching the player on the invisible entity.
