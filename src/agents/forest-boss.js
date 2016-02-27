@@ -267,7 +267,7 @@ ForestBoss.prototype = {
         
         if (this.health === FB_ATTR.PHASE_1_HEALTH) this.phase = 1;
         if (this.health === FB_ATTR.PHASE_2_HEALTH) this.phase = 2;
-        
+
         if (this.phase === 1) this.currentAttackAnim = FB_ANIM.NORMAL;
         if (this.phase === 2) this.currentAttackAnim = FB_ANIM.WIDE;
     },
@@ -295,6 +295,8 @@ ForestBoss.prototype = {
     readInput: function(input, modifier) {
         if (input === "reset") {
             this.health = FB_ATTR.MAX_HEALTH;
+            this.phase = 0;
+            this.currentAttackAnim = FB_ANIM.THIN;
         }
     }
 }

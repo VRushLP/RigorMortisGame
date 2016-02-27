@@ -25,6 +25,7 @@ function Entity(game, x, y, width, height) {
     this.collidable = true;
     
     this.removeFromWorld = false;
+    this.removeUponReset = false;
 }
 
 Entity.prototype = {

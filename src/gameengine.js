@@ -108,11 +108,16 @@ GameEngine.prototype = {
             }
             this.agents.push(this.removedAgents[i]);
         }
+        this.removedAgents = [];
+        
         //Reset all agents.
         for (var i = 0; i < this.agents.length; i++) {
             if (typeof this.agents[i].readInput === 'function') {
                 this.agents[i].readInput("reset");
-                console.log("Reset Agent");
+            }
+            
+            if (this.agents[i].entity.removeUponReset) {
+                this.agents[i].entity.removeFromWorld = true;
             }
             this.agents[i].entity.x = this.agents[i].entity.originX;
             this.agents[i].entity.y = this.agents[i].entity.originY;

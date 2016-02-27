@@ -39,6 +39,12 @@ CameraTrigger.prototype = {
             game.camera.frozen = false;
             this.entity.collidable = false;
         }
+    },
+    
+    readInput: function (input) {
+        if (input === "reset") {
+            this.entity.collidable = true;
+        }
     }
 }
 
@@ -86,6 +92,12 @@ MusicTrigger.prototype = {
                 this.entity.collidable = false;
             }
         }
+    },
+    
+    readInput: function (input) {
+        if (input === "reset") {
+            this.entity.collidable = true;
+        }
     }
 }
 
@@ -95,7 +107,9 @@ MusicTrigger.prototype = {
 function SpawnTrigger(game, AM, x, y, width, height, agent) {
     this.entity = new Entity(game, x, y, width, height);
     this.spawnAgent = agent;
+    this.spawnAgent.entity.removeUponReset = true;
     this.entity.intangible = true;
+    this.agentSpawned = false;
 }
 
 SpawnTrigger.prototype = { 
@@ -109,8 +123,26 @@ SpawnTrigger.prototype = {
     
     checkListeners: function(agent) {
         if (agent.entity.controllable) {
-            this.entity.game.agents.push(this.spawnAgent);
+            if (!this.agentSpawned) {
+                this.entity.game.agents.push(this.spawnAgent);
+            } else {
+                var removedAgents = this.entity.game.removedAgents;
+                for (var i = 0; i < removedAgents.length; i++) {
+                    if (removedAgents[i] === this.spawnAgent) {
+                        this.entity.game.agents.push(removedAgents[i]);
+                        removedAgents.splice(i, 1);
+                        break;
+                    }
+                }
+            }
             this.entity.collidable = false;
+            this.agentSpawned = true;
+        }
+    },
+    
+    readInput: function (input) {
+        if (input === "reset") {
+            this.entity.collidable = true;
         }
     }
 }
