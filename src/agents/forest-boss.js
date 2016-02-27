@@ -211,7 +211,6 @@ ForestBoss.prototype = {
             else if (i === supportPlatform) {
                 this.arms[i].setSize(FB_ANIM.PLATFORM);
                 this.arms[i].maxHeight = FB_ATTR.HELPER_PLATFORM_HEIGHT;
-                console.log(this.arms[i].maxHeight);
             } 
             else this.arms[i].setSize(this.currentAttackAnim);
         }

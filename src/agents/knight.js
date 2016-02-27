@@ -365,9 +365,7 @@ SwordHitbox.prototype = {
 
     update: function() {
         if (!this.source.attacking) {
-            //TODO: Add RemoveFromWorld to gameengine.
-            var index = this.entity.game.agents.indexOf(this);
-            this.entity.game.agents.splice(index, 1);
+            this.entity.removeFromWorld = true;
         }
         //Does not move the entity, but simply checks if it is currently colliding.
         this.entity.game.requestMove(this, 0, 0);
