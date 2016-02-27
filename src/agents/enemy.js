@@ -432,6 +432,9 @@ Arrow.prototype = {
             this.centerX = tempX;
             this.centerY = tempY;
         } else {
+            if (obstacle.entity.controllable) {
+                this.checkListeners(obstacle);
+            }
             this.entity.removeFromWorld = true;
         }
         this.entity.x = this.centerX - Math.ceil(25 / 2);
