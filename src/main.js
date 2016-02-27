@@ -128,6 +128,12 @@ AM.downloadAll(function () {
     var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2250, forestStage);
     var bossSpawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, forestBoss);
     forestStage.entityList.push(bossSpawnTrigger);
+    
+    for (var i = 0; i < 3; i ++) {
+        var exitBlock = new Block(gameEngine, AM, 4251, 2101 + i * 50);
+        forestBoss.exitAgents.push(exitBlock);
+        forestStage.entityList.push(exitBlock);
+    }
 
     gameEngine.addStage(forestStage);
 

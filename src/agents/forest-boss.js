@@ -32,7 +32,7 @@ var FB_ATTR = {
     
     //The forest boss transitions between phases based on its health.
     //Phases increase speed and width of spikes.
-    MAX_HEALTH: 9,
+    MAX_HEALTH: 1,
     PHASE_1_HEALTH: 6,
     PHASE_2_HEALTH: 3,
 
@@ -78,6 +78,7 @@ var FB_ATTR = {
 function ForestBoss(game, AM, x, y, stage) {
     this.entity = new Entity(game, x, y, 0, 0);
     this.entity.collidable = false;
+    this.exitAgents = [];
     
     //Set the default states of the forest boss.
     this.speed = 0;
@@ -285,6 +286,7 @@ ForestBoss.prototype = {
         
         var originalBGM = this.entity.game.stages[this.entity.game.currentStage].stageMusic;
         this.entity.game.switchMusic(originalBGM);
+        this.openExit();
     },
     
     //Return true if the current state of all arms is hidden.
@@ -300,6 +302,12 @@ ForestBoss.prototype = {
             this.health = FB_ATTR.MAX_HEALTH;
             this.phase = 0;
             this.currentAttackAnim = FB_ANIM.THIN;
+        }
+    },
+    
+    openExit: function () {
+        for (var i = 0; i < this.exitAgents.length; i++) {
+            this.exitAgents[i].entity.removeFromWorld = true;   
         }
     }
 }
