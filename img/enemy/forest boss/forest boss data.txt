@@ -16,7 +16,12 @@ placement (with respect to the position the background would be placed at)
 58 pixels down.
 //this is just compared to my mockup image. anywhere works really, as long as it's sort of in the center.
  
-///other details
+///image details
+forest boss dust.png
+frame width: 50
+frame height: 15
+num frames: 7
+
 forest boss background.png
 width: 1150
 height: 600
