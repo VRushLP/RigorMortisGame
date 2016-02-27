@@ -32,9 +32,9 @@ var FB_ATTR = {
     
     //The forest boss transitions between phases based on its health.
     //Phases increase speed and width of spikes.
-    MAX_HEALTH: 9,
-    PHASE_1_HEALTH: 6,
-    PHASE_2_HEALTH: 3,
+    MAX_HEALTH: 7,
+    PHASE_1_HEALTH: 4,
+    PHASE_2_HEALTH: 2,
 
     CORE_BUFFER : 50,
     

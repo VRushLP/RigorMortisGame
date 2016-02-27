@@ -1,5 +1,5 @@
 var SKELETON_ATTR = {
-    STARTING_HEALTH: 3,
+    STARTING_HEALTH: 1,
     SPEED : 3,
     INVULNERABILITY_FRAMES: 40,
     ATTENTION_DISTANCE : 400,
@@ -30,7 +30,7 @@ var ARCHER_ATTR = {
     SHOOTING_TIME : 120,
     INVULNERABILITY_FRAMES: 40,
 
-    ARROW_SPEED : 7
+    ARROW_SPEED : 8
 }
 
 var ARCHER_ANIM = {
@@ -450,6 +450,7 @@ Arrow.prototype = {
     checkListeners: function (agent) {
         if (agent.entity.controllable) {
             this.entity.game.requestInputSend(agent, "damage", 1);
+            this.entity.removeFromWorld = true;
         }
     }
 }
