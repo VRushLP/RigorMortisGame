@@ -41,7 +41,7 @@ var KNIGHT_ATTR = {
 var KNIGHT_PHYSICS = {
     TERMINAL_Y_VELOCITY : 16,
     TERMINAL_X_VELOCITY : 5,
-    KNOCKBACK_VELOCITY : 10,
+    KNOCKBACK_VELOCITY : 12,
     //Initial jump velocity for tapping jump.
     JUMP_VELOCITY : 8,
     //Gravity's downward acceleration
@@ -260,7 +260,9 @@ Knight.prototype.readInput = function(input, modifier) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
         }
-        this.adjustXVelocity(-2);
+        if (this.xVelocity > KNIGHT_PHYSICS.TERMINAL_X_VELOCITY * -1) {
+            this.adjustXVelocity(-2);
+        }
     }
     if(input === "right") {
         if(!this.canMove) return;
@@ -269,7 +271,10 @@ Knight.prototype.readInput = function(input, modifier) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }
-        this.adjustXVelocity(2);
+        
+        if (this.xVelocity < KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
+            this.adjustXVelocity(2);
+        }
     }
     if (input === "space") {
         //Prevent the player from moving while attacking.
@@ -356,8 +361,8 @@ Knight.prototype.readInput = function(input, modifier) {
 }
 
 Knight.prototype.adjustXVelocity = function (amount) {
-    this.xVelocity += amount;
     var maxVelocity = KNIGHT_PHYSICS.TERMINAL_X_VELOCITY;
+    this.xVelocity += amount;
     
     if (this.invulnerableFrames > 0) maxVelocity = KNIGHT_PHYSICS.KNOCKBACK_VELOCITY;
     
