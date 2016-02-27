@@ -64,7 +64,7 @@ function Knight(game, AM, x, y) {
         y: (this.entity.y + (this.entity.height) / 2)
     }
 
-    this.velocity = 0;
+    this.yVelocity = 0;
     this.direction = KNIGHT_DIR.RIGHT;
     this.canJump = true;
     this.canMove = true;
@@ -175,11 +175,11 @@ Knight.prototype.update = function() {
 
     if (this.entity.game.getBottomCollisions(this).length === 0) {
         //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
-        this.velocity += KNIGHT_PHYSICS.Y_ACCELERATION;
-        if (this.velocity >= KNIGHT_PHYSICS.TERMINAL_VELOCITY) this.velocity = KNIGHT_PHYSICS.TERMINAL_VELOCITY;
-    } else if (this.velocity > 0) {
+        this.yVelocity += KNIGHT_PHYSICS.Y_ACCELERATION;
+        if (this.yVelocity >= KNIGHT_PHYSICS.TERMINAL_VELOCITY) this.yVelocity = KNIGHT_PHYSICS.TERMINAL_VELOCITY;
+    } else if (this.yVelocity > 0) {
         //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
-        this.velocity = 0;
+        this.yVelocity = 0;
 
         //If the knight previously had a jumping/falling animation, request the knight to go into a rest state.
         if(this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_RIGHT ||
@@ -192,17 +192,17 @@ Knight.prototype.update = function() {
 
     //If the agent is moving upwards, then it is jumping.
     //However, currently using jump animation whenever knight is in air.
-    if(this.velocity < 0) {
+    if(this.yVelocity < 0) {
         if (this.entity.game.getTopCollisions(this).length > 0) {
             //If a top collision is detected, then the agent has hit a ceiling and must stop rising.
-            this.velocity = 0;
+            this.yVelocity = 0;
         }
     }
 
     //If downwards velocity is present, request to move the agent with it.
-    if(this.velocity !== 0) {
-        this.entity.game.requestMove(this, 0, this.velocity);
-        if(this.velocity > 0) {
+    if(this.yVelocity !== 0) {
+        this.entity.game.requestMove(this, 0, this.yVelocity);
+        if(this.yVelocity > 0) {
             if(this.direction === KNIGHT_DIR.RIGHT) {
                 this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
             } else {
@@ -224,7 +224,7 @@ Knight.prototype.update = function() {
 Knight.prototype.jump = function() {
     //Allow the jump only if the agent is on the ground.
     if(this.entity.game.getBottomCollisions(this).length > 0 && this.canJump) {
-        this.velocity = -(KNIGHT_PHYSICS.JUMP_VELOCITY);
+        this.yVelocity = -(KNIGHT_PHYSICS.JUMP_VELOCITY);
     }
     //The player must actively press up to jump, they can't just hold it.
     this.canJump = false;
@@ -241,7 +241,7 @@ Knight.prototype.readInput = function(input, modifier) {
     if (input === "up") {
         if(!this.canMove) return;
         //Add upwards velocity if the player is holding up while jumping.
-        if (this.velocity < 0) this.velocity -= KNIGHT_PHYSICS.PRESS_UP_SPEED;
+        if (this.yVelocity < 0) this.yVelocity -= KNIGHT_PHYSICS.PRESS_UP_SPEED;
         this.jump();
 
         //Allows no-clip debugging.
@@ -328,10 +328,10 @@ Knight.prototype.readInput = function(input, modifier) {
             //TODO: Knock player back based on direction that damage came from.
             if (this.direction === KNIGHT_DIR.LEFT) {
                 this.entity.game.requestMove(this, 40, 0);
-                this.velocity = -5;
+                this.yVelocity = -5;
             } else {
                 this.entity.game.requestMove(this, -40, 0);
-                this.velocity = -5;
+                this.yVelocity = -5;
             }
         }
     }
