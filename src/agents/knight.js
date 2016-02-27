@@ -224,7 +224,7 @@ Knight.prototype.update = function() {
         }
         
     }
-
+    
     //Move the player independently in both directions, otherwise it will feel off.
     this.entity.game.requestMove(this, this.xVelocity, 0);
     this.entity.game.requestMove(this, 0, this.yVelocity);
@@ -268,8 +268,10 @@ Knight.prototype.readInput = function(input, modifier) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
         }
-        if (this.xVelocity > KNIGHT_PHYSICS.TERMINAL_X_VELOCITY * -1) {
+        if (this.xVelocity >= KNIGHT_PHYSICS.TERMINAL_X_VELOCITY * -1) {
             this.adjustXVelocity(-2);
+        } else {
+            this.slowDown();
         }
     }
     if(input === "right") {
@@ -280,8 +282,10 @@ Knight.prototype.readInput = function(input, modifier) {
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }
         
-        if (this.xVelocity < KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
+        if (this.xVelocity <= KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
             this.adjustXVelocity(2);
+        } else {
+            this.slowDown();
         }
     }
     if (input === "space") {
