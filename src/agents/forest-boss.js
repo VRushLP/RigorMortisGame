@@ -278,6 +278,7 @@ ForestBoss.prototype = {
     
     //Remove the Forest Boss arms, core, and the controller from world and switch the music back..
     selfDestruct: function () {
+        var gameEngine = this.entity.game;
         for (var i = 0; i < this.arms.length; i++) {
             this.arms[i].entity.removeFromWorld = true;
         }
@@ -287,6 +288,13 @@ ForestBoss.prototype = {
         var originalBGM = this.entity.game.stages[this.entity.game.currentStage].stageMusic;
         this.entity.game.switchMusic(originalBGM);
         this.openExit();
+        
+        gameEngine.camera.frozen = true;
+        gameEngine.camera.mode = CAMERA_MODE.PAN_THEN_INSTANT;
+        gameEngine.camera.speedX = 3;
+        gameEngine.camera.speedY = 3;
+        gameEngine.cameraAgent = gameEngine.playerAgent;
+        gameEngine.camera.frozen = false;
     },
     
     //Return true if the current state of all arms is hidden.
