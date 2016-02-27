@@ -245,12 +245,6 @@ GameEngine.prototype = {
         var entity = this.cameraAgent.entity;
         var cameraAgentX = (this.surfaceWidth / 2) - entity.x - (entity.width / 2);
         var cameraAgentY = entity.y - (entity.height / 2) - (this.surfaceHeight / 2);
-        
-        if (this.camera.mode === CAMERA_MODE.PAN_THEN_INSTANT) {
-            if (this.camera.x === cameraAgentX && this.camera.y === cameraAgentY) {
-                this.cameramode = CAMERA_MODE.INSTANT;
-            }
-        }
 
         //If the camera is in instant mode, keep it locked on the agent.
         if (this.camera.mode === CAMERA_MODE.INSTANT) {
@@ -277,6 +271,13 @@ GameEngine.prototype = {
                 this.camera.y += this.camera.speedY;
             } else {
                 this.camera.y -= this.camera.speedY;
+            }
+        }
+        
+        if (this.camera.mode === CAMERA_MODE.PAN_THEN_INSTANT) {
+            if (Math.abs(this.camera.x - cameraAgentX) <= this.camera.speedX &&
+                Math.abs(this.camera.y - cameraAgentY) <= this.camera.speedY) {
+                this.camera.mode = CAMERA_MODE.INSTANT;
             }
         }
 
