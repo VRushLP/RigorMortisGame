@@ -140,8 +140,8 @@ GameEngine.prototype = {
     switchMusic : function (newMusic) {
         if (this.music !== null && typeof(this.music) !== "undefined") {
             if (this.music === newMusic) return; //Do not restart if the song is already playing.
-            else this.music.stop();
         }
+        this.music.stop();
         this.music = newMusic;
         this.music.play();
     },

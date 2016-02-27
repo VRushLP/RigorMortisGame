@@ -311,7 +311,7 @@ ForestBoss.prototype = {
  * based on certain parameters provided by Forest Boss.
  */
 function ForestBossArm(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, 0, 0);
+    this.entity = new Entity(game, x, y, 50, 0);
     this.entity.moveable = true;
     
     this.currentState = FB_ARM_STATE.HIDING;
