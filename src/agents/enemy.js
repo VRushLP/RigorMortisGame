@@ -276,6 +276,7 @@ Wisp.prototype = {
         }
         if (input === "reset") {
             this.health = WISP_ATTR.STARTING_HEALTH;
+            this.invulnerableFrames = 0;
         }
     },
 }
