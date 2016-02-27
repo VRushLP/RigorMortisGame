@@ -45,18 +45,20 @@ Timer.prototype = {
  ********************/
 
 function GameEngine() {
-    this.agents = [];
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
 
     this.stages = [];
-    this.currentStage;
-    this.currentMusic = null;
+    this.agents = [];
     this.removedAgents = [];
+
+    this.currentMusic = null;
+
     //Initially set by main before game start.
     this.playerAgent;
     this.cameraAgent;
+    this.currentStage;
 
     this.DEBUG_MODE = 1;
 }
@@ -73,13 +75,11 @@ GameEngine.prototype = {
     },
 
     init: function (ctx) {
-        console.log("Initializing GameEngine...");
         this.ctx = ctx;
         this.surfaceWidth = this.ctx.canvas.width;
         this.surfaceHeight = this.ctx.canvas.height;
         this.startInput();
         this.timer = new Timer();
-        console.log('GameEngine initialized');
     },
 
     addAgent : function (agent) {
@@ -123,7 +123,7 @@ GameEngine.prototype = {
             this.agents[i].entity.y = this.agents[i].entity.originY;
         }
         
-        //Rest the player's position.
+        //Reset the player's position.
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
         this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
         

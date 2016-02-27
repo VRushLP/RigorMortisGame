@@ -38,8 +38,6 @@ var FB_ATTR = {
 
     CORE_BUFFER : 50,
     
-    CORE_BUFFER : 50,
-    
     //Phase Number: Added Speed
     PHASE_SPEED_BUFF: {
         0: 0,
@@ -312,7 +310,7 @@ ForestBoss.prototype = {
  * based on certain parameters provided by Forest Boss.
  */
 function ForestBossArm(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, 50, 0);
+    this.entity = new Entity(game, x, y, 0, 0);
     this.entity.moveable = true;
     
     this.currentState = FB_ARM_STATE.HIDING;
@@ -470,7 +468,7 @@ ForestBossCore.prototype = {
         if (this.arm === null) return;
         
         var animation = this.entity.animationList[this.entity.currentAnimation];
-        //Spawn the core on the right side of the platform.
+        //Spawn the core in the middle of the platform.
         this.entity.x = this.arm.entity.x + FB_ATTR.CORE_BUFFER;
         
         //Emerge if the arm has reached its apex.
