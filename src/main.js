@@ -85,6 +85,7 @@ AM.queueDownload("./img/enemy/forest boss/forest boss spike 150px.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss platform.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss weak point.png");
 AM.queueDownload("./img/other/victory screen.png");
+AM.queueDownload("./img/other/title screen.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
@@ -156,6 +157,13 @@ AM.downloadAll(function () {
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;
+
+    var titleScreen = new TitleScreen(gameEngine, AM, 0, 1664);
+    forestStage.entityList.push(titleScreen);
+
+    canvas.addEventListener('click', function (event) {
+        titleScreen.entity.removeFromWorld = true;
+    }, false);
 
     gameEngine.start();
 });
