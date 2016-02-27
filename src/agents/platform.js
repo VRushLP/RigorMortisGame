@@ -6,6 +6,7 @@ var BLOCKS_GLOBALS = {
 
 function Platform(game, AM, x, y, width, height) {
     this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH * width, BLOCKS_GLOBALS.HEIGHT * height);
+    this.entity.pushesOnly = true;
     
     this.movePatterns = [];
     this.currentMovePattern = 0;

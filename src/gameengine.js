@@ -416,7 +416,9 @@ GameEngine.prototype = {
                 //Temporary fix to allow platforms to move the player.
                 if(other.controllable && other.moveable) {
                     this.requestMove(this.agents[i], amountX, amountY);
-                    //continue;
+                    if (agent.entity.pushesOnly) {
+                       continue; 
+                    } 
                 }
 
                 //Temporary fix to allow intangible objects, like camera triggers, to activate,
