@@ -421,6 +421,7 @@ GameEngine.prototype = {
 
             //Collision detected.
             if (!xMoveValid && !yMoveValid) {
+                
                 //Temporary fix to allow platforms to move the player.
                 if(other.controllable && other.moveable) {
                     this.requestMove(this.agents[i], amountX, amountY);
@@ -428,17 +429,18 @@ GameEngine.prototype = {
                        continue; 
                     } 
                 }
+                
+                if (typeof this.agents[i].checkListeners === 'function') {
+                    this.agents[i].checkListeners(agent);
+                }
+                if (typeof agent.checkListeners === 'function') {
+                    agent.checkListeners(this.agents[i]);
+                }
 
                 //Temporary fix to allow intangible objects, like camera triggers, to activate,
                 //but not affect the player's movement. Not optimized, as this will activate at any time
                 //the player may have collided with it, even if another entity is closer and blocks them.
                 if (typeof(other.intangible) !== "undefined" && other.intangible) {
-                    if (typeof this.agents[i].checkListeners === 'function') {
-                        this.agents[i].checkListeners(agent);
-                    }
-                    if (typeof agent.checkListeners === 'function') {
-                        agent.checkListeners(this.agents[i]);
-                    }
                     continue;
                 }
 

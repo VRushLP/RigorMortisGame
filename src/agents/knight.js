@@ -358,6 +358,11 @@ Knight.prototype.readInput = function(input, modifier) {
             }
         }
     }
+    
+    if (input === "reset") {
+        this.xVelocity = 0;
+        this.yVelocity = 0;
+    }
 
     //No-clip activation/deactivation
     if (input === 'n') {
