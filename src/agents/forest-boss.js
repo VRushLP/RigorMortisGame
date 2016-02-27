@@ -451,7 +451,7 @@ ForestBossArm.prototype = {
  * callback: The forest boss controller to preemptively request state changes to.
  */
 function ForestBossCore(game, AM, x, y, callback) {
-    this.entity = new Entity(game, x, y, 0, 0);
+    this.entity = new Entity(game, x, y, 50, 0);
     this.entity.moveable = true;
     this.entity.intangible = true;
     this.arm;
