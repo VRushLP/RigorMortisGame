@@ -204,22 +204,30 @@ Knight.prototype.update = function() {
 
     //If downwards velocity is present, set the player into a jumping or falling animation.
     if(this.yVelocity !== 0) {
-        if(this.yVelocity > 0) {
+        //If the knight is attacking, keep them in the attack animation.
+        if (this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_LEFT &&
+           this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_RIGHT) {
+            
+            if(this.yVelocity > 0) {
             if(this.direction === KNIGHT_DIR.RIGHT) {
                 this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
             } else {
                 this.entity.setAnimation(KNIGHT_ANIM.FALLING_LEFT);
             }
-        } else {
-            if(this.direction === KNIGHT_DIR.RIGHT) {
-                this.entity.setAnimation(KNIGHT_ANIM.JUMPING_RIGHT);
             } else {
-                this.entity.setAnimation(KNIGHT_ANIM.JUMPING_LEFT);
+                if(this.direction === KNIGHT_DIR.RIGHT) {
+                    this.entity.setAnimation(KNIGHT_ANIM.JUMPING_RIGHT);
+                } else {
+                    this.entity.setAnimation(KNIGHT_ANIM.JUMPING_LEFT);
+                }
             }
         }
+        
     }
 
-    this.entity.game.requestMove(this, this.xVelocity, this.yVelocity);
+    //Move the player independently in both directions, otherwise it will feel off.
+    this.entity.game.requestMove(this, this.xVelocity, 0);
+    this.entity.game.requestMove(this, 0, this.yVelocity);
 }
 
 /**

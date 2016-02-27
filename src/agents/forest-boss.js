@@ -453,6 +453,7 @@ function ForestBossCore(game, AM, x, y, callback) {
     this.entity = new Entity(game, x, y, 50, 0);
     this.entity.moveable = true;
     this.entity.intangible = true;
+    this.entity.pushesOnly = true;
     this.arm;
     this.callback = callback;
     
