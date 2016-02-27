@@ -39,7 +39,8 @@ var KNIGHT_ATTR = {
 
 //Physics Constants
 var KNIGHT_PHYSICS = {
-    TERMINAL_VELOCITY : 16,
+    TERMINAL_Y_VELOCITY : 16,
+    TERMINAL_X_VELOCITY : 5,
     //Initial jump velocity for tapping jump.
     JUMP_VELOCITY : 8,
     //Gravity's downward acceleration
@@ -65,6 +66,7 @@ function Knight(game, AM, x, y) {
     }
 
     this.yVelocity = 0;
+    this.xVelocity = 0;
     this.direction = KNIGHT_DIR.RIGHT;
     this.canJump = true;
     this.canMove = true;
@@ -176,7 +178,7 @@ Knight.prototype.update = function() {
     if (this.entity.game.getBottomCollisions(this).length === 0) {
         //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
         this.yVelocity += KNIGHT_PHYSICS.Y_ACCELERATION;
-        if (this.yVelocity >= KNIGHT_PHYSICS.TERMINAL_VELOCITY) this.yVelocity = KNIGHT_PHYSICS.TERMINAL_VELOCITY;
+        if (this.yVelocity >= KNIGHT_PHYSICS.TERMINAL_Y_VELOCITY) this.yVelocity = KNIGHT_PHYSICS.TERMINAL_Y_VELOCITY;
     } else if (this.yVelocity > 0) {
         //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
         this.yVelocity = 0;
@@ -199,9 +201,8 @@ Knight.prototype.update = function() {
         }
     }
 
-    //If downwards velocity is present, request to move the agent with it.
+    //If downwards velocity is present, set the player into a jumping or falling animation.
     if(this.yVelocity !== 0) {
-        this.entity.game.requestMove(this, 0, this.yVelocity);
         if(this.yVelocity > 0) {
             if(this.direction === KNIGHT_DIR.RIGHT) {
                 this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
@@ -216,6 +217,9 @@ Knight.prototype.update = function() {
             }
         }
     }
+    
+    
+    this.entity.game.requestMove(this, this.xVelocity, this.yVelocity);
 }
 
 /**
@@ -256,7 +260,7 @@ Knight.prototype.readInput = function(input, modifier) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
         }
-        this.entity.game.requestMove(this, -KNIGHT_PHYSICS.RUNNING_SPEED, 0);
+        this.adjustXVelocity(-2);
     }
     if(input === "right") {
         if(!this.canMove) return;
@@ -265,7 +269,7 @@ Knight.prototype.readInput = function(input, modifier) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }
-        this.entity.game.requestMove(this, KNIGHT_PHYSICS.RUNNING_SPEED, 0);
+        this.adjustXVelocity(2);
     }
     if (input === "space") {
         //Prevent the player from moving while attacking.
@@ -296,6 +300,9 @@ Knight.prototype.readInput = function(input, modifier) {
         } else {
             this.entity.setAnimation(KNIGHT_ANIM.STAND_LEFT);
         }
+        
+        if (this.xVelocity > 0) this.adjustXVelocity(Math.max(-2, this.xVelocity * -1));
+        else if (this.xVelocity < 0) this.adjustXVelocity(Math.min(2, this.xVelocity * -1));
     }
 
     //Knight can only jump upon pressing jump, so reset the ability to jump
@@ -342,6 +349,16 @@ Knight.prototype.readInput = function(input, modifier) {
             this.entity.fallable = !this.entity.fallable;
             this.entity.collidable = !this.entity.collidable;
         }
+    }
+}
+
+Knight.prototype.adjustXVelocity = function (amount) {
+    this.xVelocity += amount;
+    if (this.xVelocity > KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
+        this.xVelocity = KNIGHT_PHYSICS.TERMINAL_X_VELOCITY;
+    }
+    if (this.xVelocity < -1 * KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
+        this.xVelocity = -1 * KNIGHT_PHYSICS.TERMINAL_X_VELOCITY;
     }
 }
 
