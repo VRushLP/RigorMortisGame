@@ -173,7 +173,7 @@ Knight.prototype.update = function() {
 
     if(!this.entity.fallable) return;
 
-    if (this.entity.game.getBottomCollisions(this.entity).length === 0) {
+    if (this.entity.game.getBottomCollisions(this).length === 0) {
         //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
         this.velocity += KNIGHT_PHYSICS.Y_ACCELERATION;
         if (this.velocity >= KNIGHT_PHYSICS.TERMINAL_VELOCITY) this.velocity = KNIGHT_PHYSICS.TERMINAL_VELOCITY;
@@ -193,7 +193,7 @@ Knight.prototype.update = function() {
     //If the agent is moving upwards, then it is jumping.
     //However, currently using jump animation whenever knight is in air.
     if(this.velocity < 0) {
-        if (this.entity.game.getTopCollisions(this.entity).length > 0) {
+        if (this.entity.game.getTopCollisions(this).length > 0) {
             //If a top collision is detected, then the agent has hit a ceiling and must stop rising.
             this.velocity = 0;
         }
@@ -223,7 +223,7 @@ Knight.prototype.update = function() {
  */
 Knight.prototype.jump = function() {
     //Allow the jump only if the agent is on the ground.
-    if(this.entity.game.getBottomCollisions(this.entity).length > 0 && this.canJump) {
+    if(this.entity.game.getBottomCollisions(this).length > 0 && this.canJump) {
         this.velocity = -(KNIGHT_PHYSICS.JUMP_VELOCITY);
     }
     //The player must actively press up to jump, they can't just hold it.
@@ -252,7 +252,7 @@ Knight.prototype.readInput = function(input, modifier) {
     if (input === "left") {
         if(!this.canMove) return;
         this.direction = KNIGHT_DIR.LEFT;
-        if(this.entity.game.getBottomCollisions(this.entity).length > 0) {
+        if(this.entity.game.getBottomCollisions(this).length > 0) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
         }
@@ -261,7 +261,7 @@ Knight.prototype.readInput = function(input, modifier) {
     if(input === "right") {
         if(!this.canMove) return;
         this.direction = KNIGHT_DIR.RIGHT;
-        if(this.entity.game.getBottomCollisions(this.entity).length > 0) {
+        if(this.entity.game.getBottomCollisions(this).length > 0) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }
@@ -280,9 +280,9 @@ Knight.prototype.readInput = function(input, modifier) {
         if (!this.attacking) {
             this.attacking = true;
             if(this.direction === KNIGHT_DIR.RIGHT) {
-                var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width + 1, this.entity.y, this);
+                var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width - 29, this.entity.y, this);
             } else {
-                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width - 51,
+                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width + 5,
                                                 this.entity.y, this);
             }
 
@@ -355,7 +355,7 @@ Knight.prototype.draw = function () {
   * and self-destructs after a number of frames.
   */
 function SwordHitbox(game, x, y, source) {
-    this.entity = new Entity(game, x , y, 50, 50);
+    this.entity = new Entity(game, x , y, 70, 50);
     this.entity.moveable = true;
     this.entity.intangible = true;
     this.source = source;
@@ -365,9 +365,7 @@ SwordHitbox.prototype = {
 
     update: function() {
         if (!this.source.attacking) {
-            //TODO: Add RemoveFromWorld to gameengine.
-            var index = this.entity.game.agents.indexOf(this);
-            this.entity.game.agents.splice(index, 1);
+            this.entity.removeFromWorld = true;
         }
         //Does not move the entity, but simply checks if it is currently colliding.
         this.entity.game.requestMove(this, 0, 0);

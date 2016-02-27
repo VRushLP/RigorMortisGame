@@ -38,6 +38,8 @@ var FB_ATTR = {
 
     CORE_BUFFER : 50,
     
+    CORE_BUFFER : 50,
+    
     //Phase Number: Added Speed
     PHASE_SPEED_BUFF: {
         0: 0,
@@ -63,7 +65,7 @@ var FB_ATTR = {
     },
     
     SPAWN_TIME: 150,
-    HELPER_PLATFORM_HEIGHT: 350
+    HELPER_PLATFORM_HEIGHT: 350,
 }
 
 /*
@@ -211,7 +213,6 @@ ForestBoss.prototype = {
             else if (i === supportPlatform) {
                 this.arms[i].setSize(FB_ANIM.PLATFORM);
                 this.arms[i].maxHeight = FB_ATTR.HELPER_PLATFORM_HEIGHT;
-                console.log(this.arms[i].maxHeight);
             } 
             else this.arms[i].setSize(this.currentAttackAnim);
         }
@@ -269,7 +270,7 @@ ForestBoss.prototype = {
         
         if (this.health === FB_ATTR.PHASE_1_HEALTH) this.phase = 1;
         if (this.health === FB_ATTR.PHASE_2_HEALTH) this.phase = 2;
-        
+
         if (this.phase === 1) this.currentAttackAnim = FB_ANIM.NORMAL;
         if (this.phase === 2) this.currentAttackAnim = FB_ANIM.WIDE;
     },
@@ -292,6 +293,14 @@ ForestBoss.prototype = {
             if (this.arms[i].currentState !== FB_ARM_STATE.HIDING) return false;
         }
         return true;
+    },
+    
+    readInput: function(input, modifier) {
+        if (input === "reset") {
+            this.health = FB_ATTR.MAX_HEALTH;
+            this.phase = 0;
+            this.currentAttackAnim = FB_ANIM.THIN;
+        }
     }
 }
 
@@ -303,7 +312,7 @@ ForestBoss.prototype = {
  * based on certain parameters provided by Forest Boss.
  */
 function ForestBossArm(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, 0, 0);
+    this.entity = new Entity(game, x, y, 50, 0);
     this.entity.moveable = true;
     
     this.currentState = FB_ARM_STATE.HIDING;
@@ -373,7 +382,7 @@ ForestBossArm.prototype = {
         //If the arm is falling, decrease its height by its speed, and drag any entities with it.
         if (this.currentState === FB_ARM_STATE.FALLING) {
             //Determine which agents are on top of the platform before moving.
-            var agentsToDrag = this.entity.game.getTopCollisions(this.entity);
+            var agentsToDrag = this.entity.game.getTopCollisions(this);
             
             if (this.getHeight() <= this.speed) {
                 //The arm would fall past its base.
@@ -444,6 +453,7 @@ ForestBossArm.prototype = {
 function ForestBossCore(game, AM, x, y, callback) {
     this.entity = new Entity(game, x, y, 0, 0);
     this.entity.moveable = true;
+    this.entity.intangible = true;
     this.arm;
     this.callback = callback;
     
@@ -496,5 +506,5 @@ ForestBossCore.prototype = {
                 this.callback.takeDamage();
             }
         }
-    },
+    }
 }

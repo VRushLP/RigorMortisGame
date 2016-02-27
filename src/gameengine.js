@@ -53,6 +53,7 @@ function GameEngine() {
     this.stages = [];
     this.currentStage;
     this.currentMusic = null;
+    this.removedAgents = [];
     //Initially set by main before game start.
     this.playerAgent;
     this.cameraAgent;
@@ -98,10 +99,48 @@ GameEngine.prototype = {
 
         this.switchMusic(this.stages[this.currentStage].stageMusic);
     },
+    
+    resetStage : function () {
+        //Re-add removed agents to the game.
+        for (var i = 0; i < this.removedAgents.length; i++) {
+            if (typeof this.removedAgents[i].readInput === 'function') {
+                this.removedAgents[i].readInput("reset");
+            }
+            this.agents.push(this.removedAgents[i]);
+        }
+        this.removedAgents = [];
+        
+        //Reset all agents.
+        for (var i = 0; i < this.agents.length; i++) {
+            if (typeof this.agents[i].readInput === 'function') {
+                this.agents[i].readInput("reset");
+            }
+            
+            if (this.agents[i].entity.removeUponReset) {
+                this.agents[i].entity.removeFromWorld = true;
+            }
+            this.agents[i].entity.x = this.agents[i].entity.originX;
+            this.agents[i].entity.y = this.agents[i].entity.originY;
+        }
+        
+        //Rest the player's position.
+        this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
+        this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+        
+        //Reset the camera.
+        this.camera.frozen = true;
+        this.cameraAgent = this.playerAgent;
+        this.camera.mode = CAMERA_MODE.INSTANT;
+        this.camera.frozen = false;
+        
+        //Request to switch to the stage music.
+        this.switchMusic(this.stages[this.currentStage].stageMusic);
+    },
 
     switchMusic : function (newMusic) {
         if (this.music !== null && typeof(this.music) !== "undefined") {
-            this.music.stop();
+            if (this.music === newMusic) return; //Do not restart if the song is already playing.
+            else this.music.stop();
         }
         this.music = newMusic;
         this.music.play();
@@ -182,7 +221,10 @@ GameEngine.prototype = {
     update : function () {
         for (var i = 0; i < this.agents.length; i++) {
             if (this.agents[i].entity.removeFromWorld) {
-                this.agents.splice(i, 1);
+                var removedAgent = this.agents.splice(i, 1)[0];
+                //Save the removed agent for when the level restarts.
+                this.removedAgents.push(removedAgent);
+                removedAgent.entity.removeFromWorld = false;
                 continue;
             }
             this.agents[i].update();
@@ -252,8 +294,9 @@ GameEngine.prototype = {
     },
 
     respawnPlayer: function () {
-        this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
-        this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+        this.resetStage();
+        //this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
+        //this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
     },
 
 
@@ -415,7 +458,8 @@ GameEngine.prototype = {
     /**
      * Return an array of agents that are colliding with the bottom of the given entity.
      */
-    getBottomCollisions: function (entity) {
+    getBottomCollisions: function (agent) {
+        var entity = agent.entity;
 
         var bottomCollisions = [];
         if (!entity.collidable) return bottomCollisions;
@@ -427,6 +471,8 @@ GameEngine.prototype = {
 
             //Intangible entities are only for events like triggers, and should not register here.
             if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            //An entity must be collidable to count as a collision.
+            if (!other.collidable) continue;
 
             var belowEntity = false;
             //Check if the left side of this entity is within the same plane as the other.
@@ -439,10 +485,17 @@ GameEngine.prototype = {
             }
 
             //If the entity is in the same vertical plane, check if its bottom is a pixel above the other entity.
-            //If both are true, then the entity is directly on top of the other.
+            //If both are true, then the entity is directly on top of the other, and then call listeners.
             if (belowEntity) {
                 if (entity.y + entity.height >= other.y - 1 && entity.y + entity.height <= other.y + other.height) {
                     bottomCollisions.push(this.agents[i]);
+                    
+                    if (typeof this.agents[i].checkListeners === 'function') {
+                        this.agents[i].checkListeners(agent);
+                    }
+                    if (typeof agent.checkListeners === 'function') {
+                        agent.checkListeners(this.agents[i]);
+                    }
                 }
             }
         }
@@ -452,7 +505,8 @@ GameEngine.prototype = {
     /**
      * Return an array of agents that are colliding with the top of the given entity.
      */
-    getTopCollisions: function (entity) {
+    getTopCollisions: function (agent) {
+        var entity = agent.entity;
 
         var topCollisions = [];
         if (!entity.collidable) return topCollisions;
@@ -464,6 +518,8 @@ GameEngine.prototype = {
 
             //Intangible entities are only for events like triggers, and should not register here.
             if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            //An entity must be collidable to count as a collision.
+            if (!other.collidable) continue;
 
             var aboveEntity = false;
             //Check if the top side of this entity is within the same plane as the other.
@@ -484,10 +540,17 @@ GameEngine.prototype = {
             }
 
             //If the entity is in the same horizontal plane, check if its top is a pixel below the other entity.
-            //If both are true, then the entity is directly below the other.
+            //If both are true, then the entity is directly below the other, and then call listeners.
             if (aboveEntity) {
                 if (entity.y >= other.y && entity.y <= other.y + other.height + 1) {
                     topCollisions.push(this.agents[i]);
+                    
+                    if (typeof this.agents[i].checkListeners === 'function') {
+                        this.agents[i].checkListeners(agent);
+                    }
+                    if (typeof agent.checkListeners === 'function') {
+                        agent.checkListeners(this.agents[i]);
+                    }
                 }
             }
         }
