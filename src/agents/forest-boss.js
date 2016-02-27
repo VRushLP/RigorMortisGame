@@ -36,6 +36,8 @@ var FB_ATTR = {
     PHASE_1_HEALTH: 6,
     PHASE_2_HEALTH: 3,
     
+    CORE_BUFFER : 50,
+    
     //Phase Number: Added Speed
     PHASE_SPEED_BUFF: {
         0: 0,
@@ -62,8 +64,6 @@ var FB_ATTR = {
     
     SPAWN_TIME: 150,
     HELPER_PLATFORM_HEIGHT: 350,
-    //How far to the right on the arm the core is placed.
-    CORE_OFFSET: 50
 }
 
 /*
@@ -470,7 +470,7 @@ ForestBossCore.prototype = {
         
         var animation = this.entity.animationList[this.entity.currentAnimation];
         //Spawn the core on the right side of the platform.
-        this.entity.x = this.arm.entity.x + FB_ATTR.CORE_OFFSET;
+        this.entity.x = this.arm.entity.x + FB_ATTR.CORE_BUFFER;
         
         //Emerge if the arm has reached its apex.
         if (this.arm.currentState === FB_ARM_STATE.RESTING) { 
