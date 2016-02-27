@@ -41,6 +41,7 @@ var KNIGHT_ATTR = {
 var KNIGHT_PHYSICS = {
     TERMINAL_Y_VELOCITY : 16,
     TERMINAL_X_VELOCITY : 5,
+    KNOCKBACK_VELOCITY : 10,
     //Initial jump velocity for tapping jump.
     JUMP_VELOCITY : 8,
     //Gravity's downward acceleration
@@ -217,8 +218,7 @@ Knight.prototype.update = function() {
             }
         }
     }
-    
-    
+
     this.entity.game.requestMove(this, this.xVelocity, this.yVelocity);
 }
 
@@ -241,6 +241,7 @@ Knight.prototype.readInput = function(input, modifier) {
     if (input === "down") {
         if(!this.canMove) return;
         this.entity.game.requestMove(this, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
+        this.slowDown();
     }
     if (input === "up") {
         if(!this.canMove) return;
@@ -279,6 +280,7 @@ Knight.prototype.readInput = function(input, modifier) {
         } else {
             this.entity.setAnimation(KNIGHT_ANIM.ATTACK_LEFT);
         }
+        this.slowDown();
 
         //Create a new sword hitbox if the knight is not currently attacking.
         if (!this.attacking) {
@@ -300,9 +302,7 @@ Knight.prototype.readInput = function(input, modifier) {
         } else {
             this.entity.setAnimation(KNIGHT_ANIM.STAND_LEFT);
         }
-        
-        if (this.xVelocity > 0) this.adjustXVelocity(Math.max(-2, this.xVelocity * -1));
-        else if (this.xVelocity < 0) this.adjustXVelocity(Math.min(2, this.xVelocity * -1));
+        this.slowDown();
     }
 
     //Knight can only jump upon pressing jump, so reset the ability to jump
@@ -334,11 +334,11 @@ Knight.prototype.readInput = function(input, modifier) {
             //Knock the player back.
             //TODO: Knock player back based on direction that damage came from.
             if (this.direction === KNIGHT_DIR.LEFT) {
-                this.entity.game.requestMove(this, 40, 0);
-                this.yVelocity = -5;
+                this.xVelocity = KNIGHT_PHYSICS.KNOCKBACK_VELOCITY;
+                this.yVelocity = -6;
             } else {
-                this.entity.game.requestMove(this, -40, 0);
-                this.yVelocity = -5;
+                this.xVelocity = -1 * KNIGHT_PHYSICS.KNOCKBACK_VELOCITY;
+                this.yVelocity = -6;
             }
         }
     }
@@ -354,12 +354,27 @@ Knight.prototype.readInput = function(input, modifier) {
 
 Knight.prototype.adjustXVelocity = function (amount) {
     this.xVelocity += amount;
-    if (this.xVelocity > KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
-        this.xVelocity = KNIGHT_PHYSICS.TERMINAL_X_VELOCITY;
+    var maxVelocity = KNIGHT_PHYSICS.TERMINAL_X_VELOCITY;
+    
+    if (this.invulnerableFrames > 0) maxVelocity = KNIGHT_PHYSICS.KNOCKBACK_VELOCITY;
+    
+    if (this.xVelocity > maxVelocity) {
+        this.xVelocity = maxVelocity;
     }
-    if (this.xVelocity < -1 * KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
-        this.xVelocity = -1 * KNIGHT_PHYSICS.TERMINAL_X_VELOCITY;
+    if (this.xVelocity < -1 * maxVelocity) {
+        this.xVelocity = -1 * maxVelocity;
     }
+}
+
+Knight.prototype.slowDown = function () {
+    var maxSlowdown = 1;
+    if (this.invulnerableFrames > 0) maxSlowdown = .45; 
+        
+    if (this.xVelocity > 0) {
+         this.adjustXVelocity(Math.max(maxSlowdown * -1, this.xVelocity * -1)); 
+    } else if (this.xVelocity < 0) {
+          this.adjustXVelocity(Math.min(maxSlowdown, this.xVelocity * -1));
+    } 
 }
 
 Knight.prototype.draw = function () {
