@@ -424,7 +424,9 @@ GameEngine.prototype = {
                 //Temporary fix to allow platforms to move the player.
                 if(other.controllable && other.moveable) {
                     this.requestMove(this.agents[i], amountX, amountY);
-                    continue;
+                    if (agent.entity.pushesOnly) {
+                       continue; 
+                    } 
                 }
 
                 //Temporary fix to allow intangible objects, like camera triggers, to activate,
@@ -604,6 +606,7 @@ GameEngine.prototype.loop = function () {
             if(!this.pressLeft) this.agents[i].readInput("left_released");
             if(!this.pressRight) this.agents[i].readInput("right_released");
             if(!this.pressSpace) this.agents[i].readInput("space_released");
+            if(!this.pressRight && !this.pressLeft) this.agents[i].readInput("left_and_right_released");
 
             if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput("none");
         }

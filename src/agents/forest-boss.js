@@ -328,6 +328,7 @@ ForestBoss.prototype = {
 function ForestBossArm(game, AM, x, y) {
     this.entity = new Entity(game, x, y, 0, 0);
     this.entity.moveable = true;
+    this.entity.pushesOnly = true;
     
     this.currentState = FB_ARM_STATE.HIDING;
     //OriginY is the base of the arm, and is used for calculating its height/return points.
@@ -468,6 +469,7 @@ function ForestBossCore(game, AM, x, y, callback) {
     this.entity = new Entity(game, x, y, 50, 0);
     this.entity.moveable = true;
     this.entity.intangible = true;
+    this.entity.pushesOnly = true;
     this.arm;
     this.callback = callback;
     

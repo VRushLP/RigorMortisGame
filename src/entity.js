@@ -23,6 +23,7 @@ function Entity(game, x, y, width, height) {
     this.camerable = false;
     this.respawnable = false;
     this.collidable = true;
+    this.pushesOnly = false;
     
     this.removeFromWorld = false;
     this.removeUponReset = false;

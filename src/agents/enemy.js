@@ -109,7 +109,7 @@ Skeleton.prototype = {
         //Skeletons should only do math if they are not confused
         if (!this.confused) {
             var player = this.entity.game.playerAgent.entity;
-            if (this.entity.game.playerAgent.velocity === 0) {
+            if (this.entity.game.playerAgent.yVelocity === 0) {
 
                 var knightPoint = this.entity.game.playerAgent.centerPoint;
 
