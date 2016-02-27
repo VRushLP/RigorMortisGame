@@ -589,13 +589,17 @@ GameEngine.prototype.start = function () {
 GameEngine.prototype.loop = function () {
     for(var i = 0; i < this.agents.length; i++) {
         if(this.agents[i].entity.controllable === true) {
-            if(this.pressRight) this.agents[i].readInput("right");
+            if(this.pressRight && !this.pressLeft) this.agents[i].readInput("right");
             if(this.pressDown) this.agents[i].readInput("down");
             if(this.pressUp) this.agents[i].readInput("up");
-            if(this.pressLeft) this.agents[i].readInput("left");
+            if(this.pressLeft && !this.pressRight) this.agents[i].readInput("left");
             if(this.pressN) this.agents[i].readInput('n');
             if(this.pressSpace) this.agents[i].readInput("space");
 
+            if(this.pressRight && this.pressLeft) {
+                this.agents[i].readInput("left_released");
+                this.agents[i].readInput("right_released");
+            }
             if(!this.pressUp) this.agents[i].readInput("up_released");
             if(!this.pressLeft) this.agents[i].readInput("left_released");
             if(!this.pressRight) this.agents[i].readInput("right_released");
