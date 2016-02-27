@@ -24,7 +24,7 @@ var FB_PATTERN = {
 
 var FB_ATTR = {
     //The amount of room reserved to the left of the forest boss.
-    LEFT_SIDE_BUFFER: 50,
+    LEFT_SIDE_BUFFER: 100,
     //The distance between each arm.
     ARM_STRIDE: 250,
     //The absolute maximum height that an arm should ever reach.
@@ -61,7 +61,9 @@ var FB_ATTR = {
     },
     
     SPAWN_TIME: 150,
-    HELPER_PLATFORM_HEIGHT: 350
+    HELPER_PLATFORM_HEIGHT: 350,
+    //How far to the right on the arm the core is placed.
+    CORE_OFFSET: 50
 }
 
 /*
@@ -450,6 +452,7 @@ ForestBossArm.prototype = {
 function ForestBossCore(game, AM, x, y, callback) {
     this.entity = new Entity(game, x, y, 0, 0);
     this.entity.moveable = true;
+    this.entity.intangible = true;
     this.arm;
     this.callback = callback;
     
@@ -467,7 +470,7 @@ ForestBossCore.prototype = {
         
         var animation = this.entity.animationList[this.entity.currentAnimation];
         //Spawn the core on the right side of the platform.
-        this.entity.x = this.arm.entity.x + 100;
+        this.entity.x = this.arm.entity.x + FB_ATTR.CORE_OFFSET;
         
         //Emerge if the arm has reached its apex.
         if (this.arm.currentState === FB_ARM_STATE.RESTING) { 

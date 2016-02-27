@@ -114,7 +114,7 @@ AM.downloadAll(function () {
     secondPlatform.addMovePattern(450, 3, 0, 0);
     forestStage.entityList.push(secondPlatform);
     
-    var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3675, 1900);
+    var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3660, 1940);
     var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
     var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.forestBoss);
 
@@ -125,7 +125,7 @@ AM.downloadAll(function () {
     forestStage.entityList.push(bossMusicTrigger);
     forestStage.entityList.push(spawnTrigger);
     
-    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2200, forestStage);
+    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2250, forestStage);
     var bossSpawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, forestBoss);
     forestStage.entityList.push(bossSpawnTrigger);
 
