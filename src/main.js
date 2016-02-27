@@ -73,11 +73,11 @@ AM.queueDownload("./img/forest-stage/forest block.png");
 AM.queueDownload("./img/enemy/chaser.png");
 AM.queueDownload("./img/enemy/archer.png");
 AM.queueDownload("./img/enemy/wisp.png");
-AM.queueDownload("./img/enemy/boss/forest boss spike 50px.png");
-AM.queueDownload("./img/enemy/boss/forest boss spike 100px.png");
-AM.queueDownload("./img/enemy/boss/forest boss spike 150px.png");
-AM.queueDownload("./img/enemy/boss/forest boss platform.png");
-AM.queueDownload("./img/enemy/boss/forest boss weak point.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss spike 50px.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss spike 100px.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss spike 150px.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss platform.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss weak point.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
