@@ -26,9 +26,9 @@ var BGM = {
        urls: ['./snd/stronger_monsters.mp3'],
        volume: .1,
        loop: true,
-       onend: function () {
-           BGM.forestBoss.pos(10.322); //Skips the intro
-       }
+       //onend: function () {
+       //    BGM.forestBoss.pos(10.322); //Skips the intro
+       //}
    }),
 
    townBoss: new Howl({
