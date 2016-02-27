@@ -397,15 +397,15 @@ function Arrow(source, x, y, distanceX, distanceY, angle, game) {
     this.entity.y = y - Math.ceil(5 / 2);
     this.centerX = x;
     this.centerY = y;
-    this.maxVel = ARCHER_ATTR.ARROW_SPEED;
-    var scale = this.maxVel / Math.sqrt(distanceX * distanceX + distanceY * distanceY)
+
+    var scale = ARCHER_ATTR.ARROW_SPEED / Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     this.xVel = distanceX * scale;
     this.yVel = distanceY * scale;
     this.angle = angle;
-    var arrowRight = new Animation(AM.getAsset("./img/enemy/archer.png"), this.entity.width, this.entity.height, 0.2, true);
-    arrowRight.addFrame(146, 5);
 
-    this.entity.animationList.push(arrowRight);
+    var arrowAnimation = new Animation(AM.getAsset("./img/enemy/archer.png"), this.entity.width, this.entity.height, 0.2, true);
+    arrowAnimation.addFrame(146, 5);
+    this.entity.animationList.push(arrowAnimation);
 }
 
 Arrow.prototype = {
