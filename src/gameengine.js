@@ -3,6 +3,7 @@ var FOREST_STAGE = 0;
 var CAMERA_MODE = {
     INSTANT: 0,
     PAN: 1,
+    PAN_THEN_INSTANT: 2
 }
 
 window.requestAnimFrame = (function () {
@@ -252,7 +253,7 @@ GameEngine.prototype = {
         }
 
         //If the camera is in pan mode, move it towards the agent based on the camera speed.
-        if (this.camera.mode === CAMERA_MODE.PAN) {
+        if (this.camera.mode === CAMERA_MODE.PAN || this.camera.mode === CAMERA_MODE.PAN_THEN_INSTANT) {
             //If the agent is close enough, snap the camera to it.
             if (Math.abs(cameraAgentX - this.camera.x) <= this.camera.speedX) {
                     this.camera.x = cameraAgentX;
@@ -270,6 +271,13 @@ GameEngine.prototype = {
                 this.camera.y += this.camera.speedY;
             } else {
                 this.camera.y -= this.camera.speedY;
+            }
+        }
+        
+        if (this.camera.mode === CAMERA_MODE.PAN_THEN_INSTANT) {
+            if (Math.abs(this.camera.x - cameraAgentX) <= this.camera.speedX &&
+                Math.abs(this.camera.y - cameraAgentY) <= this.camera.speedY) {
+                this.camera.mode = CAMERA_MODE.INSTANT;
             }
         }
 
