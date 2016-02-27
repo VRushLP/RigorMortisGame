@@ -280,9 +280,9 @@ Knight.prototype.readInput = function(input, modifier) {
         if (!this.attacking) {
             this.attacking = true;
             if(this.direction === KNIGHT_DIR.RIGHT) {
-                var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width + 1, this.entity.y, this);
+                var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width - 29, this.entity.y, this);
             } else {
-                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width - 51,
+                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width + 5,
                                                 this.entity.y, this);
             }
 
@@ -355,7 +355,7 @@ Knight.prototype.draw = function () {
   * and self-destructs after a number of frames.
   */
 function SwordHitbox(game, x, y, source) {
-    this.entity = new Entity(game, x , y, 50, 50);
+    this.entity = new Entity(game, x , y, 70, 50);
     this.entity.moveable = true;
     this.entity.intangible = true;
     this.source = source;
