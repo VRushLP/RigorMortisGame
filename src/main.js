@@ -26,9 +26,9 @@ var BGM = {
        urls: ['./snd/stronger_monsters.mp3'],
        volume: .1,
        loop: true,
-       onend: function () {
-           BGM.forestBoss.pos(10.322); //Skips the intro
-       }
+       //onend: function () {
+       //    BGM.forestBoss.pos(10.322); //Skips the intro
+       //}
    }),
 
    townBoss: new Howl({
@@ -57,6 +57,12 @@ var BGM = {
             BGM.hellBossFinal.pos(1.966);
         }
     }),
+    
+    victoryFanfare: new Howl({
+        urls: ['./snd/fanfare.mp3'],
+        volume: .15,
+        loop: false,
+    })
 };
 
 AM.queueDownload("./img/knight/knight jump.png");
@@ -73,11 +79,13 @@ AM.queueDownload("./img/forest-stage/forest block.png");
 AM.queueDownload("./img/enemy/chaser.png");
 AM.queueDownload("./img/enemy/archer.png");
 AM.queueDownload("./img/enemy/wisp.png");
-AM.queueDownload("./img/enemy/boss/forest boss spike 50px.png");
-AM.queueDownload("./img/enemy/boss/forest boss spike 100px.png");
-AM.queueDownload("./img/enemy/boss/forest boss spike 150px.png");
-AM.queueDownload("./img/enemy/boss/forest boss platform.png");
-AM.queueDownload("./img/enemy/boss/forest boss weak point.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss spike 50px.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss spike 100px.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss spike 150px.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss platform.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss weak point.png");
+AM.queueDownload("./img/other/victory screen.png");
+AM.queueDownload("./img/other/title screen.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
 
@@ -114,7 +122,7 @@ AM.downloadAll(function () {
     secondPlatform.addMovePattern(450, 3, 0, 0);
     forestStage.entityList.push(secondPlatform);
     
-    var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3675, 1900);
+    var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3660, 1940);
     var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
     var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.forestBoss);
 
@@ -125,14 +133,37 @@ AM.downloadAll(function () {
     forestStage.entityList.push(bossMusicTrigger);
     forestStage.entityList.push(spawnTrigger);
     
-    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2200, forestStage);
+    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2250, forestStage);
     var bossSpawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, forestBoss);
     forestStage.entityList.push(bossSpawnTrigger);
-
+    
+    for (var i = 0; i < 3; i ++) {
+        var exitBlock = new Block(gameEngine, AM, 4251, 2101 + i * 50);
+        forestBoss.exitAgents.push(exitBlock);
+        forestStage.entityList.push(exitBlock);
+    }
+    
+    var victoryCameraFocus = new FocusTrigger(gameEngine, AM, 7639, 1361);
+    var victoryMusicTrigger = new MusicTrigger(gameEngine, AM, 4550, 2101, 50, 148, BGM.victoryFanfare);
+    
+    var victoryScreen = new VictoryScreen(gameEngine, AM, 7000, 1000);
+    forestStage.entityList.push(victoryScreen);
+    
+    var victoryCameraTrigger = new CameraTrigger(gameEngine, AM, 4550, 2101, 50, 148, victoryCameraFocus, CAMERA_MODE.INSTANT);
+    forestStage.entityList.push(victoryCameraTrigger);    
+    forestStage.entityList.push(victoryMusicTrigger);
+    
     gameEngine.addStage(forestStage);
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;
+
+    var titleScreen = new TitleScreen(gameEngine, AM, 0, 1664);
+    forestStage.entityList.push(titleScreen);
+
+    canvas.addEventListener('click', function (event) {
+        titleScreen.entity.removeFromWorld = true;
+    }, false);
 
     gameEngine.start();
 });

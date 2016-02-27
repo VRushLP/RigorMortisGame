@@ -1,6 +1,7 @@
 CTRL-F YOUR DESIRED ENEMY SHEET:
 chaser.png
-archer.png (INCLUDES ARROW)
+archer.png (NO LONGER INCLUDES ARROW)
+arrow.png
 wisp.png
 death anim.png
 ----------
@@ -68,6 +69,16 @@ attack up left
 attack up right
 	0, 384
 	3 frames
+
+------
+arrow.png
+------
+arrow left - (25, 5)
+	0, 0
+	1 frame
+arrow right - (25, 5)
+	0, 5
+	1 frame
 
 ----------
 wisp.png

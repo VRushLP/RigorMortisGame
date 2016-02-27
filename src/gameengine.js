@@ -3,6 +3,7 @@ var FOREST_STAGE = 0;
 var CAMERA_MODE = {
     INSTANT: 0,
     PAN: 1,
+    PAN_THEN_INSTANT: 2
 }
 
 window.requestAnimFrame = (function () {
@@ -45,17 +46,20 @@ Timer.prototype = {
  ********************/
 
 function GameEngine() {
-    this.agents = [];
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
 
     this.stages = [];
-    this.currentStage;
+    this.agents = [];
+    this.removedAgents = [];
+
     this.currentMusic = null;
+
     //Initially set by main before game start.
     this.playerAgent;
     this.cameraAgent;
+    this.currentStage;
 
     this.DEBUG_MODE = 1;
 }
@@ -72,13 +76,11 @@ GameEngine.prototype = {
     },
 
     init: function (ctx) {
-        console.log("Initializing GameEngine...");
         this.ctx = ctx;
         this.surfaceWidth = this.ctx.canvas.width;
         this.surfaceHeight = this.ctx.canvas.height;
         this.startInput();
         this.timer = new Timer();
-        console.log('GameEngine initialized');
     },
 
     addAgent : function (agent) {
@@ -98,10 +100,48 @@ GameEngine.prototype = {
 
         this.switchMusic(this.stages[this.currentStage].stageMusic);
     },
+    
+    resetStage : function () {
+        //Re-add removed agents to the game.
+        for (var i = 0; i < this.removedAgents.length; i++) {
+            if (typeof this.removedAgents[i].readInput === 'function') {
+                this.removedAgents[i].readInput("reset");
+            }
+            this.agents.push(this.removedAgents[i]);
+        }
+        this.removedAgents = [];
+        
+        //Reset all agents.
+        for (var i = 0; i < this.agents.length; i++) {
+            if (typeof this.agents[i].readInput === 'function') {
+                this.agents[i].readInput("reset");
+            }
+            
+            if (this.agents[i].entity.removeUponReset) {
+                this.agents[i].entity.removeFromWorld = true;
+            }
+            this.agents[i].entity.x = this.agents[i].entity.originX;
+            this.agents[i].entity.y = this.agents[i].entity.originY;
+        }
+        
+        //Reset the player's position.
+        this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
+        this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+        
+        //Reset the camera.
+        this.camera.frozen = true;
+        this.cameraAgent = this.playerAgent;
+        this.camera.mode = CAMERA_MODE.INSTANT;
+        this.camera.frozen = false;
+        
+        //Request to switch to the stage music.
+        this.switchMusic(this.stages[this.currentStage].stageMusic);
+    },
 
     switchMusic : function (newMusic) {
         if (this.music !== null && typeof(this.music) !== "undefined") {
-            this.music.stop();
+            if (this.music === newMusic) return; //Do not restart if the song is already playing.
+            else this.music.stop();
         }
         this.music = newMusic;
         this.music.play();
@@ -182,7 +222,10 @@ GameEngine.prototype = {
     update : function () {
         for (var i = 0; i < this.agents.length; i++) {
             if (this.agents[i].entity.removeFromWorld) {
-                this.agents.splice(i, 1);
+                var removedAgent = this.agents.splice(i, 1)[0];
+                //Save the removed agent for when the level restarts.
+                this.removedAgents.push(removedAgent);
+                removedAgent.entity.removeFromWorld = false;
                 continue;
             }
             this.agents[i].update();
@@ -210,7 +253,7 @@ GameEngine.prototype = {
         }
 
         //If the camera is in pan mode, move it towards the agent based on the camera speed.
-        if (this.camera.mode === CAMERA_MODE.PAN) {
+        if (this.camera.mode === CAMERA_MODE.PAN || this.camera.mode === CAMERA_MODE.PAN_THEN_INSTANT) {
             //If the agent is close enough, snap the camera to it.
             if (Math.abs(cameraAgentX - this.camera.x) <= this.camera.speedX) {
                     this.camera.x = cameraAgentX;
@@ -228,6 +271,13 @@ GameEngine.prototype = {
                 this.camera.y += this.camera.speedY;
             } else {
                 this.camera.y -= this.camera.speedY;
+            }
+        }
+        
+        if (this.camera.mode === CAMERA_MODE.PAN_THEN_INSTANT) {
+            if (Math.abs(this.camera.x - cameraAgentX) <= this.camera.speedX &&
+                Math.abs(this.camera.y - cameraAgentY) <= this.camera.speedY) {
+                this.camera.mode = CAMERA_MODE.INSTANT;
             }
         }
 
@@ -252,8 +302,9 @@ GameEngine.prototype = {
     },
 
     respawnPlayer: function () {
-        this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
-        this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+        this.resetStage();
+        //this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
+        //this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
     },
 
 
@@ -370,22 +421,26 @@ GameEngine.prototype = {
 
             //Collision detected.
             if (!xMoveValid && !yMoveValid) {
+                
                 //Temporary fix to allow platforms to move the player.
                 if(other.controllable && other.moveable) {
                     this.requestMove(this.agents[i], amountX, amountY);
-                    continue;
+                    if (agent.entity.pushesOnly) {
+                       continue; 
+                    } 
+                }
+                
+                if (typeof this.agents[i].checkListeners === 'function') {
+                    this.agents[i].checkListeners(agent);
+                }
+                if (typeof agent.checkListeners === 'function') {
+                    agent.checkListeners(this.agents[i]);
                 }
 
                 //Temporary fix to allow intangible objects, like camera triggers, to activate,
                 //but not affect the player's movement. Not optimized, as this will activate at any time
                 //the player may have collided with it, even if another entity is closer and blocks them.
                 if (typeof(other.intangible) !== "undefined" && other.intangible) {
-                    if (typeof this.agents[i].checkListeners === 'function') {
-                        this.agents[i].checkListeners(agent);
-                    }
-                    if (typeof agent.checkListeners === 'function') {
-                        agent.checkListeners(this.agents[i]);
-                    }
                     continue;
                 }
 
@@ -415,7 +470,8 @@ GameEngine.prototype = {
     /**
      * Return an array of agents that are colliding with the bottom of the given entity.
      */
-    getBottomCollisions: function (entity) {
+    getBottomCollisions: function (agent) {
+        var entity = agent.entity;
 
         var bottomCollisions = [];
         if (!entity.collidable) return bottomCollisions;
@@ -427,6 +483,8 @@ GameEngine.prototype = {
 
             //Intangible entities are only for events like triggers, and should not register here.
             if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            //An entity must be collidable to count as a collision.
+            if (!other.collidable) continue;
 
             var belowEntity = false;
             //Check if the left side of this entity is within the same plane as the other.
@@ -439,10 +497,17 @@ GameEngine.prototype = {
             }
 
             //If the entity is in the same vertical plane, check if its bottom is a pixel above the other entity.
-            //If both are true, then the entity is directly on top of the other.
+            //If both are true, then the entity is directly on top of the other, and then call listeners.
             if (belowEntity) {
                 if (entity.y + entity.height >= other.y - 1 && entity.y + entity.height <= other.y + other.height) {
                     bottomCollisions.push(this.agents[i]);
+                    
+                    if (typeof this.agents[i].checkListeners === 'function') {
+                        this.agents[i].checkListeners(agent);
+                    }
+                    if (typeof agent.checkListeners === 'function') {
+                        agent.checkListeners(this.agents[i]);
+                    }
                 }
             }
         }
@@ -452,7 +517,8 @@ GameEngine.prototype = {
     /**
      * Return an array of agents that are colliding with the top of the given entity.
      */
-    getTopCollisions: function (entity) {
+    getTopCollisions: function (agent) {
+        var entity = agent.entity;
 
         var topCollisions = [];
         if (!entity.collidable) return topCollisions;
@@ -464,6 +530,8 @@ GameEngine.prototype = {
 
             //Intangible entities are only for events like triggers, and should not register here.
             if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            //An entity must be collidable to count as a collision.
+            if (!other.collidable) continue;
 
             var aboveEntity = false;
             //Check if the top side of this entity is within the same plane as the other.
@@ -484,10 +552,17 @@ GameEngine.prototype = {
             }
 
             //If the entity is in the same horizontal plane, check if its top is a pixel below the other entity.
-            //If both are true, then the entity is directly below the other.
+            //If both are true, then the entity is directly below the other, and then call listeners.
             if (aboveEntity) {
                 if (entity.y >= other.y && entity.y <= other.y + other.height + 1) {
                     topCollisions.push(this.agents[i]);
+                    
+                    if (typeof this.agents[i].checkListeners === 'function') {
+                        this.agents[i].checkListeners(agent);
+                    }
+                    if (typeof agent.checkListeners === 'function') {
+                        agent.checkListeners(this.agents[i]);
+                    }
                 }
             }
         }
@@ -518,17 +593,22 @@ GameEngine.prototype.start = function () {
 GameEngine.prototype.loop = function () {
     for(var i = 0; i < this.agents.length; i++) {
         if(this.agents[i].entity.controllable === true) {
-            if(this.pressRight) this.agents[i].readInput("right");
+            if(this.pressRight && !this.pressLeft) this.agents[i].readInput("right");
             if(this.pressDown) this.agents[i].readInput("down");
             if(this.pressUp) this.agents[i].readInput("up");
-            if(this.pressLeft) this.agents[i].readInput("left");
+            if(this.pressLeft && !this.pressRight) this.agents[i].readInput("left");
             if(this.pressN) this.agents[i].readInput('n');
             if(this.pressSpace) this.agents[i].readInput("space");
 
+            if(this.pressRight && this.pressLeft) {
+                this.agents[i].readInput("left_released");
+                this.agents[i].readInput("right_released");
+            }
             if(!this.pressUp) this.agents[i].readInput("up_released");
             if(!this.pressLeft) this.agents[i].readInput("left_released");
             if(!this.pressRight) this.agents[i].readInput("right_released");
             if(!this.pressSpace) this.agents[i].readInput("space_released");
+            if(!this.pressRight && !this.pressLeft) this.agents[i].readInput("left_and_right_released");
 
             if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput("none");
         }

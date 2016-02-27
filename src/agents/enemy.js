@@ -1,5 +1,5 @@
 var SKELETON_ATTR = {
-    STARTING_HEALTH: 3,
+    STARTING_HEALTH: 1,
     SPEED : 3,
     INVULNERABILITY_FRAMES: 40,
     ATTENTION_DISTANCE : 400,
@@ -30,7 +30,7 @@ var ARCHER_ATTR = {
     SHOOTING_TIME : 120,
     INVULNERABILITY_FRAMES: 40,
 
-    ARROW_SPEED : 7
+    ARROW_SPEED : 8
 }
 
 var ARCHER_ANIM = {
@@ -94,7 +94,7 @@ Skeleton.prototype = {
         }
 
         //Skeletons should always know if they're falling
-        if (this.entity.game.getBottomCollisions(this.entity).length === 0) {
+        if (this.entity.game.getBottomCollisions(this).length === 0) {
             //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
             this.yVelocity += SKELETON_ATTR.Y_ACCELERATION;
             if (this.yVelocity >= SKELETON_ATTR.TERMINAL_VELOCITY) this.yVelocity = SKELETON_ATTR.TERMINAL_VELOCITY;
@@ -109,7 +109,7 @@ Skeleton.prototype = {
         //Skeletons should only do math if they are not confused
         if (!this.confused) {
             var player = this.entity.game.playerAgent.entity;
-            if (this.entity.game.playerAgent.velocity === 0) {
+            if (this.entity.game.playerAgent.yVelocity === 0) {
 
                 var knightPoint = this.entity.game.playerAgent.centerPoint;
 
@@ -168,6 +168,13 @@ Skeleton.prototype = {
                 }
             }
         }
+        if (input === "reset") {
+            this.health = SKELETON_ATTR.STARTING_HEALTH;
+            this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
+            this.yVelocity = 0;
+            this.xDestination = this.entity.originX;
+            this.yDestination = this.entity.originY;
+        }
     },
 
     checkListeners: function (agent) {
@@ -187,10 +194,10 @@ function Wisp(game, AM, x, y) {
     this.health = WISP_ATTR.STARTING_HEALTH;
     this.invulnerableFrames = 0;
 
-    var wispRight = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.05, true);
-    wispRight.addFrame(44, 0);
-    var wispLeft = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.05, true);
-    wispLeft.addFrame(0, 0);
+    var wispRight = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.17, true);
+    wispRight.addFrame(0, 50, 4);
+    var wispLeft = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.17, true);
+    wispLeft.addFrame(0, 0, 4);
 
     this.entity.addAnimation(wispRight);
     this.entity.addAnimation(wispLeft);
@@ -266,6 +273,9 @@ Wisp.prototype = {
                     this.entity.removeFromWorld = true;
                 }
             }
+        }
+        if (input === "reset") {
+            this.health = WISP_ATTR.STARTING_HEALTH;
         }
     },
 }
@@ -350,9 +360,11 @@ Archer.prototype = {
         if (input === "damage") {
             this.health--;
             if (this.health <= 0) {
-                var index = this.entity.game.agents.indexOf(this);
-                this.entity.game.agents.splice(index, 1);
+                this.entity.removeFromWorld = true;
             }
+        }
+        if (input === "reset") {
+            this.health = ARCHER_ATTR.STARTING_HEALTH;
         }
     },
 
@@ -385,15 +397,15 @@ function Arrow(source, x, y, distanceX, distanceY, angle, game) {
     this.entity.y = y - Math.ceil(5 / 2);
     this.centerX = x;
     this.centerY = y;
-    this.maxVel = ARCHER_ATTR.ARROW_SPEED;
-    var scale = this.maxVel / Math.sqrt(distanceX * distanceX + distanceY * distanceY)
+
+    var scale = ARCHER_ATTR.ARROW_SPEED / Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     this.xVel = distanceX * scale;
     this.yVel = distanceY * scale;
     this.angle = angle;
-    var arrowRight = new Animation(AM.getAsset("./img/enemy/archer.png"), this.entity.width, this.entity.height, 0.2, true);
-    arrowRight.addFrame(146, 5);
 
-    this.entity.animationList.push(arrowRight);
+    var arrowAnimation = new Animation(AM.getAsset("./img/enemy/archer.png"), this.entity.width, this.entity.height, 0.2, true);
+    arrowAnimation.addFrame(146, 5);
+    this.entity.animationList.push(arrowAnimation);
 }
 
 Arrow.prototype = {
@@ -420,6 +432,9 @@ Arrow.prototype = {
             this.centerX = tempX;
             this.centerY = tempY;
         } else {
+            if (obstacle.entity.controllable) {
+                this.checkListeners(obstacle);
+            }
             this.entity.removeFromWorld = true;
         }
         this.entity.x = this.centerX - Math.ceil(25 / 2);
@@ -438,6 +453,7 @@ Arrow.prototype = {
     checkListeners: function (agent) {
         if (agent.entity.controllable) {
             this.entity.game.requestInputSend(agent, "damage", 1);
+            this.entity.removeFromWorld = true;
         }
     }
 }
