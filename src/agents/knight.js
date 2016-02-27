@@ -241,7 +241,6 @@ Knight.prototype.readInput = function(input, modifier) {
     if (input === "down") {
         if(!this.canMove) return;
         this.entity.game.requestMove(this, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
-        this.slowDown();
     }
     if (input === "up") {
         if(!this.canMove) return;
@@ -324,6 +323,10 @@ Knight.prototype.readInput = function(input, modifier) {
         if (!this.attacking) {
             this.canMove = true;
         }
+    }
+    
+    if (input === "left_and_right_released") {
+        this.slowDown();
     }
 
     if (input === "damage") {
