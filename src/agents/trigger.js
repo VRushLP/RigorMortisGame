@@ -88,6 +88,7 @@ MusicTrigger.prototype = {
         if (agent.entity.controllable) {
             //Only change the music if it is not currently the one playing.
             if (this.entity.game.music !== this.music) {
+                console.log("HI?");
                 this.entity.game.switchMusic(this.music);
                 this.entity.collidable = false;
             }
