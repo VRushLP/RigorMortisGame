@@ -428,7 +428,7 @@ GameEngine.prototype = {
             if (!xMoveValid && !yMoveValid) {
                 
                 //Temporary fix to allow platforms to move the player.
-                if(other.controllable && other.moveable) {
+                if(other.controllable && other.moveable && !agent.entity.intangible) {
                     this.requestMove(this.agents[i], amountX, amountY);
                     if (agent.entity.pushesOnly) {
                        continue; 

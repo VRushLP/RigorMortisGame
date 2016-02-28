@@ -60,16 +60,17 @@ var KNIGHT_PHYSICS = {
  */
 function Knight(game, AM, x, y) {
     this.entity = new Entity(game, x, y, 48, 50);
+    this.swordHitbox = null;
 
     this.yVelocity = 0;
     this.xVelocity = 0;
     this.direction = KNIGHT_DIR.RIGHT;
+    
     this.canJump = true;
-    this.canMove = true;
+    this.attacking = false;
     this.noclip = false;
 
     this.invulnerableFrames = 0;
-    this.attacking = false;
     this.health = KNIGHT_ATTR.STARTING_HEALTH;
 
     var KnightStandRight = new Animation(AM.getAsset("./img/knight/knight standing.png"),
@@ -150,7 +151,7 @@ Knight.prototype.update = function() {
             this.attacking = true;
         } else {
             this.attacking = false;
-            this.readInput("none");
+            this.rest();
         }
     }
 
@@ -168,15 +169,13 @@ Knight.prototype.update = function() {
                this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_LEFT ||
                this.entity.currentAnimation === KNIGHT_ANIM.FALLING_RIGHT ||
                this.entity.currentAnimation === KNIGHT_ANIM.FALLING_LEFT) {
-                   this.readInput("none");
+                   this.rest();
             }
     }
 
-    //If the agent is moving upwards, then it is jumping.
-    //However, currently using jump animation whenever knight is in air.
+    //If the agent is jumping, check for top collisions.
     if(this.yVelocity < 0) {
         if (this.entity.game.getTopCollisions(this).length > 0) {
-            //If a top collision is detected, then the agent has hit a ceiling and must stop rising.
             this.yVelocity = 0;
         }
     }
@@ -187,12 +186,12 @@ Knight.prototype.update = function() {
         if (this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_LEFT &&
            this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_RIGHT) {
             
-            if(this.yVelocity > 0) {
-            if(this.direction === KNIGHT_DIR.RIGHT) {
-                this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
-            } else {
-                this.entity.setAnimation(KNIGHT_ANIM.FALLING_LEFT);
-            }
+            if (this.yVelocity > 0) {
+                if(this.direction === KNIGHT_DIR.RIGHT) {
+                    this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
+                } else {
+                    this.entity.setAnimation(KNIGHT_ANIM.FALLING_LEFT);
+                }
             } else {
                 if(this.direction === KNIGHT_DIR.RIGHT) {
                     this.entity.setAnimation(KNIGHT_ANIM.JUMPING_RIGHT);
@@ -201,12 +200,17 @@ Knight.prototype.update = function() {
                 }
             }
         }
-        
     }
     
     //Move the player independently in both directions, otherwise it will feel off.
     this.entity.game.requestMove(this, this.xVelocity, 0);
     this.entity.game.requestMove(this, 0, this.yVelocity);
+    
+    //Move the sword hitbox with the player.
+    if (this.attacking && this.swordHitbox !== null) {
+        this.entity.game.requestMove(this.swordHitbox, this.xVelocity, 0);
+        this.entity.game.requestMove(this.swordHitbox, 0, this.yVelocity);
+    }
 }
 
 /**
@@ -239,11 +243,11 @@ Knight.prototype.rest = function () {
  */
 Knight.prototype.readInput = function(input, modifier) {
     if (input === "down") {
-        if(!this.canMove) return;
+        if(this.attacking) return;
         this.entity.game.requestMove(this, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
     }
     if (input === "up") {
-        if(!this.canMove) return;
+        if(this.attacking) return;
         //Add upwards velocity if the player is holding up while jumping.
         if (this.yVelocity < 0) this.yVelocity -= KNIGHT_PHYSICS.PRESS_UP_SPEED;
         this.jump();
@@ -254,7 +258,7 @@ Knight.prototype.readInput = function(input, modifier) {
         }
     }
     if (input === "left") {
-        if(!this.canMove) return;
+        if(this.attacking) return;
         this.direction = KNIGHT_DIR.LEFT;
         if(this.entity.game.getBottomCollisions(this).length > 0) {
             //An agent should only walk if it is not in the air.
@@ -263,17 +267,17 @@ Knight.prototype.readInput = function(input, modifier) {
         if (this.xVelocity >= KNIGHT_PHYSICS.TERMINAL_X_VELOCITY * -1) {
             this.adjustXVelocity(-2);
         } else {
+            //Terminal Velocity is exceeding during knockback, so only slow down here.
             this.slowDown();
         }
     }
+    //Uses the same logic as input left.
     if(input === "right") {
-        if(!this.canMove) return;
+        if(this.attacking) return;
         this.direction = KNIGHT_DIR.RIGHT;
         if(this.entity.game.getBottomCollisions(this).length > 0) {
-            //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }
-        
         if (this.xVelocity <= KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
             this.adjustXVelocity(2);
         } else {
@@ -281,8 +285,6 @@ Knight.prototype.readInput = function(input, modifier) {
         }
     }
     if (input === "space") {
-        //Prevent the player from moving while attacking.
-        this.canMove = false;
         if(this.direction === KNIGHT_DIR.RIGHT) {
             this.entity.setAnimation(KNIGHT_ANIM.ATTACK_RIGHT);
         } else {
@@ -294,13 +296,13 @@ Knight.prototype.readInput = function(input, modifier) {
         if (!this.attacking) {
             this.attacking = true;
             if(this.direction === KNIGHT_DIR.RIGHT) {
-                var newAttack = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width - 29, this.entity.y, this);
+                this.swordHitbox = new SwordHitbox(this.entity.game, this.entity.x + this.entity.width - 29, this.entity.y, this);
             } else {
-                var newAttack = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width + 5,
+                this.swordHitbox = new SwordHitbox(this.entity.game, this.entity.x - this.entity.width + 5,
                                                 this.entity.y, this);
             }
 
-            this.entity.game.addAgent(newAttack);
+            this.entity.game.addAgent(this.swordHitbox);
         }
     }
     if (input === "none") {
@@ -320,12 +322,6 @@ Knight.prototype.readInput = function(input, modifier) {
     }
     if (input === "left_released" && this.entity.currentAnimation === KNIGHT_ANIM.WALKING_LEFT) {
         this.rest();
-    }
-
-    if (input === "space_released") {
-        if (!this.attacking) {
-            this.canMove = true;
-        }
     }
     
     if (input === "left_and_right_released") {
@@ -413,6 +409,7 @@ SwordHitbox.prototype = {
 
     update: function() {
         if (!this.source.attacking) {
+            if (this.source.swordHitbox === this) this.source.swordHitbox = null;
             this.entity.removeFromWorld = true;
         }
         //Does not move the entity, but simply checks if it is currently colliding.
