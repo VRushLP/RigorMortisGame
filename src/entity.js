@@ -19,7 +19,6 @@ function Entity(game, x, y, width, height) {
     this.ctx = game.ctx;
     this.controllable = false;
     this.moveable = false;
-    this.fallable = false;
     this.camerable = false;
     this.respawnable = false;
     this.collidable = true;

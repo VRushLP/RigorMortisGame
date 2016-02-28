@@ -71,6 +71,7 @@ function Knight(game, AM, x, y) {
     this.direction = KNIGHT_DIR.RIGHT;
     this.canJump = true;
     this.canMove = true;
+    this.noclip = false;
 
     this.invulnerableFrames = 0;
     this.attacking = false;
@@ -146,12 +147,9 @@ Knight.prototype.findYourCenter = function () {
 
 /**
  * Update the Knight agent.
- * As of right now, this only includes accounting for velocity and movement
- * from falling and jumping.
  */
 Knight.prototype.update = function() {
 
-    this.attacking = false;
     var currentAnimation = this.entity.currentAnimation;
 
     if (currentAnimation === KNIGHT_ANIM.ATTACK_RIGHT ||
@@ -159,6 +157,7 @@ Knight.prototype.update = function() {
         if (!this.entity.animationList[currentAnimation].isFinalFrame()) {
             this.attacking = true;
         } else {
+            this.attacking = false;
             this.readInput("none");
         }
     }
@@ -168,8 +167,6 @@ Knight.prototype.update = function() {
     if(this.invulnerableFrames > 0) {
         this.invulnerableFrames--;
     }
-
-    if(!this.entity.fallable) return;
 
     if (this.entity.game.getBottomCollisions(this).length === 0) {
         //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
@@ -252,7 +249,7 @@ Knight.prototype.readInput = function(input, modifier) {
         this.jump();
 
         //Allows no-clip debugging.
-        if(!this.entity.fallable) {
+        if(this.noclip) {
             this.entity.game.requestMove(this, 0, -10)
         }
     }
@@ -371,7 +368,7 @@ Knight.prototype.readInput = function(input, modifier) {
     //No-clip activation/deactivation
     if (input === 'n') {
         if(this.entity.game.DEBUG_MODE === 1) {
-            this.entity.fallable = !this.entity.fallable;
+            this.noclip = !this.noclip;
             this.entity.collidable = !this.entity.collidable;
         }
     }
