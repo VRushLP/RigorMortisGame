@@ -56,6 +56,12 @@ Entity.prototype = {
             this.animationList[this.currentAnimation].elapsedTime = 0;
         }
         this.currentAnimation = animation;
+    },
+    
+    getCenter: function () {
+        return {
+            x: (this.x + (this.width) / 2),
+            y: (this.y + (this.height) / 2)
+        }
     }
-
 }

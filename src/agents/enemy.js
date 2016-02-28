@@ -108,10 +108,10 @@ Skeleton.prototype = {
 
         //Skeletons should only do math if they are not confused
         if (!this.confused) {
-            var player = this.entity.game.playerAgent.entity;
-            if (this.entity.game.playerAgent.yVelocity === 0) {
+            var player = this.entity.game.playerAgent;
+            if (player.yVelocity === 0) {
 
-                var knightPoint = this.entity.game.playerAgent.centerPoint;
+                var knightPoint = player.entity.getCenter();
 
                 var skeletonPoint = {
                     x: (this.entity.x + (this.entity.width) / 2),
@@ -216,7 +216,7 @@ Wisp.prototype = {
             this.invulnerableFrames--;
         }
 
-        var knightPoint = this.entity.game.playerAgent.centerPoint;
+        var knightPoint = this.entity.game.playerAgent.entity.getCenter();
 
         var wispPoint = {
             x: (this.entity.x + (this.entity.width) / 2),
@@ -321,7 +321,7 @@ Archer.prototype = {
 
     update: function () {
 
-        var knightPoint = this.entity.game.playerAgent.centerPoint;
+        var knightPoint = this.entity.game.playerAgent.entity.getCenter();
 
         var archerPoint = {
             x: this.entity.x + this.entity.width / 2,

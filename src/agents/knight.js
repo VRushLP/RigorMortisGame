@@ -61,11 +61,6 @@ var KNIGHT_PHYSICS = {
 function Knight(game, AM, x, y) {
     this.entity = new Entity(game, x, y, 48, 50);
 
-    this.centerPoint = {
-        x: (this.entity.x + (this.entity.width) / 2),
-        y: (this.entity.y + (this.entity.height) / 2)
-    }
-
     this.yVelocity = 0;
     this.xVelocity = 0;
     this.direction = KNIGHT_DIR.RIGHT;
@@ -138,13 +133,6 @@ Knight.prototype.draw = function (cameraX, cameraY) {
     ctx.fillRect(20, 20, 500 * percent, 30);
 };
 
-Knight.prototype.findYourCenter = function () {
-    this.centerPoint = {
-        x: (this.entity.x + (this.entity.width) / 2),
-        y: (this.entity.y + (this.entity.height) / 2)
-    }
-}
-
 /**
  * Update the Knight agent.
  */
@@ -161,8 +149,6 @@ Knight.prototype.update = function() {
             this.readInput("none");
         }
     }
-
-    this.findYourCenter();
 
     if(this.invulnerableFrames > 0) {
         this.invulnerableFrames--;
