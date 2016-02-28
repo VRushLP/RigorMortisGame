@@ -220,15 +220,22 @@ GameEngine.prototype = {
 
     //Entities should check for input when updated here
     update : function () {
-        for (var i = 0; i < this.agents.length; i++) {
+        //Iterate backwards to avoid splice errors.
+        for (var i = this.agents.length - 1; i >= 0; i--) {
+            //If the agent has been flagged for removal, do so; otherwise, update it.
             if (this.agents[i].entity.removeFromWorld) {
                 var removedAgent = this.agents.splice(i, 1)[0];
                 //Save the removed agent for when the level restarts.
                 this.removedAgents.push(removedAgent);
                 removedAgent.entity.removeFromWorld = false;
-                continue;
+                
+                //If the removed agent was the player, then respawn them.
+                if (removedAgent === this.playerAgent) {
+                    this.respawnPlayer();
+                }
+            } else {
+                this.agents[i].update();
             }
-            this.agents[i].update();
         }
 
         this.updateCamera();
@@ -303,8 +310,6 @@ GameEngine.prototype = {
 
     respawnPlayer: function () {
         this.resetStage();
-        //this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
-        //this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
     },
 
 

@@ -151,11 +151,6 @@ Knight.prototype.findYourCenter = function () {
  */
 Knight.prototype.update = function() {
 
-    if (this.health <= 0) {
-        this.health = KNIGHT_ATTR.STARTING_HEALTH;
-        this.entity.game.respawnPlayer(this);
-    }
-
     this.attacking = false;
     var currentAnimation = this.entity.currentAnimation;
 
@@ -361,9 +356,14 @@ Knight.prototype.readInput = function(input, modifier) {
                 this.yVelocity = -6;
             }
         }
+        
+        if (this.health <= 0) {
+            this.entity.removeFromWorld = true;
+        }
     }
     
     if (input === "reset") {
+        this.health = KNIGHT_ATTR.STARTING_HEALTH;
         this.xVelocity = 0;
         this.yVelocity = 0;
     }
