@@ -137,9 +137,13 @@ Knight.prototype.draw = function (cameraX, cameraY) {
  * Update the Knight agent.
  */
 Knight.prototype.update = function() {
+    
+    if(this.invulnerableFrames > 0) {
+        this.invulnerableFrames--;
+    }
 
-    var currentAnimation = this.entity.currentAnimation;
-
+    //Update the knight's attack state.
+    var currentAnimation = this.entity.currentAnimation;   
     if (currentAnimation === KNIGHT_ANIM.ATTACK_RIGHT ||
         currentAnimation === KNIGHT_ANIM.ATTACK_LEFT) {
         if (!this.entity.animationList[currentAnimation].isFinalFrame()) {
@@ -150,10 +154,7 @@ Knight.prototype.update = function() {
         }
     }
 
-    if(this.invulnerableFrames > 0) {
-        this.invulnerableFrames--;
-    }
-
+    //Update the Knight's falling state.
     if (this.entity.game.getBottomCollisions(this).length === 0) {
         //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
         this.yVelocity += KNIGHT_PHYSICS.Y_ACCELERATION;
@@ -218,6 +219,19 @@ Knight.prototype.jump = function() {
     }
     //The player must actively press up to jump, they can't just hold it.
     this.canJump = false;
+}
+
+/**
+  * Request the Knight to rest.
+  */
+Knight.prototype.rest = function () {
+    if(this.attacking) return;
+    if(this.direction === KNIGHT_DIR.RIGHT) {
+        this.entity.setAnimation(KNIGHT_ANIM.STAND_RIGHT);
+    } else {
+        this.entity.setAnimation(KNIGHT_ANIM.STAND_LEFT);
+    }
+    this.slowDown();
 }
 
 /**
@@ -290,13 +304,7 @@ Knight.prototype.readInput = function(input, modifier) {
         }
     }
     if (input === "none") {
-        if(this.attacking) return;
-        if(this.direction === KNIGHT_DIR.RIGHT) {
-            this.entity.setAnimation(KNIGHT_ANIM.STAND_RIGHT);
-        } else {
-            this.entity.setAnimation(KNIGHT_ANIM.STAND_LEFT);
-        }
-        this.slowDown();
+        this.rest();
     }
 
     //Knight can only jump upon pressing jump, so reset the ability to jump
@@ -308,10 +316,10 @@ Knight.prototype.readInput = function(input, modifier) {
     //If right or left aren't being pressed, but the knight is currently running, then reset
     //the knight's animation.
     if(input === "right_released" && this.entity.currentAnimation === KNIGHT_ANIM.WALKING_RIGHT) {
-        this.readInput("none");
+        this.rest();
     }
     if (input === "left_released" && this.entity.currentAnimation === KNIGHT_ANIM.WALKING_LEFT) {
-        this.readInput("none");
+        this.rest();
     }
 
     if (input === "space_released") {
