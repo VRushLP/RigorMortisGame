@@ -161,8 +161,8 @@ AM.downloadAll(function () {
     var titleScreen = new TitleScreen(gameEngine, AM, 0, 1664);
     forestStage.entityList.push(titleScreen);
 
-    canvas.addEventListener('click', function (event) {
-        titleScreen.entity.removeFromWorld = true;
+    canvas.addEventListener('focus', function (event) {
+        gameEngine.agents.splice(gameEngine.agents.indexOf(titleScreen, 1));
     }, false);
 
     gameEngine.start();
