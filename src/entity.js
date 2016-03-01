@@ -19,7 +19,6 @@ function Entity(game, x, y, width, height) {
     this.ctx = game.ctx;
     this.controllable = false;
     this.moveable = false;
-    this.fallable = false;
     this.camerable = false;
     this.respawnable = false;
     this.collidable = true;
@@ -57,6 +56,12 @@ Entity.prototype = {
             this.animationList[this.currentAnimation].elapsedTime = 0;
         }
         this.currentAnimation = animation;
+    },
+    
+    getCenter: function () {
+        return {
+            x: (this.x + (this.width) / 2),
+            y: (this.y + (this.height) / 2)
+        }
     }
-
 }

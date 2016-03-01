@@ -107,7 +107,6 @@ AM.downloadAll(function () {
     var knight = new Knight(gameEngine, AM, forestStage.spawnX, forestStage.spawnY);
     knight.entity.controllable = true;
     knight.entity.moveable = true;
-    knight.entity.fallable = true;
     knight.entity.camerable = true;
     knight.entity.respawnable = true;
     forestStage.entityList.push(knight);
