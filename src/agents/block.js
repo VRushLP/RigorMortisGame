@@ -16,10 +16,6 @@ function Block(game, AM, x, y) {
 
 Block.prototype = {
 
-    draw: function () {
-        this.entity.draw();
-    },
-
     update: function () {
         //Nothing to do.
     }

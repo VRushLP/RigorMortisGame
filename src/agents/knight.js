@@ -123,18 +123,7 @@ function Knight(game, AM, x, y) {
 };
 
 Knight.prototype.draw = function (cameraX, cameraY) {
-    var percent = this.health / KNIGHT_ATTR.STARTING_HEALTH;
-    var ctx = this.entity.game.ctx;
-    ctx.fillStyle = "#8B3E31";
-    ctx.fillRect(10, 10, 520, 50);
-    ctx.fillStyle = "black";
-    ctx.fillRect(20, 20, 500, 30);
-    if (percent > 0.4) {
-        ctx.fillStyle = "green";
-    } else {
-        ctx.fillStyle = "red";
-    }
-    ctx.fillRect(20, 20, 500 * percent, 30);
+    this.entity.draw(cameraX, cameraY);
 };
 
 Knight.prototype.findYourCenter = function () {
@@ -400,10 +389,6 @@ Knight.prototype.slowDown = function () {
     } else if (this.xVelocity < 0) {
           this.adjustXVelocity(Math.min(maxSlowdown, this.xVelocity * -1));
     } 
-}
-
-Knight.prototype.draw = function () {
-    this.entity.draw();
 }
 
 /**
