@@ -40,7 +40,7 @@ var WISP_ATTR = {
     STARTING_HEALTH : 1,
     SPEED: 2,
     ATTENTION_DISTANCE: 500,
-    TOUCH_DISTANCE : 40,
+    TOUCH_DISTANCE : 50,
     FLEE_TIME: 45,
     FLEE_ACCELERATION: 4
     //This should be true: SPEED*FLEE_TIME*FLEE_ACCELERATION < ATTENTION_DISTANCE
@@ -210,6 +210,7 @@ Wisp.prototype = {
             this.timeToStrikeAgain--;
         } else {
             this.struckRecently = false;
+            this.entity.collidable = true;
         }
 
         if (this.invulnerableFrames > 0) {
@@ -260,6 +261,7 @@ Wisp.prototype = {
         if (distanceToKnight < WISP_ATTR.TOUCH_DISTANCE) {
             this.struckRecently = true;
             this.timeToStrikeAgain = WISP_ATTR.FLEE_TIME;
+            this.entity.collidable = false;
             this.entity.game.requestInputSend(this.entity.game.playerAgent, "damage", 1);
         }
     },
