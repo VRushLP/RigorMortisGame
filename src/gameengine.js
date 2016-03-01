@@ -619,6 +619,21 @@ GameEngine.prototype.loop = function () {
     this.draw();
 }
 
+GameEngine.prototype.drawRoundedRect = function(x, y, w, h) {
+    var r = 10;
+    this.ctx.beginPath();
+    this.ctx.moveTo(x+r, y);
+    this.ctx.lineTo(x+w-r, y);
+    this.ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+    this.ctx.lineTo(x+w, y+h-r);
+    this.ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    this.ctx.lineTo(x+r, y+h);
+    this.ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+    this.ctx.lineTo(x, y+r);
+    this.ctx.quadraticCurveTo(x, y, x+r, y);
+    this.ctx.fill();
+}
+
 GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
     this.ctx.save();
@@ -630,6 +645,18 @@ GameEngine.prototype.draw = function () {
             this.agents[i].entity.draw(this.camera.x, this.camera.y);
         }
     }
+    // draw health bar 
+    var percent = this.playerAgent.health / KNIGHT_ATTR.STARTING_HEALTH;
+    this.ctx.fillStyle = "#2C5D63";
+    this.drawRoundedRect(10, 10, 520, 50);
+    this.ctx.fillStyle = "black";
+    this.drawRoundedRect(20, 20, 500, 30);
+    if (percent > 0.4) {
+        this.ctx.fillStyle = "#A9C52F";
+    } else {
+        this.ctx.fillStyle = "red";
+    }
+    this.drawRoundedRect(20, 20, 500 * percent, 30);
     this.ctx.restore();
 }
 
