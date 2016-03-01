@@ -631,8 +631,13 @@ GameEngine.prototype.draw = function () {
         this.stages[i].drawBackground(this.ctx, this.camera.x);
     }
     for (var i = 0; i < this.agents.length; i++) {
-        if(this.isOnScreen(this.agents[i].entity)) {
-            this.agents[i].entity.draw(this.camera.x, this.camera.y);
+        
+        if (this.isOnScreen(this.agents[i].entity)) {
+            if (typeof this.agents[i].draw === 'function') {
+                this.agents[i].draw(this.camera.x, this.camera.y);
+            } else {
+                this.agents[i].entity.draw(this.camera.x, this.camera.y);
+            }
         }
     }
     this.ctx.restore();
