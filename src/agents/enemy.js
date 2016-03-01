@@ -60,6 +60,7 @@ function Skeleton(game, AM, x, y) {
 
     this.health = SKELETON_ATTR.STARTING_HEALTH;
     this.invulnerableFrames = 0;
+    this.isAlive = true;
     this.yVelocity = 0;
     this.xDestination = x;
     this.yDestination = y;
@@ -73,86 +74,99 @@ function Skeleton(game, AM, x, y) {
     skeletonRunRight.addFrame(0, 118, 3);
     var skeletonRunLeft = new Animation(AM.getAsset("./img/enemy/chaser.png"), 52, 59, 0.1, true);
     skeletonRunLeft.addFrame(0, 59, 3);
+    var skeletonDeath = new Animation(AM.getAsset("./img/enemy/death anim.png"), 15, 15, 0.1, false);
+    skeletonDeath.addFrame(0, 0, 7);
 
     this.entity.addAnimation(skeletonIdleRight);
     this.entity.addAnimation(skeletonIdleLeft);
     this.entity.addAnimation(skeletonRunRight);
     this.entity.addAnimation(skeletonRunLeft);
+    this.entity.addAnimation(skeletonDeath);
     this.entity.setAnimation(SKELETON_ANIM.STAND_RIGHT);
 }
 
 Skeleton.prototype = {
 
     update: function () {
-        //compute updates that are independent of player distance
-        if (this.invulnerableFrames > 0) {
-            this.invulnerableFrames--;
+        if (this.isAlive) {
+            //compute updates that are independent of player distance
+            if (this.invulnerableFrames > 0) {
+                this.invulnerableFrames--;
 
-            if (this.invulnerableFrames === 0) {
-                this.confused = false;
-            }
-        }
-
-        //Skeletons should always know if they're falling
-        if (this.entity.game.getBottomCollisions(this).length === 0) {
-            //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
-            this.yVelocity += SKELETON_ATTR.Y_ACCELERATION;
-            if (this.yVelocity >= SKELETON_ATTR.TERMINAL_VELOCITY) this.yVelocity = SKELETON_ATTR.TERMINAL_VELOCITY;
-        } else if (this.yVelocity > 0) {
-            //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
-            this.yVelocity = 0;
-        }
-        if (this.yVelocity !== 0) {
-            this.entity.game.requestMove(this, 0, this.yVelocity);
-        }
-
-        //Skeletons should only do math if they are not confused
-        if (!this.confused) {
-            var player = this.entity.game.playerAgent.entity;
-            if (this.entity.game.playerAgent.yVelocity === 0) {
-
-                var knightPoint = this.entity.game.playerAgent.centerPoint;
-
-                var skeletonPoint = {
-                    x: (this.entity.x + (this.entity.width) / 2),
-                    y: (this.entity.y + (this.entity.height) / 2)
-                };
-
-                var verticalDistance = skeletonPoint.y - knightPoint.y;
-
-                if (verticalDistance > SKELETON_ATTR.VERTICAL_TOLERANCE
-                    && verticalDistance < 0
-                    && Math.abs(knightPoint.x - skeletonPoint.x) <= SKELETON_ATTR.ATTENTION_DISTANCE) {
-                    this.xDestination = knightPoint.x; //The skeleton noticed you
+                if (this.invulnerableFrames === 0) {
+                    this.confused = false;
                 }
             }
 
-            if (this.entity.x !== this.xDestination) {
-                var distance = -(this.entity.x - this.xDestination);                     //Reassign so negative values are to your left, positive values are to your right
+            //Skeletons should always know if they're falling
+            if (this.entity.game.getBottomCollisions(this).length === 0) {
+                //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
+                this.yVelocity += SKELETON_ATTR.Y_ACCELERATION;
+                if (this.yVelocity >= SKELETON_ATTR.TERMINAL_VELOCITY) this.yVelocity = SKELETON_ATTR.TERMINAL_VELOCITY;
+            } else if (this.yVelocity > 0) {
+                //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
+                this.yVelocity = 0;
+            }
+            if (this.yVelocity !== 0) {
+                this.entity.game.requestMove(this, 0, this.yVelocity);
+            }
 
-                if (distance < 0) {
-                    this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
-                    if (this.entity.x != this.xDestination) {
-                        this.entity.currentAnimation = SKELETON_ANIM.RUN_LEFT;
-                    } else {
-                        this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
+            //Skeletons should only do math if they are not confused
+            if (!this.confused) {
+                var player = this.entity.game.playerAgent.entity;
+                if (this.entity.game.playerAgent.yVelocity === 0) {
+
+                    var knightPoint = this.entity.game.playerAgent.centerPoint;
+
+                    var skeletonPoint = {
+                        x: (this.entity.x + (this.entity.width) / 2),
+                        y: (this.entity.y + (this.entity.height) / 2)
+                    };
+
+                    var verticalDistance = skeletonPoint.y - knightPoint.y;
+
+                    if (verticalDistance > SKELETON_ATTR.VERTICAL_TOLERANCE
+                        && verticalDistance < 0
+                        && Math.abs(knightPoint.x - skeletonPoint.x) <= SKELETON_ATTR.ATTENTION_DISTANCE) {
+                        this.xDestination = knightPoint.x; //The skeleton noticed you
                     }
-                } else { //distance >= 0
-                    this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
-                    if (this.entity.x != this.xDestination) {
-                        this.entity.currentAnimation = SKELETON_ANIM.RUN_RIGHT;
-                    } else {
-                        this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
+                }
+
+                if (this.entity.x !== this.xDestination) {
+                    var distance = -(this.entity.x - this.xDestination);                     //Reassign so negative values are to your left, positive values are to your right
+
+                    if (distance < 0) {
+                        this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
+                        if (this.entity.x != this.xDestination) {
+                            this.entity.currentAnimation = SKELETON_ANIM.RUN_LEFT;
+                        } else {
+                            this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
+                        }
+                    } else { //distance >= 0
+                        this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
+                        if (this.entity.x != this.xDestination) {
+                            this.entity.currentAnimation = SKELETON_ANIM.RUN_RIGHT;
+                        } else {
+                            this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
+                        }
                     }
+                }
+            } else {
+                if (this.entity.currentAnimation === SKELETON_ANIM.RUN_LEFT) {
+                    this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
+                } else if (this.entity.currentAnimation === SKELETON_ANIM.RUN_RIGHT) {
+                    this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
                 }
             }
         } else {
-            if (this.entity.currentAnimation === SKELETON_ANIM.RUN_LEFT) {
-                this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
-            } else if (this.entity.currentAnimation === SKELETON_ANIM.RUN_RIGHT) {
-                this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
+            // 4 is deathAnimation. REMIND assign 4 to constant
+            if (this.entity.animationList[4].isDone()) {
+                this.entity.animationList[4].elapsedTime = 0;
+                this.entity.removeFromWorld = true;
             }
+            this.entity.setAnimation(4); // DEATH_ANIMATION
         }
+        
     },
 
     readInput: function (input, modifier) {
@@ -162,13 +176,16 @@ Skeleton.prototype = {
                 this.invulnerableFrames = SKELETON_ATTR.INVULNERABILITY_FRAMES;
                 this.health--;
                 if (this.health <= 0) {
-                    this.entity.removeFromWorld = true;
+                    this.entity.x += this.entity.width / 2;
+                    this.entity.y += this.entity.height / 2;
+                    this.isAlive = false;
                 } else {
                     this.confused = true;
                 }
             }
         }
         if (input === "reset") {
+            this.isAlive = true;
             this.health = SKELETON_ATTR.STARTING_HEALTH;
             this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
             this.yVelocity = 0;
@@ -190,7 +207,7 @@ function Wisp(game, AM, x, y) {
     this.entity.moveable = true;
     this.struckRecently = false;
     this.timeToStrikeAgain = 0;
-
+    this.isAlive = true;
     this.health = WISP_ATTR.STARTING_HEALTH;
     this.invulnerableFrames = 0;
 
@@ -198,70 +215,83 @@ function Wisp(game, AM, x, y) {
     wispRight.addFrame(0, 50, 4);
     var wispLeft = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.17, true);
     wispLeft.addFrame(0, 0, 4);
+    var wispDie = new Animation(AM.getAsset("./img/enemy/death anim.png"), 15, 15, 0.1, false);
+    wispDie.addFrame(0, 0, 7);
 
     this.entity.addAnimation(wispRight);
     this.entity.addAnimation(wispLeft);
+    this.entity.addAnimation(wispDie);
 }
 
 Wisp.prototype = {
 
     update: function () {
-        if (this.timeToStrikeAgain > 0) {
-            this.timeToStrikeAgain--;
-        } else {
-            this.struckRecently = false;
-        }
+        if (this.isAlive) {
+            if (this.timeToStrikeAgain > 0) {
+                this.timeToStrikeAgain--;
+            } else {
+                this.struckRecently = false;
+            }
 
-        if (this.invulnerableFrames > 0) {
-            this.invulnerableFrames--;
-        }
+            if (this.invulnerableFrames > 0) {
+                this.invulnerableFrames--;
+            }
 
-        var knightPoint = this.entity.game.playerAgent.centerPoint;
+            var knightPoint = this.entity.game.playerAgent.centerPoint;
 
-        var wispPoint = {
-            x: (this.entity.x + (this.entity.width) / 2),
-            y: (this.entity.y + (this.entity.height) / 2)
-        }
+            var wispPoint = {
+                x: (this.entity.x + (this.entity.width) / 2),
+                y: (this.entity.y + (this.entity.height) / 2)
+            }
 
-        //If the knight is close enough, start chasing.
-        var distanceToKnight = getDistance(wispPoint, knightPoint)
-        if (distanceToKnight <= WISP_ATTR.ATTENTION_DISTANCE) {
+            //If the knight is close enough, start chasing.
+            var distanceToKnight = getDistance(wispPoint, knightPoint)
+            if (distanceToKnight <= WISP_ATTR.ATTENTION_DISTANCE) {
 
-            if (wispPoint.x - knightPoint.x !== 0) {
-                var movementVector = getNormalizedSlope(wispPoint, knightPoint, distanceToKnight);
+                if (wispPoint.x - knightPoint.x !== 0) {
+                    var movementVector = getNormalizedSlope(wispPoint, knightPoint, distanceToKnight);
 
-                if (this.struckRecently) {
-                    //this.entity.game.requestMove(this, movementVector.x * WISP_ATTR.SPEED * 4,
-                    //   movementVector.y * WISP_ATTR.SPEED * 4);
-                    this.entity.x += movementVector.x * WISP_ATTR.SPEED * WISP_ATTR.FLEE_ACCELERATION;
-                    this.entity.y += movementVector.y * WISP_ATTR.SPEED * WISP_ATTR.FLEE_ACCELERATION;
+                    if (this.struckRecently) {
+                        //this.entity.game.requestMove(this, movementVector.x * WISP_ATTR.SPEED * 4,
+                        //   movementVector.y * WISP_ATTR.SPEED * 4);
+                        this.entity.x += movementVector.x * WISP_ATTR.SPEED * WISP_ATTR.FLEE_ACCELERATION;
+                        this.entity.y += movementVector.y * WISP_ATTR.SPEED * WISP_ATTR.FLEE_ACCELERATION;
 
-                    if (movementVector.x > 0) {
-                        this.entity.currentAnimation = WISP_ANIM.FLOATING_RIGHT;
-                    }
-                    else {
-                        this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
-                    }
-                } else {
-                    //this.entity.game.requestMove(this, -movementVector.x * WISP_ATTR.SPEED,
-                    //    -movementVector.y * WISP_ATTR.SPEED);
-                    this.entity.x -= movementVector.x * WISP_ATTR.SPEED;
-                    this.entity.y -= movementVector.y * WISP_ATTR.SPEED;
-
-                    if (movementVector.x < 0) {
-                        this.entity.currentAnimation = WISP_ANIM.FLOATING_RIGHT;
+                        if (movementVector.x > 0) {
+                            this.entity.currentAnimation = WISP_ANIM.FLOATING_RIGHT;
+                        }
+                        else {
+                            this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
+                        }
                     } else {
-                        this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
+                        //this.entity.game.requestMove(this, -movementVector.x * WISP_ATTR.SPEED,
+                        //    -movementVector.y * WISP_ATTR.SPEED);
+                        this.entity.x -= movementVector.x * WISP_ATTR.SPEED;
+                        this.entity.y -= movementVector.y * WISP_ATTR.SPEED;
+
+                        if (movementVector.x < 0) {
+                            this.entity.currentAnimation = WISP_ANIM.FLOATING_RIGHT;
+                        } else {
+                            this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
+                        }
                     }
                 }
             }
-        }
 
-        if (distanceToKnight < WISP_ATTR.TOUCH_DISTANCE) {
-            this.struckRecently = true;
-            this.timeToStrikeAgain = WISP_ATTR.FLEE_TIME;
-            this.entity.game.requestInputSend(this.entity.game.playerAgent, "damage", 1);
+            if (distanceToKnight < WISP_ATTR.TOUCH_DISTANCE) {
+                this.struckRecently = true;
+                this.timeToStrikeAgain = WISP_ATTR.FLEE_TIME;
+                this.entity.game.requestInputSend(this.entity.game.playerAgent, "damage", 1);
+            }
+        } else {
+            this.entity.setAnimation(2); // DEATH_ANIMATION
+            // 2 is deathAnimation. REMIND assign 2 to constant
+            if (this.entity.animationList[2].isDone()) {
+                this.entity.animationList[2].elapsedTime = 0;
+                this.entity.removeFromWorld = true;
+            }
         }
+        
     },
 
     readInput: function (input, modifier) {
@@ -270,11 +300,15 @@ Wisp.prototype = {
                 this.invulnerableFrames = WISP_ATTR.INVULNERABILITY_FRAMES;
                 this.health--;
                 if (this.health <= 0) {
-                    this.entity.removeFromWorld = true;
+                    this.entity.x += this.entity.width / 2;
+                    this.entity.y += this.entity.height / 2;
+                    // this.entity.removeFromWorld = true;
+                    this.isAlive = false;
                 }
             }
         }
         if (input === "reset") {
+            this.isAlive = true;
             this.health = WISP_ATTR.STARTING_HEALTH;
             this.invulnerableFrames = 0;
         }
@@ -288,6 +322,7 @@ function Archer (game, AM, x, y) {
     this.health = ARCHER_ATTR.STARTING_HEALTH;
     this.vision = ARCHER_ATTR.VISION_RADIUS;
     this.invulnerableFrames = 0;
+    this.isAlive = true;
 
     var archerImg = AM.getAsset("./img/enemy/archer.png");
     var archerRight = new Animation(archerImg, 73, 64, 0.05, true);
@@ -306,6 +341,8 @@ function Archer (game, AM, x, y) {
     archerLeftShootingUp.addFrame(0, 320, 3);
     var archerRightShootingUp = new Animation(archerImg, 73, 64, 0.2, false);
     archerRightShootingUp.addFrame(0, 384, 3);
+    var archerDeath = new Animation(AM.getAsset("./img/enemy/death anim.png"), 15, 15, 0.1, false);
+    archerDeath.addFrame(0, 0, 7);
 
     this.entity.animationList.push(archerLeft);
     this.entity.animationList.push(archerRight);
@@ -315,56 +352,69 @@ function Archer (game, AM, x, y) {
     this.entity.animationList.push(archerRightShootingDown);
     this.entity.animationList.push(archerLeftShootingUp);
     this.entity.animationList.push(archerRightShootingUp);
+    this.entity.animationList.push(archerDeath);
 }
 
 Archer.prototype = {
 
     update: function () {
+        if (this.isAlive) {
+            var knightPoint = this.entity.game.playerAgent.centerPoint;
 
-        var knightPoint = this.entity.game.playerAgent.centerPoint;
+            var archerPoint = {
+                x: this.entity.x + this.entity.width / 2,
+                y: this.entity.y + this.entity.height / 2
+            };
 
-        var archerPoint = {
-            x: this.entity.x + this.entity.width / 2,
-            y: this.entity.y + this.entity.height / 2
-        };
+            var distanceX = knightPoint.x - archerPoint.x;
+            var distanceY = knightPoint.y - archerPoint.y;
 
-        var distanceX = knightPoint.x - archerPoint.x;
-        var distanceY = knightPoint.y - archerPoint.y;
+            var angle = Math.atan2(-distanceY, distanceX);
+            var distance = getDistance(archerPoint, knightPoint);
 
-        var angle = Math.atan2(-distanceY, distanceX);
-        var distance = getDistance(archerPoint, knightPoint);
-
-        if (distance < this.vision) {
-            if (this.timeDurationNextArrow === ARCHER_ATTR.SHOOTING_TIME) {
-                this.setAnimationFromAngle(angle);
-            }
-            this.timeDurationNextArrow --;
-            if (this.timeDurationNextArrow <= 0) {
-                this.timeDurationNextArrow = ARCHER_ATTR.SHOOTING_TIME;
-            }
-        }
-        if (this.entity.currentAnimation !== ARCHER_ATTR.IDLE_LEFT && this.entity.currentAnimation !== ARCHER_ATTR.IDLE_RIGHT) {
-            if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
-                this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
-                var arrow = new Arrow(this, archerPoint.x, archerPoint.y, distanceX, distanceY, angle, this.entity.game);
-                this.entity.game.addAgent(arrow);
-                if (knightPoint.x > this.entity.x) {
-                    this.entity.currentAnimation = ARCHER_ATTR.IDLE_RIGHT;
-                } else {
-                    this.entity.currentAnimation = ARCHER_ATTR.IDLE_LEFT;
+            if (distance < this.vision) {
+                if (this.timeDurationNextArrow === ARCHER_ATTR.SHOOTING_TIME) {
+                    this.setAnimationFromAngle(angle);
+                }
+                this.timeDurationNextArrow --;
+                if (this.timeDurationNextArrow <= 0) {
+                    this.timeDurationNextArrow = ARCHER_ATTR.SHOOTING_TIME;
                 }
             }
+            if (this.entity.currentAnimation !== ARCHER_ATTR.IDLE_LEFT && this.entity.currentAnimation !== ARCHER_ATTR.IDLE_RIGHT) {
+                if (this.entity.animationList[this.entity.currentAnimation].isDone()) {
+                    this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
+                    var arrow = new Arrow(this, archerPoint.x, archerPoint.y, distanceX, distanceY, angle, this.entity.game);
+                    this.entity.game.addAgent(arrow);
+                    if (knightPoint.x > this.entity.x) {
+                        this.entity.currentAnimation = ARCHER_ATTR.IDLE_RIGHT;
+                    } else {
+                        this.entity.currentAnimation = ARCHER_ATTR.IDLE_LEFT;
+                    }
+                }
+            }
+        } else {
+            this.entity.setAnimation(8); // DEATH_ANIMATION
+            // 2 is deathAnimation. REMIND assign 2 to constant
+            if (this.entity.animationList[8].isDone()) {
+                this.entity.animationList[8].elapsedTime = 0;
+                this.entity.removeFromWorld = true;
+            }
         }
+        
     },
 
     readInput: function (input, modifier) {
         if (input === "damage") {
             this.health--;
             if (this.health <= 0) {
-                this.entity.removeFromWorld = true;
+                this.entity.x += this.entity.width / 2;
+                this.entity.y += this.entity.height / 2;
+                this.isAlive = false;
             }
         }
         if (input === "reset") {
+            this.isAlive = true;
             this.health = ARCHER_ATTR.STARTING_HEALTH;
         }
     },
