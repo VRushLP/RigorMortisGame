@@ -226,8 +226,11 @@ GameEngine.prototype = {
             if (this.agents[i].entity.removeFromWorld) {
                 var removedAgent = this.agents.splice(i, 1)[0];
                 //Save the removed agent for when the level restarts.
-                this.removedAgents.push(removedAgent);
-                removedAgent.entity.removeFromWorld = false;
+                //If the agent was only temporary, then let it get dereferenced and die.
+                if (!removedAgent.entity.temporary) {
+                    this.removedAgents.push(removedAgent);
+                    removedAgent.entity.removeFromWorld = false;
+                }
                 
                 //If the removed agent was the player, then respawn them.
                 if (removedAgent === this.playerAgent) {

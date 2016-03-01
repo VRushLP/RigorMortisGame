@@ -387,6 +387,7 @@ function SwordHitbox(game, x, y, source) {
     this.entity = new Entity(game, x , y, 70, 50);
     this.entity.moveable = true;
     this.entity.intangible = true;
+    this.entity.temporary = true;
     this.source = source;
 }
 

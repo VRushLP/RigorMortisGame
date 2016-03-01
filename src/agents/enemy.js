@@ -400,6 +400,7 @@ function Arrow(source, x, y, distanceX, distanceY, angle, game) {
     this.entity.y = y - Math.ceil(5 / 2);
     this.centerX = x;
     this.centerY = y;
+    this.entity.temporary = true;
 
     var scale = ARCHER_ATTR.ARROW_SPEED / Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     this.xVel = distanceX * scale;
