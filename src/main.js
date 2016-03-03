@@ -89,6 +89,7 @@ AM.queueDownload("./img/other/victory screen.png");
 AM.queueDownload("./img/other/title screen.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
+AM.queueStageDownload("./txt/castle-stage.txt");
 
 /*
 Download all the elements and add entities to the game.
@@ -153,7 +154,11 @@ AM.downloadAll(function () {
     forestStage.entityList.push(victoryCameraTrigger);    
     forestStage.entityList.push(victoryMusicTrigger);
     
+    var castleStage = new Stage(gameEngine, STAGE_TYPE.CASTLE, BGM.castleLevel);
+    castleStage.parseLevelFile(AM.getAsset("./txt/castle-stage.txt").split("\n"), AM);
+    
     gameEngine.addStage(forestStage);
+    gameEngine.addStage(castleStage);
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;
