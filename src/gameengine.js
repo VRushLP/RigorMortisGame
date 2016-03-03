@@ -55,6 +55,7 @@ function GameEngine() {
     this.removedAgents = [];
 
     this.currentMusic = null;
+    this.healthBarVisible = false;
 
     //Initially set by main before game start.
     this.playerAgent;
@@ -658,7 +659,14 @@ GameEngine.prototype.draw = function () {
             }
         }
     }
-    // draw health bar 
+    
+    this.drawHealthBar();
+    this.ctx.restore();
+}
+
+GameEngine.prototype.drawHealthBar = function () {
+    if (!this.healthBarVisible) return;
+    
     var percent = this.playerAgent.health / KNIGHT_ATTR.STARTING_HEALTH;
     this.ctx.fillStyle = "#2C5D63";
     this.drawRoundedRect(10, 10, 520, 50);
@@ -670,7 +678,6 @@ GameEngine.prototype.draw = function () {
         this.ctx.fillStyle = "red";
     }
     this.drawRoundedRect(20, 20, 500 * percent, 30);
-    this.ctx.restore();
 }
 
 /**

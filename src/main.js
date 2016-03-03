@@ -163,6 +163,7 @@ AM.downloadAll(function () {
 
     canvas.addEventListener('focus', function (event) {
         gameEngine.agents.splice(gameEngine.agents.indexOf(titleScreen, 1));
+        gameEngine.healthBarVisible = true;
     }, false);
 
     gameEngine.start();
