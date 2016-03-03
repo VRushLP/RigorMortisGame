@@ -100,6 +100,7 @@ GameEngine.prototype = {
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
         this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
         
+        this.playerAgent.readInput("reset");
         this.agents.push(this.playerAgent);
 
         this.switchMusic(this.stages[this.currentStage].stageMusic);
