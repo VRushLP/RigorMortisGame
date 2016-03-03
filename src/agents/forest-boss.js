@@ -468,7 +468,7 @@ ForestBossArm.prototype = {
 function ForestBossCore(game, AM, x, y, callback) {
     this.entity = new Entity(game, x, y, 50, 0);
     this.entity.moveable = true;
-    this.entity.intangible = true;
+    //this.entity.intangible = true;
     this.entity.pushesOnly = true;
     this.arm;
     this.callback = callback;
@@ -503,12 +503,17 @@ ForestBossCore.prototype = {
             animation.frameHeight += moveUp;
             this.entity.game.requestMove(this, 0, -1 * moveUp);
             this.entity.height += moveUp;
+            
+            //By making the core intangible after it finishes rising, it pops up the player
+            //momentarily but otherwise does not impede them.
+            if (moveUp === 0) this.entity.intangible = true;
+            else this.entity.intangible = false;
         } else {
             //Repeat a similar process as moving up.
             var moveDown = Math.min(10, animation.frameHeight);
             animation.frameHeight -= moveDown;
-            this.entity.game.requestMove(this, 0, moveDown);
             this.entity.height -= moveDown;
+            this.entity.game.requestMove(this, 0, moveDown);
         }
         
         //If the core has emerged, make it collidable.

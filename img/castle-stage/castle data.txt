@@ -1,0 +1,14 @@
+CTRL-F YOUR DESIRED ASSET!
+castle block.png
+
+----------------
+castle block.png
+----------------
+
+surface block
+	size : (50, 50)
+	location : (0, 0)
+
+underground block
+	size : (50, 50)
+	location (0, 0)

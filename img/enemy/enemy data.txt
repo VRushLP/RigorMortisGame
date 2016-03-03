@@ -4,6 +4,7 @@ archer.png (NO LONGER INCLUDES ARROW)
 arrow.png
 wisp.png
 death anim.png
+iron ball.png
 ----------
 chaser.png
 ----------
@@ -94,7 +95,7 @@ move right
 	4 frames
 
 ----------
-death anim
+death anim.png
 ----------
 
 death sprite size - (15, 15)
@@ -102,3 +103,13 @@ death sprite size - (15, 15)
 animation
 	0, 0
 	7 frames
+
+-------
+iron ball.png
+-------------
+
+size - (150, 150)
+
+animation
+	0, 0
+	AT THE MOMENT 1 frame

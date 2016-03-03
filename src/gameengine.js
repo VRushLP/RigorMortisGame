@@ -220,15 +220,25 @@ GameEngine.prototype = {
 
     //Entities should check for input when updated here
     update : function () {
-        for (var i = 0; i < this.agents.length; i++) {
+        //Iterate backwards to avoid splice errors.
+        for (var i = this.agents.length - 1; i >= 0; i--) {
+            //If the agent has been flagged for removal, do so; otherwise, update it.
             if (this.agents[i].entity.removeFromWorld) {
                 var removedAgent = this.agents.splice(i, 1)[0];
                 //Save the removed agent for when the level restarts.
-                this.removedAgents.push(removedAgent);
-                removedAgent.entity.removeFromWorld = false;
-                continue;
+                //If the agent was only temporary, then let it get dereferenced and die.
+                if (!removedAgent.entity.temporary) {
+                    this.removedAgents.push(removedAgent);
+                    removedAgent.entity.removeFromWorld = false;
+                }
+                
+                //If the removed agent was the player, then respawn them.
+                if (removedAgent === this.playerAgent) {
+                    this.respawnPlayer();
+                }
+            } else {
+                this.agents[i].update();
             }
-            this.agents[i].update();
         }
 
         this.updateCamera();
@@ -303,8 +313,6 @@ GameEngine.prototype = {
 
     respawnPlayer: function () {
         this.resetStage();
-        //this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
-        //this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
     },
 
 
@@ -423,7 +431,7 @@ GameEngine.prototype = {
             if (!xMoveValid && !yMoveValid) {
                 
                 //Temporary fix to allow platforms to move the player.
-                if(other.controllable && other.moveable) {
+                if(other.controllable && other.moveable && !agent.entity.intangible) {
                     this.requestMove(this.agents[i], amountX, amountY);
                     if (agent.entity.pushesOnly) {
                        continue; 
@@ -641,8 +649,13 @@ GameEngine.prototype.draw = function () {
         this.stages[i].drawBackground(this.ctx, this.camera.x);
     }
     for (var i = 0; i < this.agents.length; i++) {
-        if(this.isOnScreen(this.agents[i].entity)) {
-            this.agents[i].entity.draw(this.camera.x, this.camera.y);
+        
+        if (this.isOnScreen(this.agents[i].entity)) {
+            if (typeof this.agents[i].draw === 'function') {
+                this.agents[i].draw(this.camera.x, this.camera.y);
+            } else {
+                this.agents[i].entity.draw(this.camera.x, this.camera.y);
+            }
         }
     }
     // draw health bar 

@@ -39,11 +39,7 @@ function Platform(game, AM, x, y, width, height) {
 }
 
 Platform.prototype = { 
-    
-    draw: function () {
-        this.entity.draw();
-    },
-    
+        
     /**
       * Update the moving platform, which almost entirely involves progressing it upon
       * the current move pattern, or advancing to the next pattern.
