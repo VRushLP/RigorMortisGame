@@ -6,15 +6,19 @@ var BLOCKS_GLOBALS = {
 
 function Block(game, AM, x, y, stageType) {
     this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
-    
+    var NormalState;
     switch (stageType) {
         case STAGE_TYPE.FOREST:
-            var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"),                         BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+            NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"),                         BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
             NormalState.addFrame(0, 0);
             break;
         case STAGE_TYPE.CASTLE:
-            var NormalState = new Animation(AM.getAsset("./img/castle-stage/castle block.png"),                         BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+            NormalState = new Animation(AM.getAsset("./img/castle-stage/castle block.png"),                         BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
             NormalState.addFrame(50, 0);
+            break;
+        default:
+            NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"),                         BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+            NormalState.addFrame(0, 0);
     }
 
     this.entity.addAnimation(NormalState);

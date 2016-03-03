@@ -38,6 +38,9 @@ Entity.prototype = {
         if (this.animationList.length <= 0) {
             return;
         }
+        if (typeof(this.animationList[this.currentAnimation]) === 'undefined') {
+            console.log(this);
+        }
         this.animationList[this.currentAnimation]
             .drawFrame(this.game.clockTick, this.ctx, this.x + cameraX, this.y - cameraY);
     },
