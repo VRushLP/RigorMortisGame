@@ -55,8 +55,9 @@ var WISP_ANIM = {
   * Create a new Normal Skeleton.
   */
 function Skeleton(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, 52, 59);
+    this.entity = new Entity(x, y, 52, 59);
     this.entity.moveable = true;
+    this.game = game;
 
     this.health = SKELETON_ATTR.STARTING_HEALTH;
     this.invulnerableFrames = 0;
@@ -94,7 +95,7 @@ Skeleton.prototype = {
         }
 
         //Skeletons should always know if they're falling
-        if (this.entity.game.getBottomCollisions(this).length === 0) {
+        if (this.game.getBottomCollisions(this).length === 0) {
             //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
             this.yVelocity += SKELETON_ATTR.Y_ACCELERATION;
             if (this.yVelocity >= SKELETON_ATTR.TERMINAL_VELOCITY) this.yVelocity = SKELETON_ATTR.TERMINAL_VELOCITY;
@@ -103,12 +104,12 @@ Skeleton.prototype = {
             this.yVelocity = 0;
         }
         if (this.yVelocity !== 0) {
-            this.entity.game.requestMove(this, 0, this.yVelocity);
+            this.game.requestMove(this, 0, this.yVelocity);
         }
 
         //Skeletons should only do math if they are not confused
         if (!this.confused) {
-            var player = this.entity.game.playerAgent;
+            var player = this.game.playerAgent;
             if (player.yVelocity === 0) {
 
                 var knightPoint = player.entity.getCenter();
@@ -131,14 +132,14 @@ Skeleton.prototype = {
                 var distance = -(this.entity.x - this.xDestination);                     //Reassign so negative values are to your left, positive values are to your right
 
                 if (distance < 0) {
-                    this.entity.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
+                    this.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
                     if (this.entity.x != this.xDestination) {
                         this.entity.currentAnimation = SKELETON_ANIM.RUN_LEFT;
                     } else {
                         this.entity.currentAnimation = SKELETON_ANIM.STAND_LEFT;
                     }
                 } else { //distance >= 0
-                    this.entity.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
+                    this.game.requestMove(this, Math.min(distance, SKELETON_ATTR.SPEED), 0);
                     if (this.entity.x != this.xDestination) {
                         this.entity.currentAnimation = SKELETON_ANIM.RUN_RIGHT;
                     } else {
@@ -180,14 +181,15 @@ Skeleton.prototype = {
     checkListeners: function (agent) {
 
         if (agent.entity.controllable) {
-            this.entity.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, "damage", 1);
         }
     }
 }
 
 function Wisp(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, 44, 50);
+    this.entity = new Entity(x, y, 44, 50);
     this.entity.moveable = true;
+    this.game = game;
     this.struckRecently = false;
     this.timeToStrikeAgain = 0;
 
@@ -217,7 +219,7 @@ Wisp.prototype = {
             this.invulnerableFrames--;
         }
 
-        var knightPoint = this.entity.game.playerAgent.entity.getCenter();
+        var knightPoint = this.game.playerAgent.entity.getCenter();
 
         var wispPoint = {
             x: (this.entity.x + (this.entity.width) / 2),
@@ -232,7 +234,7 @@ Wisp.prototype = {
                 var movementVector = getNormalizedSlope(wispPoint, knightPoint, distanceToKnight);
 
                 if (this.struckRecently) {
-                    //this.entity.game.requestMove(this, movementVector.x * WISP_ATTR.SPEED * 4,
+                    //this.game.requestMove(this, movementVector.x * WISP_ATTR.SPEED * 4,
                     //   movementVector.y * WISP_ATTR.SPEED * 4);
                     this.entity.x += movementVector.x * WISP_ATTR.SPEED * WISP_ATTR.FLEE_ACCELERATION;
                     this.entity.y += movementVector.y * WISP_ATTR.SPEED * WISP_ATTR.FLEE_ACCELERATION;
@@ -244,7 +246,7 @@ Wisp.prototype = {
                         this.entity.currentAnimation = WISP_ANIM.FLOATING_LEFT;
                     }
                 } else {
-                    //this.entity.game.requestMove(this, -movementVector.x * WISP_ATTR.SPEED,
+                    //this.game.requestMove(this, -movementVector.x * WISP_ATTR.SPEED,
                     //    -movementVector.y * WISP_ATTR.SPEED);
                     this.entity.x -= movementVector.x * WISP_ATTR.SPEED;
                     this.entity.y -= movementVector.y * WISP_ATTR.SPEED;
@@ -262,7 +264,7 @@ Wisp.prototype = {
             this.struckRecently = true;
             this.timeToStrikeAgain = WISP_ATTR.FLEE_TIME;
             this.entity.collidable = false;
-            this.entity.game.requestInputSend(this.entity.game.playerAgent, "damage", 1);
+            this.game.requestInputSend(this.game.playerAgent, "damage", 1);
         }
     },
 
@@ -284,7 +286,8 @@ Wisp.prototype = {
 }
 
 function Archer (game, AM, x, y) {
-    this.entity = new Entity(game, x, y, 68, 60);
+    this.entity = new Entity(x, y, 68, 60);
+    this.game = game;
 
     this.timeDurationNextArrow = ARCHER_ATTR.SHOOTING_TIME;
     this.health = ARCHER_ATTR.STARTING_HEALTH;
@@ -323,7 +326,7 @@ Archer.prototype = {
 
     update: function () {
 
-        var knightPoint = this.entity.game.playerAgent.entity.getCenter();
+        var knightPoint = this.game.playerAgent.entity.getCenter();
 
         var archerPoint = {
             x: this.entity.x + this.entity.width / 2,
@@ -348,8 +351,8 @@ Archer.prototype = {
         if (this.entity.currentAnimation !== ARCHER_ATTR.IDLE_LEFT && this.entity.currentAnimation !== ARCHER_ATTR.IDLE_RIGHT) {
             if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
                 this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
-                var arrow = new Arrow(this, archerPoint.x, archerPoint.y, distanceX, distanceY, angle, this.entity.game);
-                this.entity.game.addAgent(arrow);
+                var arrow = new Arrow(this, archerPoint.x, archerPoint.y, distanceX, distanceY, angle, this.game);
+                this.game.addAgent(arrow);
                 if (knightPoint.x > this.entity.x) {
                     this.entity.currentAnimation = ARCHER_ATTR.IDLE_RIGHT;
                 } else {
@@ -389,13 +392,14 @@ Archer.prototype = {
 
     checkListeners: function (agent) {
         if (agent.entity.controllable) {
-            this.entity.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, "damage", 1);
         }
     }
 }
 function Arrow(source, x, y, distanceX, distanceY, angle, game) {
     this.source = source;
-    this.entity = new Entity(game, x, y, 25, 5);
+    this.entity = new Entity(x, y, 25, 5);
+    this.game = game;
     this.entity.x = x - Math.ceil(25 / 2);
     this.entity.y = y - Math.ceil(5 / 2);
     this.centerX = x;
@@ -415,8 +419,8 @@ function Arrow(source, x, y, distanceX, distanceY, angle, game) {
 Arrow.prototype = {
 
     obstacleAt: function (x, y) {
-        for (var i = 0; i < this.entity.game.agents.length; i += 1) {
-            var obstacle = this.entity.game.agents[i];
+        for (var i = 0; i < this.game.agents.length; i += 1) {
+            var obstacle = this.game.agents[i];
             if (this !== obstacle && this.source !== obstacle) {
                 if (x + this.entity.width > obstacle.entity.x &&
                     x < obstacle.entity.x + obstacle.entity.width &&
@@ -445,18 +449,18 @@ Arrow.prototype = {
         this.entity.y = this.centerY - Math.ceil(25 / 2);
     },
 
-    draw: function (cameraX, cameraY) {
-        this.entity.ctx.save();
-        this.entity.ctx.translate(this.entity.x + cameraX, this.entity.y - cameraY + 10);
-        this.entity.ctx.rotate(-this.angle);
-        this.entity.animationList[this.entity.currentAnimation].drawFrame(this.entity.game.clockTick,
-                            this.entity.ctx, 0, 0);
-        this.entity.ctx.restore();
+    draw: function (game, cameraX, cameraY) {
+        game.ctx.save();
+        game.ctx.translate(this.entity.x + cameraX, this.entity.y - cameraY + 10);
+        game.ctx.rotate(-this.angle);
+        this.entity.animationList[this.entity.currentAnimation].drawFrame(game.clockTick,
+                            game.ctx, 0, 0);
+        game.ctx.restore();
     },
 
     checkListeners: function (agent) {
         if (agent.entity.controllable) {
-            this.entity.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, "damage", 1);
             this.entity.removeFromWorld = true;
         }
     }

@@ -5,7 +5,8 @@ var BLOCKS_GLOBALS = {
 }
 
 function Platform(game, AM, x, y, width, height, stageType) {
-    this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH * width, BLOCKS_GLOBALS.HEIGHT * height);
+    this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH * width, BLOCKS_GLOBALS.HEIGHT * height);
+    this.game = game;
     this.entity.pushesOnly = true;
     
     this.movePatterns = [];
@@ -71,10 +72,10 @@ Platform.prototype = {
                 this.lastMoveOriginY = this.entity.y;
             }
             //Move the platform by the amount requested by the movement pattern.
-            var agentsToDrag = this.entity.game.getTopCollisions(this);
+            var agentsToDrag = this.game.getTopCollisions(this);
             
             if (this.currentMovePattern < this.movePatterns.length) {
-                this.entity.game.requestMove(this, 
+                this.game.requestMove(this, 
                                              this.movePatterns[this.currentMovePattern][1], 
                                              this.movePatterns[this.currentMovePattern][3]);
                 
@@ -82,7 +83,7 @@ Platform.prototype = {
                 var downwardsDrag = Math.max(0, this.movePatterns[this.currentMovePattern][3]);
                 
                 for (var i = 0; i < agentsToDrag.length; i++) {
-                    this.entity.game.requestMove(agentsToDrag[i], 
+                    this.game.requestMove(agentsToDrag[i], 
                                              this.movePatterns[this.currentMovePattern][1], 
                                              downwardsDrag);
                 }

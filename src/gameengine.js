@@ -635,9 +635,9 @@ GameEngine.prototype.draw = function () {
         
         if (this.isOnScreen(this.agents[i].entity)) {
             if (typeof this.agents[i].draw === 'function') {
-                this.agents[i].draw(this.camera.x, this.camera.y);
+                this.agents[i].draw(this, this.camera.x, this.camera.y);
             } else {
-                this.agents[i].entity.draw(this.camera.x, this.camera.y);
+                this.agents[i].entity.draw(this, this.camera.x, this.camera.y);
             }
         }
     }

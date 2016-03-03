@@ -5,7 +5,7 @@ var BLOCKS_GLOBALS = {
 }
 
 function Block(game, AM, x, y, stageType) {
-    this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
+    this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
     var NormalState;
     switch (stageType) {
         case STAGE_TYPE.FOREST:
@@ -36,7 +36,7 @@ Block.prototype = {
  * Invisiblock is to be used for invisible walls/platforms of variable length.
  */
 function Invisiblock(game, AM, x, y, width, height) {
-    this.entity = new Entity(game, x, y, width, height);
+    this.entity = new Entity(x, y, width, height);
 }
 
 Invisiblock.prototype = {
