@@ -21,10 +21,13 @@ function Stage(gameEngine, stageType, music) {
     
     switch (stageType) {
         case (STAGE_TYPE.FOREST):
-            this.placeBlocks = this.placeForestBlocks;
+            this.placeBlock = this.placeForestBlock;
+            break;
+        case (STAGE_TYPE.CASTLE):
+            this.placeBlock = this.placeCastleBlock;
             break;
         default:
-            this.placeBlocks = this.placeForestBlocks;
+            this.placeBlocks = this.placeForestBlock;
     }
 }
 
@@ -119,17 +122,24 @@ Stage.prototype = {
         }
 
         this.stageHeight = currentY + 50;
-        this.placeBlocks(blockArray, AM);
-    },
-    
-    placeForestBlocks: function (blockArray, AM) {
+        
+        //Scan through the loaded block array and place the blocks.
         for (var row = 0; row < blockArray.length; row++) {
             for (var column = 0; column < blockArray[row].length; column++) {
                 if (blockArray[row][column].exists) {
-                    this.entityList.push(new Block(this.gameEngine, AM,
-                                               column * 50, row * 50, this.stageType));
+                    this.placeBlock(blockArray, row, column);
                 }
             }
-        }  
+        }
+    },
+    
+    placeForestBlock: function (blockArray, row, column) {
+        this.entityList.push(new Block(this.gameEngine, AM,
+                                               column * 50, row * 50, STAGE_TYPE.FOREST)); 
+    },
+    
+    placeCastleBlock: function (blockArray, row, column) {
+        this.entityList.push(new Block(this.gameEngine, AM,
+                                               column * 50, row * 50, STAGE_TYPE.CASTLE)); 
     }
 }
