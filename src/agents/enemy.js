@@ -60,7 +60,6 @@ function Skeleton(game, AM, x, y) {
 
     this.health = SKELETON_ATTR.STARTING_HEALTH;
     this.invulnerableFrames = 0;
-    this.isAlive = true;
     this.yVelocity = 0;
     this.xDestination = x;
     this.yDestination = y;
@@ -88,7 +87,7 @@ function Skeleton(game, AM, x, y) {
 Skeleton.prototype = {
 
     update: function () {
-        if (this.isAlive) {
+        if (this.entity.collidable) {
             //compute updates that are independent of player distance
             if (this.invulnerableFrames > 0) {
                 this.invulnerableFrames--;
@@ -170,7 +169,6 @@ Skeleton.prototype = {
     },
 
     readInput: function (input, modifier) {
-
         if (input === "damage") {
             if (this.invulnerableFrames === 0) {
                 this.invulnerableFrames = SKELETON_ATTR.INVULNERABILITY_FRAMES;
@@ -178,14 +176,14 @@ Skeleton.prototype = {
                 if (this.health <= 0) {
                     this.entity.x += this.entity.width / 2;
                     this.entity.y += this.entity.height / 2;
-                    this.isAlive = false;
+                    this.entity.collidable = false;
                 } else {
                     this.confused = true;
                 }
             }
         }
         if (input === "reset") {
-            this.isAlive = true;
+            this.entity.collidable = true;
             this.health = SKELETON_ATTR.STARTING_HEALTH;
             this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
             this.yVelocity = 0;
@@ -195,7 +193,6 @@ Skeleton.prototype = {
     },
 
     checkListeners: function (agent) {
-
         if (agent.entity.controllable) {
             this.entity.game.requestInputSend(agent, "damage", 1);
         }
@@ -207,7 +204,6 @@ function Wisp(game, AM, x, y) {
     this.entity.moveable = true;
     this.struckRecently = false;
     this.timeToStrikeAgain = 0;
-    this.isAlive = true;
     this.health = WISP_ATTR.STARTING_HEALTH;
     this.invulnerableFrames = 0;
 
@@ -226,7 +222,7 @@ function Wisp(game, AM, x, y) {
 Wisp.prototype = {
 
     update: function () {
-        if (this.isAlive) {
+        if (this.entity.collidable) {
             if (this.timeToStrikeAgain > 0) {
                 this.timeToStrikeAgain--;
             } else {
@@ -303,12 +299,12 @@ Wisp.prototype = {
                     this.entity.x += this.entity.width / 2;
                     this.entity.y += this.entity.height / 2;
                     // this.entity.removeFromWorld = true;
-                    this.isAlive = false;
+                    this.entity.collidable = false;
                 }
             }
         }
         if (input === "reset") {
-            this.isAlive = true;
+            this.entity.collidable = true;
             this.health = WISP_ATTR.STARTING_HEALTH;
             this.invulnerableFrames = 0;
         }
@@ -322,7 +318,6 @@ function Archer (game, AM, x, y) {
     this.health = ARCHER_ATTR.STARTING_HEALTH;
     this.vision = ARCHER_ATTR.VISION_RADIUS;
     this.invulnerableFrames = 0;
-    this.isAlive = true;
 
     var archerImg = AM.getAsset("./img/enemy/archer.png");
     var archerRight = new Animation(archerImg, 73, 64, 0.05, true);
@@ -358,7 +353,7 @@ function Archer (game, AM, x, y) {
 Archer.prototype = {
 
     update: function () {
-        if (this.isAlive) {
+        if (this.entity.collidable) {
             var knightPoint = this.entity.game.playerAgent.centerPoint;
 
             var archerPoint = {
@@ -410,11 +405,11 @@ Archer.prototype = {
             if (this.health <= 0) {
                 this.entity.x += this.entity.width / 2;
                 this.entity.y += this.entity.height / 2;
-                this.isAlive = false;
+                this.entity.collidable = false;
             }
         }
         if (input === "reset") {
-            this.isAlive = true;
+            this.entity.collidable = true;
             this.health = ARCHER_ATTR.STARTING_HEALTH;
         }
     },
