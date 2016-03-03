@@ -159,7 +159,6 @@ Skeleton.prototype = {
         } else {
             this.entity.setAnimation(SKELETON_ANIM.DYING); // DEATH_ANIMATION
             if (this.entity.animationList[SKELETON_ANIM.DYING].isDone()) {
-                this.entity.animationList[SKELETON_ANIM.DYING].elapsedTime = 0;
                 this.entity.removeFromWorld = true;
             }
         }
@@ -186,6 +185,7 @@ Skeleton.prototype = {
             this.yVelocity = 0;
             this.xDestination = this.entity.originX;
             this.yDestination = this.entity.originY;
+            this.entity.animationList[SKELETON_ANIM.DYING].elapsedTime = 0;
         }
     },
 
@@ -280,7 +280,6 @@ Wisp.prototype = {
             this.entity.setAnimation(WISP_ANIM.DYING);
             if (this.entity.animationList[WISP_ANIM.DYING].isDone()) {
                 this.entity.removeFromWorld = true;
-                this.entity.animationList[WISP_ANIM.DYING].elapsedTime = 0;
             }
         }
     },
@@ -304,6 +303,7 @@ Wisp.prototype = {
             this.entity.collidable = true;
             this.health = WISP_ATTR.STARTING_HEALTH;
             this.invulnerableFrames = 0;
+            this.entity.animationList[WISP_ANIM.DYING].elapsedTime = 0;
         }
     },
 }
@@ -388,7 +388,6 @@ Archer.prototype = {
         } else {
             this.entity.setAnimation(ARCHER_ANIM.DYING);
             if (this.entity.animationList[ARCHER_ANIM.DYING].isDone()) {
-                this.entity.animationList[ARCHER_ANIM.DYING].elapsedTime = 0;
                 this.entity.removeFromWorld = true;
             }
         }
@@ -406,6 +405,7 @@ Archer.prototype = {
         if (input === "reset") {
             this.entity.collidable = true;
             this.health = ARCHER_ATTR.STARTING_HEALTH;
+            this.entity.animationList[ARCHER_ANIM.DYING].elapsedTime = 0;
         }
     },
 
