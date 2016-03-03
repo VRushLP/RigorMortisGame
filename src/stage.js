@@ -5,7 +5,7 @@ var STAGE_TYPE = {
 }
 
 function Stage(gameEngine, stageType, music) {
-    //Initialize background with default values.
+    //Initialize stage with default values.
     this.entityList = [];
     this.spawnX = 0;
     this.spawnY = 0;
@@ -18,6 +18,14 @@ function Stage(gameEngine, stageType, music) {
     }    
     this.gameEngine = gameEngine;
     this.stageType = stageType;
+    
+    switch (stageType) {
+        case (STAGE_TYPE.FOREST):
+            this.placeBlocks = this.placeForestBlocks;
+            break;
+        default:
+            this.placeBlocks = this.placeForestBlocks;
+    }
 }
 
 Stage.prototype = {
@@ -68,19 +76,25 @@ Stage.prototype = {
 
     /*
      * Read through an array of strings and build the level from recognizable characters.
-     * inputArray: an array of ASCII characters.
+     * inputArray: a 2D array of ASCII characters.
      */
     parseLevelFile: function (inputArray, AM) {
+        //When parsing the level file, put the blocks into this array so that
+        //they can be optimized before building.
+        var blockArray = [];
+        
         var currentX = 0;
         var currentY = 0;
 
         for(var lineNum = 0; lineNum < inputArray.length; lineNum++) {
+            var blockLine = [];
             for(var tileNum = 0; tileNum < inputArray[lineNum].length; tileNum++) {
                 var currentSymbol = inputArray[lineNum][tileNum];
+                blockLine[tileNum] = {exists: false, depth: 0};
 
                 switch (currentSymbol) {
                     case 'x':
-                        this.entityList.push(new Block(this.gameEngine, AM, currentX, currentY, this.stageType));
+                        blockLine[tileNum].exists = true;
                         break;
                     case '@':
                         this.spawnX = currentX;
@@ -99,10 +113,23 @@ Stage.prototype = {
                 }
                 currentX += 50;
             }
+            blockArray[lineNum] = blockLine;
             currentX = 0;
             currentY += 50;
         }
 
         this.stageHeight = currentY + 50;
+        this.placeBlocks(blockArray, AM);
+    },
+    
+    placeForestBlocks: function (blockArray, AM) {
+        for (var row = 0; row < blockArray.length; row++) {
+            for (var column = 0; column < blockArray[row].length; column++) {
+                if (blockArray[row][column].exists) {
+                    this.entityList.push(new Block(this.gameEngine, AM,
+                                               column * 50, row * 50, this.stageType));
+                }
+            }
+        }  
     }
 }
