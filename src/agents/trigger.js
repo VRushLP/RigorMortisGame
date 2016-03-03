@@ -149,3 +149,39 @@ SpawnTrigger.prototype = {
         }
     }
 }
+
+/*
+ * A music trigger causes the game engine to change the current song upon collision.
+ */
+function StageTrigger(game, AM, x, y, width, height, stageNumber) {
+    this.entity = new Entity(x, y, width, height);
+    this.game = game;
+    this.stageNumber = stageNumber;
+    this.entity.intangible = true;
+}
+
+StageTrigger.prototype = { 
+    draw: function () {
+        //Nothing to do.
+    },
+    
+    update: function () {
+        //Nothing to do.
+    },
+    
+    checkListeners: function(agent) {
+        if (agent.entity.controllable) {
+            //Only change the stage if it is not the current one.
+            if (this.game.currentStage !== this.stageNumber) {
+                this.entity.collidable = false;
+                this.game.loadStage(stageNumber);
+            }
+        }
+    },
+    
+    readInput: function (input) {
+        if (input === "reset") {
+            this.entity.collidable = true;
+        }
+    }
+}
