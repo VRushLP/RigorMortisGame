@@ -55,6 +55,7 @@ function GameEngine() {
     this.removedAgents = [];
 
     this.currentMusic = null;
+    this.stageReset = false;
 
     //Initially set by main before game start.
     this.playerAgent;
@@ -93,12 +94,16 @@ GameEngine.prototype = {
 
     loadStage : function (stageNumber) {
         this.currentStage = stageNumber;
+        this.agents = [];
         this.agents = this.stages[this.currentStage].entityList;
 
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
         this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+        
+        this.agents.push(this.playerAgent);
 
         this.switchMusic(this.stages[this.currentStage].stageMusic);
+        this.stageReset = true;
     },
     
     resetStage : function () {
@@ -136,6 +141,7 @@ GameEngine.prototype = {
         
         //Request to switch to the stage music.
         this.switchMusic(this.stages[this.currentStage].stageMusic);
+        this.stageReset = true;
     },
 
     switchMusic : function (newMusic) {
@@ -222,6 +228,11 @@ GameEngine.prototype = {
     update : function () {
         //Iterate backwards to avoid splice errors.
         for (var i = this.agents.length - 1; i >= 0; i--) {
+            //If the stage has changed or been reset, then we need to restart the current update loop.
+            if (this.stageReset) {
+                this.stageReset = false;
+                break;
+            }
             //If the agent has been flagged for removal, do so; otherwise, update it.
             if (this.agents[i].entity.removeFromWorld) {
                 var removedAgent = this.agents.splice(i, 1)[0];

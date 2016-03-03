@@ -174,7 +174,7 @@ StageTrigger.prototype = {
             //Only change the stage if it is not the current one.
             if (this.game.currentStage !== this.stageNumber) {
                 this.entity.collidable = false;
-                this.game.loadStage(stageNumber);
+                this.game.loadStage(this.stageNumber);
             }
         }
     },

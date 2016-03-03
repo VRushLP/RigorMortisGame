@@ -111,7 +111,6 @@ AM.downloadAll(function () {
     knight.entity.moveable = true;
     knight.entity.camerable = true;
     knight.entity.respawnable = true;
-    forestStage.entityList.push(knight);
     
     var firstPlatform = new Platform(gameEngine, AM, 2650, 650, 4, 1, STAGE_TYPE.FOREST);
     firstPlatform.addMovePattern(350, 2, 0, 0);
@@ -144,15 +143,8 @@ AM.downloadAll(function () {
         forestStage.entityList.push(exitBlock);
     }
     
-    var victoryCameraFocus = new FocusTrigger(gameEngine, AM, 7639, 1361);
-    var victoryMusicTrigger = new MusicTrigger(gameEngine, AM, 4550, 2101, 50, 148, BGM.victoryFanfare);
-    
-    var victoryScreen = new VictoryScreen(gameEngine, AM, 7000, 1000);
-    forestStage.entityList.push(victoryScreen);
-    
-    var victoryCameraTrigger = new CameraTrigger(gameEngine, AM, 4550, 2101, 50, 148, victoryCameraFocus, CAMERA_MODE.INSTANT);
-    forestStage.entityList.push(victoryCameraTrigger);    
-    forestStage.entityList.push(victoryMusicTrigger);
+    var castleStageTrigger = new StageTrigger(gameEngine, AM, 4550, 2101, 50, 148, 1);
+    forestStage.entityList.push(castleStageTrigger);
     
     var castleStage = new Stage(gameEngine, STAGE_TYPE.CASTLE, BGM.castleLevel);
     castleStage.parseLevelFile(AM.getAsset("./txt/castle-stage.txt").split("\n"), AM);
@@ -164,11 +156,31 @@ AM.downloadAll(function () {
     gameEngine.cameraAgent = knight;
 
     var titleScreen = new TitleScreen(gameEngine, AM, 0, 1664);
+    titleScreen.entity.removeUponReset = true;
     forestStage.entityList.push(titleScreen);
 
     canvas.addEventListener('focus', function (event) {
-        gameEngine.agents.splice(gameEngine.agents.indexOf(titleScreen, 1));
+        var agents = gameEngine.agents;
+        for (var i = 0; i < agents.length; i++) {
+            if (agents[i] === titleScreen) {
+                agents.splice(i, 1);
+                break;
+            }
+        }
     }, false);
+    
+    
+    
+    
+    //var victoryCameraFocus = new FocusTrigger(gameEngine, AM, 7639, 1361);
+    //var victoryMusicTrigger = new MusicTrigger(gameEngine, AM, 4550, 2101, 50, 148, BGM.victoryFanfare);
+    
+    //var victoryScreen = new VictoryScreen(gameEngine, AM, 7000, 1000);
+    //forestStage.entityList.push(victoryScreen);
+    
+    //var victoryCameraTrigger = new CameraTrigger(gameEngine, AM, 4550, 2101, 50, 148, victoryCameraFocus, CAMERA_MODE.INSTANT);
+    //forestStage.entityList.push(victoryCameraTrigger);    
+    //forestStage.entityList.push(victoryMusicTrigger);
 
     gameEngine.start();
 });
