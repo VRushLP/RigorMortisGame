@@ -4,7 +4,7 @@ var BLOCKS_GLOBALS = {
     FRAME_DURATION: 1,
 }
 
-function Block(game, AM, x, y) {
+function Block(game, AM, x, y, stageType) {
     this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
 
     var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);

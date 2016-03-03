@@ -630,9 +630,7 @@ GameEngine.prototype.loop = function () {
 GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
     this.ctx.save();
-    for (var i = 0; i < this.stages.length; i++) {
-        this.stages[i].drawBackground(this.ctx, this.camera.x);
-    }
+    this.stages[this.currentStage].drawBackground(this.camera.x);
     for (var i = 0; i < this.agents.length; i++) {
         
         if (this.isOnScreen(this.agents[i].entity)) {
