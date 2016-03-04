@@ -95,6 +95,7 @@ GameEngine.prototype = {
     loadStage : function (stageNumber) {
         this.currentStage = stageNumber;
         this.agents = [];
+        this.removedAgents = [];
         this.agents = this.stages[this.currentStage].entityList;
 
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
