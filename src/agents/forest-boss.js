@@ -36,6 +36,7 @@ var FB_ATTR = {
     PHASE_1_HEALTH: 4,
     PHASE_2_HEALTH: 2,
 
+    //The amount of distance between the core and the left edge of the platform it's on.
     CORE_BUFFER : 50,
     
     //Phase Number: Added Speed
@@ -77,7 +78,7 @@ function ForestBoss(game, AM, x, y, stage) {
     this.entity = new Entity(game, x, y, 0, 0);
     this.entity.collidable = false;
     this.exitAgents = [];
-    
+
     //Set the default states of the forest boss.
     this.speed = 0;
     this.phase = 0;
@@ -284,7 +285,7 @@ ForestBoss.prototype = {
         this.entity.removeFromWorld = true;
         
         var originalBGM = this.entity.game.stages[this.entity.game.currentStage].stageMusic;
-        this.entity.game.switchMusic(originalBGM);
+        gameEngine.switchMusic(originalBGM);
         this.openExit();
         
         gameEngine.camera.frozen = true;
@@ -472,6 +473,7 @@ function ForestBossCore(game, AM, x, y, callback) {
     this.entity.pushesOnly = true;
     this.arm;
     this.callback = callback;
+    this.alive = true;
     
     //The core is hidden by default, so set its initial height to zero.
     var normalAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss weak point.png"), 50, 0, 1, true);

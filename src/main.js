@@ -85,6 +85,8 @@ AM.queueDownload("./img/enemy/forest boss/forest boss spike 100px.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss spike 150px.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss platform.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss weak point.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss background.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss statue active.png");
 AM.queueDownload("./img/other/victory screen.png");
 AM.queueDownload("./img/other/title screen.png");
 
@@ -103,6 +105,13 @@ AM.downloadAll(function () {
     var forestStage = new Stage(ctx, gameEngine, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y, BGM.forestLevel);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.TREE_SCROLL_SPEED);
+
+    var graveyard = new backgroundObject(gameEngine, AM, 3101, 1671, "./img/enemy/forest boss/forest boss background.png");
+    forestStage.entityList.push(graveyard);
+
+    var forestBossStatue = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active.png");
+    forestStage.entityList.push(forestBossStatue);
+
     forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
 
     var knight = new Knight(gameEngine, AM, forestStage.spawnX, forestStage.spawnY);

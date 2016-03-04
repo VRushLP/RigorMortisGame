@@ -37,3 +37,23 @@ Invisiblock.prototype = {
         //Nothing to do.
     }
 }
+
+function backgroundObject(game, AM, x, y, imgSource) {
+
+    this.image = AM.getAsset(imgSource);
+    this.entity = new Entity(game, x, y, this.image.width, this.image.height);
+    this.entity.collidable = false;
+
+    var normalState = new Animation(this.image, this.image.width, this.image.height, BLOCKS_GLOBALS.FRAME_DURATION, true);
+    normalState.addFrame(0, 0);
+
+    this.entity.addAnimation(normalState);
+    this.entity.setAnimation(0);
+
+}
+
+backgroundObject.prototype = {
+    update: function() {
+
+    }
+}
