@@ -284,12 +284,6 @@ Wisp.prototype = {
             if (this.entity.animationList[WISP_ANIM.DYING].isDone()) {
                 this.entity.removeFromWorld = true;
             }
-            if (distanceToKnight < WISP_ATTR.TOUCH_DISTANCE) {
-                this.struckRecently = true;
-                this.timeToStrikeAgain = WISP_ATTR.FLEE_TIME;
-                this.entity.collidable = false;
-                this.game.requestInputSend(this.game.playerAgent, "damage", 1);
-            }
         }
     },
 
