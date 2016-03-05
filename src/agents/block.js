@@ -4,11 +4,25 @@ var BLOCKS_GLOBALS = {
     FRAME_DURATION: 1,
 }
 
-function Block(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
-
-    var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
-    NormalState.addFrame(0, 0);
+function Block(game, AM, x, y, stageType) {
+    this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
+    var NormalState;
+    switch (stageType) {
+        case STAGE_TYPE.FOREST:
+            NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"),
+                BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+            NormalState.addFrame(0, 0);
+            break;
+        case STAGE_TYPE.CASTLE:
+            NormalState = new Animation(AM.getAsset("./img/castle-stage/castle block.png"),
+                BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+            NormalState.addFrame(50, 0);
+            break;
+        default:
+            NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"),
+                BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+            NormalState.addFrame(0, 0);
+    }
 
     this.entity.addAnimation(NormalState);
     this.entity.setAnimation(0);
@@ -25,7 +39,7 @@ Block.prototype = {
  * Invisiblock is to be used for invisible walls/platforms of variable length.
  */
 function Invisiblock(game, AM, x, y, width, height) {
-    this.entity = new Entity(game, x, y, width, height);
+    this.entity = new Entity(x, y, width, height);
 }
 
 Invisiblock.prototype = {
@@ -41,7 +55,7 @@ Invisiblock.prototype = {
 function backgroundObject(game, AM, x, y, imgSource) {
 
     this.image = AM.getAsset(imgSource);
-    this.entity = new Entity(game, x, y, this.image.width, this.image.height);
+    this.entity = new Entity(x, y, this.image.width, this.image.height);
     this.entity.collidable = false;
 
     var normalState = new Animation(this.image, this.image.width, this.image.height, BLOCKS_GLOBALS.FRAME_DURATION, true);
@@ -49,7 +63,6 @@ function backgroundObject(game, AM, x, y, imgSource) {
 
     this.entity.addAnimation(normalState);
     this.entity.setAnimation(0);
-
 }
 
 backgroundObject.prototype = {

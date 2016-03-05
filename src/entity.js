@@ -3,7 +3,7 @@
  * The entity contains the object's x and y coordinates, animations,
  * and handles drawing of animation frames.
  */
-function Entity(game, x, y, width, height) {
+function Entity(x, y, width, height) {
     this.animationList = [];
     this.currentAnimation = 0;
     //Used for respawning the entity.
@@ -15,8 +15,6 @@ function Entity(game, x, y, width, height) {
     this.width = width;
     this.height = height;
     
-    this.game = game;
-    this.ctx = game.ctx;
     this.controllable = false;
     this.moveable = false;
     this.camerable = false;
@@ -34,12 +32,15 @@ Entity.prototype = {
     /*
      * Request the entity to draw the current animation frame.
      */
-    draw: function (cameraX, cameraY) {
+    draw: function (game, cameraX, cameraY) {
         if (this.animationList.length <= 0) {
             return;
         }
+        if (typeof(this.animationList[this.currentAnimation]) === 'undefined') {
+            console.log(this);
+        }
         this.animationList[this.currentAnimation]
-            .drawFrame(this.game.clockTick, this.ctx, this.x + cameraX, this.y - cameraY);
+            .drawFrame(game.clockTick, game.ctx, this.x + cameraX, this.y - cameraY);
     },
 
     /*

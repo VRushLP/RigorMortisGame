@@ -76,6 +76,7 @@ AM.queueDownload("./img/knight/knight attack flipped.png");
 AM.queueDownload("./img/forest-stage/forest sky.png");
 AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
+AM.queueDownload("./img/castle-stage/castle block.png");
 AM.queueDownload("./img/enemy/chaser.png");
 AM.queueDownload("./img/enemy/archer.png");
 AM.queueDownload("./img/enemy/wisp.png");
@@ -91,6 +92,7 @@ AM.queueDownload("./img/other/victory screen.png");
 AM.queueDownload("./img/other/title screen.png");
 
 AM.queueStageDownload("./txt/forest-stage.txt");
+AM.queueStageDownload("./txt/castle-stage.txt");
 
 /*
 Download all the elements and add entities to the game.
@@ -102,31 +104,29 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
 
-    var forestStage = new Stage(ctx, gameEngine, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_X, RM_GLOBALS.FOREST_STAGE.KNIGHT_SPAWN_Y, BGM.forestLevel);
+    var forestStage = new Stage(gameEngine, STAGE_TYPE.FOREST, BGM.forestLevel);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.TREE_SCROLL_SPEED);
 
+    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
     var graveyard = new backgroundObject(gameEngine, AM, 3101, 1671, "./img/enemy/forest boss/forest boss background.png");
     forestStage.entityList.push(graveyard);
 
     var forestBossStatue = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active.png");
     forestStage.entityList.push(forestBossStatue);
 
-    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
-
     var knight = new Knight(gameEngine, AM, forestStage.spawnX, forestStage.spawnY);
     knight.entity.controllable = true;
     knight.entity.moveable = true;
     knight.entity.camerable = true;
     knight.entity.respawnable = true;
-    forestStage.entityList.push(knight);
     
-    var firstPlatform = new Platform(gameEngine, AM, 2650, 650, 4, 1);
+    var firstPlatform = new Platform(gameEngine, AM, 2650, 650, 4, 1, STAGE_TYPE.FOREST);
     firstPlatform.addMovePattern(350, 2, 0, 0);
     firstPlatform.addMovePattern(350, -2, 0, 0);
     forestStage.entityList.push(firstPlatform);
 
-    var secondPlatform = new Platform(gameEngine, AM, 3200, 1300, 4, 1);
+    var secondPlatform = new Platform(gameEngine, AM, 3200, 1300, 4, 1, STAGE_TYPE.FOREST);
     secondPlatform.addMovePattern(450, -3, 0, 0);
     secondPlatform.addMovePattern(450, 3, 0, 0);
     forestStage.entityList.push(secondPlatform);
@@ -152,28 +152,45 @@ AM.downloadAll(function () {
         forestStage.entityList.push(exitBlock);
     }
     
-    var victoryCameraFocus = new FocusTrigger(gameEngine, AM, 7639, 1361);
-    var victoryMusicTrigger = new MusicTrigger(gameEngine, AM, 4550, 2101, 50, 148, BGM.victoryFanfare);
+    var castleStageTrigger = new StageTrigger(gameEngine, AM, 4550, 2101, 50, 148, 1);
+    forestStage.entityList.push(castleStageTrigger);
     
-    var victoryScreen = new VictoryScreen(gameEngine, AM, 7000, 1000);
-    forestStage.entityList.push(victoryScreen);
-    
-    var victoryCameraTrigger = new CameraTrigger(gameEngine, AM, 4550, 2101, 50, 148, victoryCameraFocus, CAMERA_MODE.INSTANT);
-    forestStage.entityList.push(victoryCameraTrigger);    
-    forestStage.entityList.push(victoryMusicTrigger);
+    var castleStage = new Stage(gameEngine, STAGE_TYPE.CASTLE, BGM.castleLevel);
+    castleStage.parseLevelFile(AM.getAsset("./txt/castle-stage.txt").split("\n"), AM);
     
     gameEngine.addStage(forestStage);
+    gameEngine.addStage(castleStage);
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;
 
     var titleScreen = new TitleScreen(gameEngine, AM, 0, 1664);
+    titleScreen.entity.removeUponReset = true;
     forestStage.entityList.push(titleScreen);
 
     canvas.addEventListener('focus', function (event) {
-        gameEngine.agents.splice(gameEngine.agents.indexOf(titleScreen, 1));
         gameEngine.healthBarVisible = true;
+        var agents = gameEngine.agents;
+        for (var i = 0; i < agents.length; i++) {
+            if (agents[i] === titleScreen) {
+                agents.splice(i, 1);
+                break;
+            }
+        }
     }, false);
+    
+    
+    
+    
+    //var victoryCameraFocus = new FocusTrigger(gameEngine, AM, 7639, 1361);
+    //var victoryMusicTrigger = new MusicTrigger(gameEngine, AM, 4550, 2101, 50, 148, BGM.victoryFanfare);
+    
+    //var victoryScreen = new VictoryScreen(gameEngine, AM, 7000, 1000);
+    //forestStage.entityList.push(victoryScreen);
+    
+    //var victoryCameraTrigger = new CameraTrigger(gameEngine, AM, 4550, 2101, 50, 148, victoryCameraFocus, CAMERA_MODE.INSTANT);
+    //forestStage.entityList.push(victoryCameraTrigger);    
+    //forestStage.entityList.push(victoryMusicTrigger);
 
     gameEngine.start();
 });

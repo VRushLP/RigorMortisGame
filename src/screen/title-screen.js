@@ -1,5 +1,5 @@
 function TitleScreen(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, 1280, 720);
+    this.entity = new Entity(x, y, 1280, 720);
     this.entity.removeUponReset = false;
     this.entity.collidable = false;
     this.canvas;

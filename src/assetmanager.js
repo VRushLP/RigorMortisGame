@@ -23,26 +23,31 @@ AssetManager.prototype = {
     getAsset : function (path) {
         return this.cache[path];
     },
+    
+    getStages : function (callback, stageNumber) {
+        var stagePath = this.stageQueue[stageNumber];
+        var stageContents;
+        var client = new XMLHttpRequest();
+        var that = this;
 
-    downloadAll : function (callback) {
-        for (var i = 0; i < this.stageQueue.length; i++) {
-            var stagePath = this.stageQueue[i];
-            var stageContents;
-            var client = new XMLHttpRequest();
-            var that = this;
-
-            client.onreadystatechange = function() {
-                if(client.readyState === 4 && client.status === 200) {
-                    that.cache[stagePath] = client.responseText;
-                    that.successCount++;
-                    if(that.isDone()) callback();
+        client.onreadystatechange = function() {
+            if(client.readyState === 4 && client.status === 200) {
+                that.cache[stagePath] = client.responseText;
+                that.successCount++;
+                if(that.isDone()) {
+                    callback();
+                } else if (stageNumber < that.stageQueue.length - 1) {
+                    that.getStages(callback, stageNumber + 1);
                 }
             }
-
-            client.open('GET', './txt/forest-stage.txt');
-            client.send();
         }
+        client.open('GET', stagePath);
+        client.send();
+    },
 
+    downloadAll : function (callback) {
+        this.getStages(callback, 0);
+    
         for (var i = 0; i < this.downloadQueue.length; i++) {
             var img = new Image();
             var that = this;

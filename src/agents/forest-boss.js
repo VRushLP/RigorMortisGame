@@ -75,7 +75,8 @@ var FB_ATTR = {
  * it utilizes, and send signals to its arms accordingly.
  */
 function ForestBoss(game, AM, x, y, stage) {
-    this.entity = new Entity(game, x, y, 0, 0);
+    this.entity = new Entity(x, y, 0, 0);
+    this.game = game;
     this.entity.collidable = false;
     this.exitAgents = [];
 
@@ -277,15 +278,15 @@ ForestBoss.prototype = {
     
     //Remove the Forest Boss arms, core, and the controller from world and switch the music back..
     selfDestruct: function () {
-        var gameEngine = this.entity.game;
+        var gameEngine = this.game;
         for (var i = 0; i < this.arms.length; i++) {
             this.arms[i].entity.removeFromWorld = true;
         }
         this.core.entity.removeFromWorld = true;
         this.entity.removeFromWorld = true;
         
-        var originalBGM = this.entity.game.stages[this.entity.game.currentStage].stageMusic;
-        gameEngine.switchMusic(originalBGM);
+        var originalBGM = this.game.stages[this.game.currentStage].stageMusic;
+        this.game.switchMusic(originalBGM);
         this.openExit();
         
         gameEngine.camera.frozen = true;
@@ -319,15 +320,14 @@ ForestBoss.prototype = {
     }
 }
 
-
-
 /*
  * A Forest Boss Arm is either a thin/normal/wide spike, or a platform.
  * Arms have four states, and independently determine what they should do
  * based on certain parameters provided by Forest Boss.
  */
 function ForestBossArm(game, AM, x, y) {
-    this.entity = new Entity(game, x, y, 0, 0);
+    this.entity = new Entity(x, y, 0, 0);
+    this.game = game;
     this.entity.moveable = true;
     this.entity.pushesOnly = true;
     
@@ -380,9 +380,9 @@ ForestBossArm.prototype = {
         if (this.currentState === FB_ARM_STATE.RISING) {
             if (this.maxHeight - this.getHeight() <= this.speed) {
                 //The arm would exceed its max height.
-                this.entity.game.requestMove(this, 0, -1 * (this.maxHeight - this.getHeight()) );
+                this.game.requestMove(this, 0, -1 * (this.maxHeight - this.getHeight()) );
             } else {
-                this.entity.game.requestMove(this, 0, -1 * this.speed);
+                this.game.requestMove(this, 0, -1 * this.speed);
             }
         }
         
@@ -398,20 +398,20 @@ ForestBossArm.prototype = {
         //If the arm is falling, decrease its height by its speed, and drag any entities with it.
         if (this.currentState === FB_ARM_STATE.FALLING) {
             //Determine which agents are on top of the platform before moving.
-            var agentsToDrag = this.entity.game.getTopCollisions(this);
+            var agentsToDrag = this.game.getTopCollisions(this);
             
             if (this.getHeight() <= this.speed) {
                 //The arm would fall past its base.
                 this.entity.height = 0;
-                this.entity.game.requestMove(this, 0, this.getHeight());
+                this.game.requestMove(this, 0, this.getHeight());
             } else {
                 this.entity.height -= this.speed;
-                this.entity.game.requestMove(this, 0, this.speed);
+                this.game.requestMove(this, 0, this.speed);
             }            
             
             //After moving, drag any agents on top of the platform down with it.
             for (var i = 0; i < agentsToDrag.length; i++) {
-                this.entity.game.requestMove(agentsToDrag[i], 0, this.speed);
+                this.game.requestMove(agentsToDrag[i], 0, this.speed);
             }
         }
         
@@ -453,7 +453,7 @@ ForestBossArm.prototype = {
     
     checkListeners: function(agent) {
         if (agent.entity.controllable && this.entity.currentAnimation !== FB_ANIM.PLATFORM) {
-            this.entity.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, "damage", 1);
         }
     }
     
@@ -467,10 +467,11 @@ ForestBossArm.prototype = {
  * callback: The forest boss controller to preemptively request state changes to.
  */
 function ForestBossCore(game, AM, x, y, callback) {
-    this.entity = new Entity(game, x, y, 50, 0);
+    this.entity = new Entity(x, y, 50, 0);
     this.entity.moveable = true;
     //this.entity.intangible = true;
     this.entity.pushesOnly = true;
+    this.game = game;
     this.arm;
     this.callback = callback;
     this.alive = true;
@@ -503,7 +504,7 @@ ForestBossCore.prototype = {
             //and entity height accordingly, and then move that entity upwards.
             var moveUp = Math.min(10, 50 - animation.frameHeight);             
             animation.frameHeight += moveUp;
-            this.entity.game.requestMove(this, 0, -1 * moveUp);
+            this.game.requestMove(this, 0, -1 * moveUp);
             this.entity.height += moveUp;
             
             //By making the core intangible after it finishes rising, it pops up the player
@@ -515,7 +516,7 @@ ForestBossCore.prototype = {
             var moveDown = Math.min(10, animation.frameHeight);
             animation.frameHeight -= moveDown;
             this.entity.height -= moveDown;
-            this.entity.game.requestMove(this, 0, moveDown);
+            this.game.requestMove(this, 0, moveDown);
         }
         
         //If the core has emerged, make it collidable.

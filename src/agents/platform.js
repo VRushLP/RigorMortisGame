@@ -4,8 +4,9 @@ var BLOCKS_GLOBALS = {
     FRAME_DURATION: 1,
 }
 
-function Platform(game, AM, x, y, width, height) {
-    this.entity = new Entity(game, x, y, BLOCKS_GLOBALS.WIDTH * width, BLOCKS_GLOBALS.HEIGHT * height);
+function Platform(game, AM, x, y, width, height, stageType) {
+    this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH * width, BLOCKS_GLOBALS.HEIGHT * height);
+    this.game = game;
     this.entity.pushesOnly = true;
     
     this.movePatterns = [];
@@ -14,13 +15,25 @@ function Platform(game, AM, x, y, width, height) {
     this.lastMoveOriginX = x;
     this.lastMoveOriginY = y;
     
-    var NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+    var NormalState;
+    var blockStart;
+    switch (stageType) {
+        case STAGE_TYPE.FOREST:
+            NormalState = new Animation(AM.getAsset("./img/forest-stage/forest block.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+            blockStart = 0;
+            break;
+        case STAGE_TYPE.CASTLE:
+            NormalState = new Animation(AM.getAsset("./img/castle-stage/castle block.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+            blockStart = 50;
+            break;
+    }
+    
     var multiframeArray = [];
     
     for (var i = 0; i < height; i++) {
         var tempArray = [];
         for (var j = 0; j < width; j++) {
-            tempArray.push(0);
+            tempArray.push(blockStart);
             tempArray.push(0);
         }
         multiframeArray.push(tempArray);
@@ -59,10 +72,10 @@ Platform.prototype = {
                 this.lastMoveOriginY = this.entity.y;
             }
             //Move the platform by the amount requested by the movement pattern.
-            var agentsToDrag = this.entity.game.getTopCollisions(this);
+            var agentsToDrag = this.game.getTopCollisions(this);
             
             if (this.currentMovePattern < this.movePatterns.length) {
-                this.entity.game.requestMove(this, 
+                this.game.requestMove(this, 
                                              this.movePatterns[this.currentMovePattern][1], 
                                              this.movePatterns[this.currentMovePattern][3]);
                 
@@ -70,7 +83,7 @@ Platform.prototype = {
                 var downwardsDrag = Math.max(0, this.movePatterns[this.currentMovePattern][3]);
                 
                 for (var i = 0; i < agentsToDrag.length; i++) {
-                    this.entity.game.requestMove(agentsToDrag[i], 
+                    this.game.requestMove(agentsToDrag[i], 
                                              this.movePatterns[this.currentMovePattern][1], 
                                              downwardsDrag);
                 }
