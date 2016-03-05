@@ -36,6 +36,7 @@ var FB_ATTR = {
     PHASE_1_HEALTH: 4,
     PHASE_2_HEALTH: 2,
 
+    //The amount of distance between the core and the left edge of the platform it's on.
     CORE_BUFFER : 50,
     
     //Phase Number: Added Speed
@@ -78,7 +79,7 @@ function ForestBoss(game, AM, x, y, stage) {
     this.game = game;
     this.entity.collidable = false;
     this.exitAgents = [];
-    
+
     //Set the default states of the forest boss.
     this.speed = 0;
     this.phase = 0;
@@ -319,8 +320,6 @@ ForestBoss.prototype = {
     }
 }
 
-
-
 /*
  * A Forest Boss Arm is either a thin/normal/wide spike, or a platform.
  * Arms have four states, and independently determine what they should do
@@ -475,6 +474,7 @@ function ForestBossCore(game, AM, x, y, callback) {
     this.game = game;
     this.arm;
     this.callback = callback;
+    this.alive = true;
     
     //The core is hidden by default, so set its initial height to zero.
     var normalAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss weak point.png"), 50, 0, 1, true);

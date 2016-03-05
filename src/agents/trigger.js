@@ -185,3 +185,44 @@ StageTrigger.prototype = {
         }
     }
 }
+
+function EntitySwitchTrigger(game, x, y, width, height, newEntity, outEntity) {
+    this.game = game;
+    this.entity = new Entity(x, y, width, height);
+    this.entity.intangible = true;
+    this.newEntity = newEntity;
+    this.outEntity = outEntity;
+}
+
+EntitySwitchTrigger.prototype = {
+    draw: function () {
+        //Do nothing
+    },
+
+    update: function () {
+        //Do nothing
+    },
+
+    checkListeners: function (agent) {
+        if (agent.entity.controllable) 
+        {
+            this.entity.collidable = false;
+            var index = this.game.agents.indexOf(this.outEntity);
+            if (index > -1) {
+                this.game.agents[index] = this.newEntity;
+                //Swap entities
+            } //else do nothing.
+        }
+    },
+
+    readInput: function (input) {
+        if (input === "reset") {
+            this.entity.collidable = true;
+            var index = this.game.agents.indexOf(this.newEntity);
+            if (index > -1) {
+                this.game.agents[index] = this.outEntity;
+                //Swap entities back on reset
+            } //else do nothing.
+        }
+    }
+}
