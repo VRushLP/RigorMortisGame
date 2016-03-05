@@ -56,6 +56,7 @@ function GameEngine() {
 
     this.currentMusic = null;
     this.healthBarVisible = false;
+    this.stageReset = false;
 
     //Initially set by main before game start.
     this.playerAgent;
@@ -94,12 +95,18 @@ GameEngine.prototype = {
 
     loadStage : function (stageNumber) {
         this.currentStage = stageNumber;
+        this.agents = [];
+        this.removedAgents = [];
         this.agents = this.stages[this.currentStage].entityList;
 
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
         this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
+        
+        this.playerAgent.readInput("reset");
+        this.agents.push(this.playerAgent);
 
         this.switchMusic(this.stages[this.currentStage].stageMusic);
+        this.stageReset = true;
     },
     
     resetStage : function () {
@@ -137,6 +144,7 @@ GameEngine.prototype = {
         
         //Request to switch to the stage music.
         this.switchMusic(this.stages[this.currentStage].stageMusic);
+        this.stageReset = true;
     },
 
     switchMusic : function (newMusic) {
@@ -223,6 +231,11 @@ GameEngine.prototype = {
     update : function () {
         //Iterate backwards to avoid splice errors.
         for (var i = this.agents.length - 1; i >= 0; i--) {
+            //If the stage has changed or been reset, then we need to restart the current update loop.
+            if (this.stageReset) {
+                this.stageReset = false;
+                break;
+            }
             //If the agent has been flagged for removal, do so; otherwise, update it.
             if (this.agents[i].entity.removeFromWorld) {
                 var removedAgent = this.agents.splice(i, 1)[0];
@@ -646,16 +659,14 @@ GameEngine.prototype.drawRoundedRect = function(x, y, w, h) {
 GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
     this.ctx.save();
-    for (var i = 0; i < this.stages.length; i++) {
-        this.stages[i].drawBackground(this.ctx, this.camera.x);
-    }
+    this.stages[this.currentStage].drawBackground(this.camera.x);
     for (var i = 0; i < this.agents.length; i++) {
         
         if (this.isOnScreen(this.agents[i].entity)) {
             if (typeof this.agents[i].draw === 'function') {
-                this.agents[i].draw(this.camera.x, this.camera.y);
+                this.agents[i].draw(this, this.camera.x, this.camera.y);
             } else {
-                this.agents[i].entity.draw(this.camera.x, this.camera.y);
+                this.agents[i].entity.draw(this, this.camera.x, this.camera.y);
             }
         }
     }
