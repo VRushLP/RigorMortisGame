@@ -87,6 +87,7 @@ AM.queueDownload("./img/enemy/forest boss/forest boss spike 150px.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss platform.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss weak point.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss background.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss statue idle.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss statue active.png");
 AM.queueDownload("./img/other/victory screen.png");
 AM.queueDownload("./img/other/title screen.png");
@@ -108,12 +109,13 @@ AM.downloadAll(function () {
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.TREE_SCROLL_SPEED);
 
-    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
     var graveyard = new backgroundObject(gameEngine, AM, 3101, 1671, "./img/enemy/forest boss/forest boss background.png");
     forestStage.entityList.push(graveyard);
+    var forestBossStatueIdle = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue idle.png");
+    var forestBossStatueActive = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active.png");
+    forestStage.entityList.push(forestBossStatueIdle);
 
-    var forestBossStatue = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active.png");
-    forestStage.entityList.push(forestBossStatue);
+    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
 
     var knight = new Knight(gameEngine, AM, forestStage.spawnX, forestStage.spawnY);
     knight.entity.controllable = true;
@@ -145,6 +147,9 @@ AM.downloadAll(function () {
     var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2250, forestStage);
     var bossSpawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, forestBoss);
     forestStage.entityList.push(bossSpawnTrigger);
+
+    var bossActivateTrigger = new EntitySwitchTrigger(gameEngine, 3149, 2000, 1100, 100, forestBossStatueActive, forestBossStatueIdle);
+    forestStage.entityList.push(bossActivateTrigger);
     
     for (var i = 0; i < 3; i ++) {
         var exitBlock = new Block(gameEngine, AM, 4251, 2101 + i * 50);
