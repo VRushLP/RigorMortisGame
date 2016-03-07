@@ -112,8 +112,16 @@ var getCircularPath = function (radius, sides, speed) {
     var path = [];
     
     for (var i = 0; i < sides; i++) {
-        var hypoLength = sideLength / Math.cos(centralRadian);
-        var oppLength = sideLength / Math.sin(centralRadian);
+        var hypoLength = sideLength / Math.cos(centralRadian * i + 1);
+        var oppLength = sideLength / Math.sin(centralRadian * i + 1);
+        
+        if (hypoLength < oppLength) {
+            path.push({amountX: hypoLength, velocityX: hypoLength / oppLength,
+                       amountY: oppLength, velocityY: 1 - hypoLength / oppLength});
+        } else {
+            path.push({amountX: hypoLength, velocityX: 1 - oppLength / hypoLength,
+                       amountY: oppLength, velocityY: oppLength / hypoLength});
+        }
     }
     
     return path;
