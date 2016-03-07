@@ -11,55 +11,51 @@ var RM_GLOBALS = {
     },
 };
 
-//This should eventually be moved into the data for an individual level
-//Perhaps these could be passed in to levels as we make them and then we can call <StageVar>.playBGM() ?
-//One area of concern is that the way these currently loaded in to the page. It's probably embedded music in the page queueing and finishing that causes the burst of slowdown.
-//I don't mind the magic numbers so much here, since I think they're only used here and they have particular timestamps, but we could make them globals if enough people hate them.
 var BGM = {
    forestLevel : new Howl({
-        urls: ['./snd/bloody_tears.mp3'],
+        src: ['./snd/bloody_tears.mp3'],
         volume: .1,
         loop: true
    }),
 
    forestBoss: new Howl({
-       urls: ['./snd/stronger_monsters.mp3'],
+       src: ['./snd/stronger_monsters.mp3'],
        volume: .1,
        loop: true,
        onend: function () {
-           BGM.forestBoss.pos(10.322); //Skips the intro
+           BGM.forestBoss.seek(10.322); //Skips the intro
        }
    }),
 
    townBoss: new Howl({
-       urls: ['./snd/cornered.mp3'],
+       src: ['./snd/cornered.mp3'],
        volume: .1,
        loop: true,
        onend: function () {
-           BGM.townBoss.pos(7.27); //Skips the intro
+           BGM.townBoss.seek(7.27); //Skips the intro
        }
    }),
 
     castleLevel : new Howl({
-    urls: ['./snd/awake.mp3'],
-    volume: .1,
-    loop: true,
-    onend: function () {
-        BGM.castleLevel.pos(17.93); //Skips the intro
+        src: ['./snd/awake.mp3'],
+        volume: .1,
+        loop: true,
+        onend: function () {
+            BGM.castleLevel.seek(17.93); //Skips the intro
         }
     }),
 
     hellBossFinal: new Howl({
-        urls: ['./snd/megalovania.mp3'],
+        src: ['./snd/megalovania.mp3'],
         volume: .15,
         loop: true,
         onend: function () {
-            BGM.hellBossFinal.pos(1.966);
+            BGM.hellBossFinal.seek(1.966);
         }
     }),
     
     victoryFanfare: new Howl({
-        urls: ['./snd/fanfare.mp3'],
+        src: ['./snd/fanfare.mp3'],
         volume: .15,
         loop: false,
     })
