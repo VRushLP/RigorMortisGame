@@ -101,3 +101,20 @@ Platform.prototype = {
         this.movePatterns.push([amountX, velocityX, amountY, velocityY]);
     }
 }
+
+/**
+  * Return a list of x and y magnitudes that will form a circular path of a given radius.
+  */
+var getCircularPath = function (radius, sides, speed) {
+    var centralAngle = 360.0 / sides;
+    var centralRadian = central_angle * Math.PI / 180;
+    var sideLength = 2 * (radius * Math.sin(centralRadian));
+    var path = [];
+    
+    for (var i = 0; i < sides; i++) {
+        var hypoLength = sideLength / Math.cos(centralRadian);
+        var oppLength = sideLength / Math.sin(centralRadian);
+    }
+    
+    return path;
+}
