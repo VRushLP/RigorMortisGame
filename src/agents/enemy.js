@@ -357,17 +357,14 @@ Archer.prototype = {
         if (this.entity.collidable) {
             var knightPoint = this.game.playerAgent.entity.getCenter();
 
-            var archerPoint = {
-                x: this.entity.x + this.entity.width / 2,
-                y: this.entity.y + this.entity.height / 2
-            };
+            var archerPoint = this.entity.getCenter();
 
             var distanceX = knightPoint.x - archerPoint.x;
             var distanceY = knightPoint.y - archerPoint.y;
 
             var angle = Math.atan2(-distanceY, distanceX);
             var distance = getDistance(archerPoint, knightPoint);
-
+            
             if (distance < this.vision) {
                 if (this.timeDurationNextArrow === ARCHER_ATTR.SHOOTING_TIME) {
                     this.setAnimationFromAngle(angle);
@@ -380,7 +377,15 @@ Archer.prototype = {
             if (this.entity.currentAnimation !== ARCHER_ANIM.IDLE_LEFT && this.entity.currentAnimation !== ARCHER_ANIM.IDLE_RIGHT) {
                 if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
                     this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
-                    var arrow = new Arrow(this, archerPoint.x, archerPoint.y, distanceX, distanceY, angle, this.game);
+
+                    if (this.entity.currentAnimation === ARCHER_ANIM.ATK_DOWN_LEFT ||
+                        this.entity.currentAnimation === ARCHER_ANIM.ATK_STRAIGHT_LEFT ||
+                        this.entity.currentAnimation === ARCHER_ANIM.ATK_UP_LEFT) {
+                        var arrow = new Arrow(archerPoint.x - this.entity.width, archerPoint.y, distanceX, distanceY, angle, this.game);
+                    } else {
+                        var arrow = new Arrow(archerPoint.x + this.entity.width, archerPoint.y, distanceX, distanceY, angle, this.game);
+                    }
+
                     this.game.addAgent(arrow);
                     if (knightPoint.x > this.entity.x) {
                         this.entity.currentAnimation = ARCHER_ANIM.IDLE_RIGHT;
@@ -435,67 +440,34 @@ Archer.prototype = {
         }
     }
 }
-
-function Arrow(source, x, y, distanceX, distanceY, angle, game) {
-    this.source = source;
+//TODO Should be : function Arrow(game, AM, x, y, distanceX, distanceY, angle)
+function Arrow(x, y, distanceX, distanceY, angle, game) {
     this.entity = new Entity(x, y, 25, 5);
     this.game = game;
-    this.entity.x = x - Math.ceil(25 / 2);
-    this.entity.y = y - Math.ceil(5 / 2);
-    this.centerX = x;
-    this.centerY = y;
     this.entity.temporary = true;
 
-    var scale = ARCHER_ATTR.ARROW_SPEED / Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-    this.xVel = distanceX * scale;
-    this.yVel = distanceY * scale;
+    this.xVel = distanceX * ARCHER_ATTR.ARROW_SPEED;
+    this.yVel = distanceY * ARCHER_ATTR.ARROW_SPEED;
     this.angle = angle;
 
-    var arrowAnimation = new Animation(AM.getAsset("./img/enemy/archer.png"), this.entity.width, this.entity.height, 0.2, true);
-    arrowAnimation.addFrame(146, 5);
+    var arrowAnimation = new Animation(this.rotateAndCache(AM.getAsset("./img/enemy/arrow.png")), this.entity.width, this.entity.width, 0.2, true);
+    arrowAnimation.addFrame(0, 0);
     this.entity.animationList.push(arrowAnimation);
 }
 
 Arrow.prototype = {
 
-    obstacleAt: function (x, y) {
-        for (var i = 0; i < this.game.agents.length; i += 1) {
-            var obstacle = this.game.agents[i];
-            if (this !== obstacle && this.source !== obstacle) {
-                if (x + this.entity.width > obstacle.entity.x &&
-                    x < obstacle.entity.x + obstacle.entity.width &&
-                    y + this.entity.height > obstacle.entity.y &&
-                    y < obstacle.entity.y + obstacle.entity.height) {
-                    return obstacle;
-                }
-            }
-        }
-    },
-
     update: function () {
-        var tempX = this.centerX + this.xVel;
-        var tempY = this.centerY + this.yVel;
-        var obstacle = this.obstacleAt(tempX, tempY);
-        if (!obstacle) {
-            this.centerX = tempX;
-            this.centerY = tempY;
-        } else {
-            if (obstacle.entity.controllable) {
-                this.checkListeners(obstacle);
-            }
-            this.entity.removeFromWorld = true;
+        var temp = {
+            x: this.entity.x,
+            y: this.entity.y
         }
-        this.entity.x = this.centerX - Math.ceil(25 / 2);
-        this.entity.y = this.centerY - Math.ceil(25 / 2);
-    },
+        this.game.requestMove(this, this.xVel, this.yVel);
 
-    draw: function (game, cameraX, cameraY) {
-        game.ctx.save();
-        game.ctx.translate(this.entity.x + cameraX, this.entity.y - cameraY + 10);
-        game.ctx.rotate(-this.angle);
-        this.entity.animationList[this.entity.currentAnimation].drawFrame(game.clockTick,
-                            game.ctx, 0, 0);
-        game.ctx.restore();
+        //If the entity didn't actually move, remove it.
+        //if (temp.y === this.entity.y && temp.x === this.entity.x) {
+        //    this.entity.removeFromWorld = true;
+        //}
     },
 
     checkListeners: function (agent) {
@@ -503,6 +475,18 @@ Arrow.prototype = {
             this.game.requestInputSend(agent, "damage", 1);
             this.entity.removeFromWorld = true;
         }
+    },
+
+    rotateAndCache: function (image) {
+        var size = this.entity.width;
+        var offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = size;
+        offscreenCanvas.height = size;
+        var offscreenCtx = offscreenCanvas.getContext('2d');
+        offscreenCtx.translate(size / 2, size / 2);
+        offscreenCtx.rotate(-this.angle);
+        offscreenCtx.drawImage(image, -(image.width / 2), -(image.height / 2));
+        return offscreenCanvas;
     }
 }
 
