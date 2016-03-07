@@ -446,8 +446,9 @@ function Arrow(x, y, distanceX, distanceY, angle, game) {
     this.game = game;
     this.entity.temporary = true;
 
-    this.xVel = distanceX * ARCHER_ATTR.ARROW_SPEED;
-    this.yVel = distanceY * ARCHER_ATTR.ARROW_SPEED;
+    var actualSpeed = ARCHER_ATTR.ARROW_SPEED / Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+    this.xVel = distanceX * actualSpeed;
+    this.yVel = distanceY * actualSpeed;
     this.angle = angle;
 
     var arrowAnimation = new Animation(this.rotateAndCache(AM.getAsset("./img/enemy/arrow.png")), this.entity.width, this.entity.width, 0.2, true);
@@ -465,9 +466,9 @@ Arrow.prototype = {
         this.game.requestMove(this, this.xVel, this.yVel);
 
         //If the entity didn't actually move, remove it.
-        //if (temp.y === this.entity.y && temp.x === this.entity.x) {
-        //    this.entity.removeFromWorld = true;
-        //}
+        if (temp.y === this.entity.y && temp.x === this.entity.x) {
+            this.entity.removeFromWorld = true;
+        }
     },
 
     checkListeners: function (agent) {

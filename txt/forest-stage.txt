@@ -13,9 +13,9 @@
                                     x                                !               x
                                     x      xxxxxxx                   xxx             x
                                     x        x                              xxxx     x
-                                    xxxx     x          *                            x
-                                    x  *     x          *                            x
-                                    x  *                *    xxx        xxx          x
+                                    xxxx     x                                       x
+                                    x        x                                       x
+                                    x                   *    xxx        xxx          x
                                     xxxx                xxx       xxx        xx      x 
                                     x                   x                            x
                                     x      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx       x
