@@ -65,8 +65,8 @@ Platform.prototype = {
                 else return;
             }            
             //Check if the current movement pattern has ended.
-            if (Math.abs(this.lastMoveOriginX - this.entity.x) > this.movePatterns[this.currentMovePattern][0] ||
-                Math.abs(this.lastMoveOriginY - this.entity.y) > this.movePatterns[this.currentMovePattern][2]) {
+            if (Math.abs(this.lastMoveOriginX - this.entity.x) > this.movePatterns[this.currentMovePattern].amountX ||
+                Math.abs(this.lastMoveOriginY - this.entity.y) > this.movePatterns[this.currentMovePattern].amountY) {
                 this.currentMovePattern++;
                 this.lastMoveOriginX = this.entity.x;
                 this.lastMoveOriginY = this.entity.y;
@@ -76,15 +76,15 @@ Platform.prototype = {
             
             if (this.currentMovePattern < this.movePatterns.length) {
                 this.game.requestMove(this, 
-                                             this.movePatterns[this.currentMovePattern][1], 
-                                             this.movePatterns[this.currentMovePattern][3]);
+                                             this.movePatterns[this.currentMovePattern].velocityX, 
+                                             this.movePatterns[this.currentMovePattern].velocityY);
                 
                 //Only vertically drag riding entities downwards. Gravity will take care of the rest.
-                var downwardsDrag = Math.max(0, this.movePatterns[this.currentMovePattern][3]);
+                var downwardsDrag = Math.max(0, this.movePatterns[this.currentMovePattern].velocityY);
                 
                 for (var i = 0; i < agentsToDrag.length; i++) {
                     this.game.requestMove(agentsToDrag[i], 
-                                             this.movePatterns[this.currentMovePattern][1], 
+                                             this.movePatterns[this.currentMovePattern].velocityX, 
                                              downwardsDrag);
                 }
             }
@@ -98,7 +98,8 @@ Platform.prototype = {
       */
     addMovePattern: function (amountX, velocityX, amountY, velocityY) {
         this.entity.moveable = true;
-        this.movePatterns.push([amountX, velocityX, amountY, velocityY]);
+        this.movePatterns.push({amountX: amountX, velocityX: velocityX,
+                               amountY: amountY, velocityY: velocityY});
     }
 }
 
