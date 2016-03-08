@@ -54,6 +54,8 @@ function GameEngine() {
     this.agents = [];
     this.removedAgents = [];
 
+    this.jukebox = new Map();
+
     this.currentMusic = null;
     this.healthBarVisible = false;
     this.stageReset = false;
@@ -65,7 +67,6 @@ function GameEngine() {
 
     this.DEBUG_MODE = 1;
 }
-
 GameEngine.prototype = {
 
     camera: {
@@ -147,15 +148,18 @@ GameEngine.prototype = {
         this.stageReset = true;
     },
 
-    switchMusic : function (newMusic) {
+    switchMusic: function (newMusic) {
+        if (!this.jukebox.has(newMusic._src)) {
+            this.jukebox.set(newMusic._src, newMusic);
+        }
+
         if (this.music !== null && typeof(this.music) !== "undefined") {
             if (this.music === newMusic) return; //Do not restart if the song is already playing.
-            else this.music.stop();
+            else this.jukebox.get(this.music._src).stop();
         }
-        this.music = newMusic;
-        this.music.play();
+        this.music = this.jukebox.get(newMusic._src);
+        this.jukebox.get(newMusic._src).play();
     },
-
 
      /*****************
      * Input Handling *
