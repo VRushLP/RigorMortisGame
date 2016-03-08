@@ -6,6 +6,7 @@ var BLOCKS_GLOBALS = {
 
 function Platform(game, AM, x, y, width, height, stageType) {
     this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH * width, BLOCKS_GLOBALS.HEIGHT * height);
+    this.entity.moveable = true;
     this.game = game;
     this.entity.pushesOnly = true;
     
@@ -63,10 +64,11 @@ Platform.prototype = {
             if (this.currentMovePattern > this.movePatterns.length - 1) {
                 if (this.loopMovePatterns) this.currentMovePattern = 0;
                 else return;
-            }            
+            }    
+
             //Check if the current movement pattern has ended.
-            if (Math.abs(this.lastMoveOriginX - this.entity.x) > this.movePatterns[this.currentMovePattern].amountX ||
-                Math.abs(this.lastMoveOriginY - this.entity.y) > this.movePatterns[this.currentMovePattern].amountY) {
+            if (Math.abs(this.lastMoveOriginX - this.entity.x) >= this.movePatterns[this.currentMovePattern].amountX - 0.0001 &&
+                Math.abs(this.lastMoveOriginY - this.entity.y) >= this.movePatterns[this.currentMovePattern].amountY - 0.0001) {
                 this.currentMovePattern++;
                 this.lastMoveOriginX = this.entity.x;
                 this.lastMoveOriginY = this.entity.y;
@@ -75,17 +77,27 @@ Platform.prototype = {
             var agentsToDrag = this.game.getTopCollisions(this);
             
             if (this.currentMovePattern < this.movePatterns.length) {
-                this.game.requestMove(this, 
-                                             this.movePatterns[this.currentMovePattern].velocityX, 
-                                             this.movePatterns[this.currentMovePattern].velocityY);
+                var velocityX = this.movePatterns[this.currentMovePattern].velocityX;
+                var velocityY = this.movePatterns[this.currentMovePattern].velocityY;
+                var amountX = this.movePatterns[this.currentMovePattern].amountX;
+                var amountY = this.movePatterns[this.currentMovePattern].amountY;
+                
+                var adjustedX = Math.min( Math.abs(velocityX), 
+                                       amountX - Math.abs(this.lastMoveOriginX - this.entity.x) );
+                var adjustedY = Math.min( Math.abs(velocityY),
+                                       amountY - Math.abs(this.lastMoveOriginY - this.entity.y) );
+                
+                if (velocityX < 0) adjustedX *= -1;
+                if (velocityY < 0) adjustedY *= -1;
+                this.game.requestMove(this, adjustedX, 0);
+                this.game.requestMove(this, 0, adjustedY);
                 
                 //Only vertically drag riding entities downwards. Gravity will take care of the rest.
-                var downwardsDrag = Math.max(0, this.movePatterns[this.currentMovePattern].velocityY);
+                var downwardsDrag = Math.max(0, adjustedY);
                 
                 for (var i = 0; i < agentsToDrag.length; i++) {
-                    this.game.requestMove(agentsToDrag[i], 
-                                             this.movePatterns[this.currentMovePattern].velocityX, 
-                                             downwardsDrag);
+                    this.game.requestMove(agentsToDrag[i], adjustedX, 0);
+                    this.game.requestMove(agentsToDrag[i], 0, downwardsDrag);
                 }
             }
         }
@@ -103,27 +115,54 @@ Platform.prototype = {
     }
 }
 
+
 /**
   * Return a list of x and y magnitudes that will form a circular path of a given radius.
+  * sides: The number of sides of the polygon path we are creating. Higher means more circular.
   */
-var getCircularPath = function (radius, sides, speed) {
+Platform.getCircularPath = function (radius, sides, speed) {
     var centralAngle = 360.0 / sides;
-    var centralRadian = central_angle * Math.PI / 180;
+    var centralRadian = centralAngle * Math.PI / 180;
     var sideLength = 2 * (radius * Math.sin(centralRadian));
     var path = [];
-    
+
     for (var i = 0; i < sides; i++) {
-        var hypoLength = sideLength / Math.cos(centralRadian * i + 1);
-        var oppLength = sideLength / Math.sin(centralRadian * i + 1);
+        var adjLength = Math.cos(centralRadian * (i + 1)) * sideLength;
+        var oppLength = Math.sin(centralRadian * (i + 1)) * sideLength;
         
-        if (hypoLength < oppLength) {
-            path.push({amountX: hypoLength, velocityX: hypoLength / oppLength,
-                       amountY: oppLength, velocityY: 1 - hypoLength / oppLength});
-        } else {
-            path.push({amountX: hypoLength, velocityX: 1 - oppLength / hypoLength,
-                       amountY: oppLength, velocityY: oppLength / hypoLength});
-        }
+        var amountX = adjLength;
+        var amountY = oppLength;
+        var velocityX = (speed / sideLength) * amountX;
+        var velocityY = (speed / sideLength) * amountY;
+        
+        path.push({amountX: Math.abs(amountX), velocityX: velocityX,
+                   amountY: Math.abs(amountY), velocityY: velocityY});
     }
-    
     return path;
+},
+
+Platform.addPlatformsToPath = function (path, platforms) {
+    for (var i = 0; i < platforms.length; i++) {
+        var startIndex = path.length / platforms.length * i;
+        var currentIndex = startIndex;
+
+        for (var j = 0; j < path.length; j++) {
+            platforms[i].movePatterns.push(path[currentIndex]);
+            currentIndex++;
+            if (currentIndex === path.length) currentIndex = 0;
+
+            if (j < startIndex) {
+                var signX, signY;
+                path[j].velocityX > 0 ? signX = 1 : signX = -1;
+                path[j].velocityY > 0 ? signY = 1 : signY = -1;
+                
+                
+                platforms[i].entity.originX += path[j].amountX * signX;
+                platforms[i].entity.originY += path[j].amountY * signY;
+            }
+        }
+
+        platforms[i].entity.x = platforms[i].entity.originX;
+        platforms[i].entity.y = platforms[i].entity.originY;
+    }
 }
