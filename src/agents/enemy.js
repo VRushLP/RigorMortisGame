@@ -22,7 +22,9 @@ var ARCHER_ATTR = {
     STARTING_HEALTH: 1,
     SHOOTING_TIME: 120,
     INVULNERABILITY_FRAMES: 40,
-    ARROW_SPEED: 8
+    ARROW_SPEED: 8,
+    ARROW_LEFT_OFFSET: -10,
+    ARROW_RIGHT_OFFSET: 10
 }
 
 var ARCHER_ANIM = {
@@ -381,9 +383,9 @@ Archer.prototype = {
                     if (this.entity.currentAnimation === ARCHER_ANIM.ATK_DOWN_LEFT ||
                         this.entity.currentAnimation === ARCHER_ANIM.ATK_STRAIGHT_LEFT ||
                         this.entity.currentAnimation === ARCHER_ANIM.ATK_UP_LEFT) {
-                        var arrow = new Arrow(archerPoint.x - this.entity.width, archerPoint.y, distanceX, distanceY, angle, this.game);
+                        var arrow = new Arrow(archerPoint.x - ARCHER_ATTR.ARROW_LEFT_OFFSET, archerPoint.y, distanceX, distanceY, angle, this.game, this);
                     } else {
-                        var arrow = new Arrow(archerPoint.x + this.entity.width, archerPoint.y, distanceX, distanceY, angle, this.game);
+                        var arrow = new Arrow(archerPoint.x + ARCHER_ATTR.ARROW_RIGHT_OFFSET, archerPoint.y, distanceX, distanceY, angle, this.game, this);
                     }
 
                     this.game.addAgent(arrow);
@@ -441,11 +443,12 @@ Archer.prototype = {
     }
 }
 //TODO Should be : function Arrow(game, AM, x, y, distanceX, distanceY, angle)
-function Arrow(x, y, distanceX, distanceY, angle, game) {
-    this.entity = new Entity(x, y, 25, 5);
+function Arrow(x, y, distanceX, distanceY, angle, game, callback) {
     this.game = game;
+    this.entity = new Entity(x, y, 25, 5);
     this.entity.temporary = true;
     this.entity.moveable = true;
+    this.entity.nonColliders = [callback.entity];
 
     var actualSpeed = ARCHER_ATTR.ARROW_SPEED / Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     this.xVel = distanceX * actualSpeed;
