@@ -141,27 +141,34 @@ Platform.getCircularPath = function (radius, sides, speed) {
     return path;
 },
 
+/**
+  * Inserts an array of platforms into a pre-existing path,
+  * with as much space existing between each platform as possible.
+  */
 Platform.addPlatformsToPath = function (path, platforms) {
     for (var i = 0; i < platforms.length; i++) {
         var startIndex = path.length / platforms.length * i;
         var currentIndex = startIndex;
 
         for (var j = 0; j < path.length; j++) {
+            //Re-construct the path by starting from some index, going until the end,
+            //then restarting and going until we get to the index again.
             platforms[i].movePatterns.push(path[currentIndex]);
             currentIndex++;
             if (currentIndex === path.length) currentIndex = 0;
 
-            if (j < startIndex) {
+            //Move the platform's start coordinates along the projected path.
+            if (j <= startIndex) {
                 var signX, signY;
                 path[j].velocityX > 0 ? signX = 1 : signX = -1;
                 path[j].velocityY > 0 ? signY = 1 : signY = -1;
-                
                 
                 platforms[i].entity.originX += path[j].amountX * signX;
                 platforms[i].entity.originY += path[j].amountY * signY;
             }
         }
 
+        //Set the current point of the platforms to be the current point.
         platforms[i].entity.x = platforms[i].entity.originX;
         platforms[i].entity.y = platforms[i].entity.originY;
     }
