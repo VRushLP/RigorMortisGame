@@ -17,7 +17,7 @@
                                     x        x                                       x
                                     x                   *    xxx        xxx          x
                                     xxxx                xxx       xxx        xx      x 
-                                    x                   x                            x
+                                    x           @       x                            x
                                     x      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx       x
                                     x        x                                       x
                                     x   x    x                                    xxxx
@@ -39,7 +39,7 @@
          xx   x x          !   x                             x                       x
               x xxxxxxxxxxxxxxxx                             x                       x
               x                                              x                       x
-@    x     !  x                                              x                       xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+     x     !  x                                              x                       xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 xxxxxxxxxxxxxxx                                              x                       
                                                              x                       
                                                              x                            

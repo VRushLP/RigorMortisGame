@@ -445,6 +445,7 @@ function Arrow(x, y, distanceX, distanceY, angle, game) {
     this.entity = new Entity(x, y, 25, 5);
     this.game = game;
     this.entity.temporary = true;
+    this.entity.moveable = true;
 
     var actualSpeed = ARCHER_ATTR.ARROW_SPEED / Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     this.xVel = distanceX * actualSpeed;
@@ -463,13 +464,7 @@ Arrow.prototype = {
             x: this.entity.x,
             y: this.entity.y
         }
-        console.log(this.game.findNearestCollision(this, this.entity.width, this.entity.width));
         this.game.requestMove(this, this.xVel, this.yVel);
-
-        //If the entity didn't actually move, remove it.
-        if (temp.y === this.entity.y && temp.x === this.entity.x) {
-            this.entity.removeFromWorld = true;
-        }
     },
 
     checkListeners: function (agent) {
@@ -477,6 +472,11 @@ Arrow.prototype = {
             this.game.requestInputSend(agent, "damage", 1);
             this.entity.removeFromWorld = true;
         }
+        
+        //If the entity collides, remove it from the world.
+        if (!agent.entity.intangible) {
+            this.entity.removeFromWorld = true;
+        }        
     },
 
     rotateAndCache: function (image) {
