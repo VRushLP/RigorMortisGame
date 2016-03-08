@@ -159,6 +159,18 @@ AM.downloadAll(function () {
     var castleStage = new Stage(gameEngine, STAGE_TYPE.CASTLE, BGM.castleLevel);
     castleStage.parseLevelFile(AM.getAsset("./txt/castle-stage.txt").split("\n"), AM);
     
+    var testPlatform = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testPlatform2 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testPlatform3 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testPlatform4 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testCirclePath = Platform.getCircularPath(100, 40, 2);
+    var testPlatformArray = [testPlatform, testPlatform2, testPlatform3, testPlatform4];
+    Platform.addPlatformsToPath(testCirclePath, testPlatformArray);
+    castleStage.entityList.push(testPlatform);
+    castleStage.entityList.push(testPlatform2);
+    castleStage.entityList.push(testPlatform3);
+    castleStage.entityList.push(testPlatform4);
+    
     gameEngine.addStage(forestStage);
     gameEngine.addStage(castleStage);
 
