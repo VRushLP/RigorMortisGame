@@ -463,6 +463,7 @@ Arrow.prototype = {
             x: this.entity.x,
             y: this.entity.y
         }
+        console.log(this.game.findNearestCollision(this, this.entity.width, this.entity.width));
         this.game.requestMove(this, this.xVel, this.yVel);
 
         //If the entity didn't actually move, remove it.
