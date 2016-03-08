@@ -506,6 +506,26 @@ Arrow.prototype = {
     }
 }
 
+function HealthPotion(game, AM, x, y) {
+    this.entity = new Entity(x, y, 10, 10);
+    this.game = game;
+}
+
+HealthPotion.prototype = {
+
+    update : function(){
+
+    },
+
+    checkListeners: function (agent) {
+        if (agent.entity.controllable) {
+            this.game.requestInputSend(agent, "heal");
+            this.entity.removeFromWorld = true;
+        }
+    }
+}
+
+
 function getDistance(myPoint, theirPoint) {
     return Math.sqrt(Math.pow((myPoint.x - theirPoint.x), 2) + Math.pow((myPoint.y - theirPoint.y), 2));
 }
