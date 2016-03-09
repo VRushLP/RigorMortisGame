@@ -388,6 +388,15 @@ GameEngine.prototype = {
             if (other === entity) continue;
             //Skip if this entity is collidable.
             if (!other.collidable) continue;
+            
+            //Skip if this entity is prespecified to not collide with the moving entity.
+            var nonColliderDetected = false;
+            if (typeof(entity.nonColliders) !== 'undefined' && entity.nonColliders.length > 0) {
+                for (var j = 0; j < entity.nonColliders.length; j++) {
+                    if (other === entity.nonColliders[j]) nonColliderDetected = true;
+                }
+            }
+            if (nonColliderDetected) continue;
 
             var xMoveValid = true;
             var yMoveValid = true;
