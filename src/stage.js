@@ -134,12 +134,46 @@ Stage.prototype = {
     },
     
     placeForestBlock: function (blockArray, row, column) {
+        var blockAbove, blockLeft, blockRight;
+        var blockDepth = 0;
+        
+        if (typeof(blockArray[row - 1]) !== 'undefined') {
+            blockAbove = blockArray[row - 1][column];
+        }
+        var blockLeft = blockArray[row][column - 1];
+        var blockRight = blockArray[row][column + 1];
+        
+        //If the block has a block above it, then it is not a surface block.
+        if (typeof(blockAbove) !== 'undefined' && blockAbove.exists) {
+            blockDepth = 1;
+            
+            //If the block has blocks to its left and right, then set its depth to be
+            //one greater than the block above it.
+            if (typeof(blockLeft) !== 'undefined' && blockLeft.exists &&
+                typeof(blockRight) !== 'undefined' && blockRight.exists) {
+                blockDepth = blockAbove.depth + 1;
+            }
+        }
+        
         this.entityList.push(new Block(this.gameEngine, AM,
-                                               column * 50, row * 50, STAGE_TYPE.FOREST)); 
+                                               column * 50, row * 50, STAGE_TYPE.FOREST, blockDepth)); 
     },
     
     placeCastleBlock: function (blockArray, row, column) {
+        
+        var blockAbove;
+        if (typeof(blockArray[row - 1]) !== 'undefined') {
+            blockAbove = blockArray[row - 1][column];
+        }
+        
+        //If the block has a block above it, then it has a depth of 1.
+        if (typeof(blockAbove) !== 'undefined' && blockAbove.exists) {
+            var blockDepth = 1;
+        } else {
+            var blockDepth = 0;
+        }
+        
         this.entityList.push(new Block(this.gameEngine, AM,
-                                               column * 50, row * 50, STAGE_TYPE.CASTLE)); 
+                                               column * 50, row * 50, STAGE_TYPE.CASTLE, blockDepth)); 
     }
 }

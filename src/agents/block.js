@@ -4,7 +4,18 @@ var BLOCKS_GLOBALS = {
     FRAME_DURATION: 1,
 }
 
-function Block(game, AM, x, y, stageType) {
+var MAX_DEPTH = {
+    FOREST: 5,
+    CASTLE: 1
+}
+
+var BLOCK_EDGE  = {
+    NONE: 0,
+    LEFT: 1,
+    RIGHT: 2
+}
+
+function Block(game, AM, x, y, stageType, depth) {
     this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
     var NormalState;
     switch (stageType) {
