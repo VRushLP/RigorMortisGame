@@ -636,6 +636,7 @@ GameEngine.prototype.loop = function () {
             if(this.pressDown) this.agents[i].readInput("down");
             if(this.pressUp) this.agents[i].readInput("up");
             if(this.pressLeft && !this.pressRight) this.agents[i].readInput("left");
+            if(this.pressLeft && this.pressRight) this.agents[i].readInput("none");
             if(this.pressN) this.agents[i].readInput('n');
             if(this.pressSpace) this.agents[i].readInput("space");
 
