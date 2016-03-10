@@ -338,6 +338,10 @@ Knight.prototype.readInput = function(input, modifier) {
             this.entity.removeFromWorld = true;
         }
     }
+
+    if (input === "heal") {
+        this.health = KNIGHT_ATTR.STARTING_HEALTH;
+    }
     
     if (input === "reset") {
         this.health = KNIGHT_ATTR.STARTING_HEALTH;

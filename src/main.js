@@ -75,6 +75,8 @@ AM.queueDownload("./img/forest-stage/forest block.png");
 AM.queueDownload("./img/castle-stage/castle block.png");
 AM.queueDownload("./img/enemy/chaser.png");
 AM.queueDownload("./img/enemy/archer.png");
+AM.queueDownload("./img/enemy/arrow.png");
+AM.queueDownload("./img/enemy/potion.png");
 AM.queueDownload("./img/enemy/wisp.png");
 AM.queueDownload("./img/enemy/death anim.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss spike 50px.png");
@@ -85,6 +87,9 @@ AM.queueDownload("./img/enemy/forest boss/forest boss weak point.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss background.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss statue idle.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss statue active.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss statue active 1.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss statue active 2.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss statue active 3.png");
 AM.queueDownload("./img/other/victory screen.png");
 AM.queueDownload("./img/other/title screen.png");
 
@@ -107,8 +112,16 @@ AM.downloadAll(function () {
 
     var graveyard = new backgroundObject(gameEngine, AM, 3101, 1671, "./img/enemy/forest boss/forest boss background.png");
     forestStage.entityList.push(graveyard);
+    
     var forestBossStatueIdle = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue idle.png");
     var forestBossStatueActive = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active.png");
+    var forestBossStatueActive1 = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active 1.png");
+    var forestBossStatueActive2 = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active 2.png");
+    var forestBossStatueActive3 = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active 3.png");
+    var forestBossStates = [forestBossStatueIdle, forestBossStatueActive, 
+                            forestBossStatueActive1, forestBossStatueActive2,
+                            forestBossStatueActive3];
+    
     forestStage.entityList.push(forestBossStatueIdle);
 
     forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
@@ -140,12 +153,13 @@ AM.downloadAll(function () {
     forestStage.entityList.push(bossMusicTrigger);
     forestStage.entityList.push(spawnTrigger);
     
-    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2250, forestStage);
+    var bossStateSwitchTrigger = new EntitySwitchTrigger(gameEngine, 3149, 2000, 1100, 100, forestBossStates);
+    
+    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2250, forestStage, bossStateSwitchTrigger);
     var bossSpawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, forestBoss);
+    
     forestStage.entityList.push(bossSpawnTrigger);
-
-    var bossActivateTrigger = new EntitySwitchTrigger(gameEngine, 3149, 2000, 1100, 100, forestBossStatueActive, forestBossStatueIdle);
-    forestStage.entityList.push(bossActivateTrigger);
+    forestStage.entityList.push(bossStateSwitchTrigger);
     
     for (var i = 0; i < 3; i ++) {
         var exitBlock = new Block(gameEngine, AM, 4251, 2101 + i * 50);
@@ -158,6 +172,18 @@ AM.downloadAll(function () {
     
     var castleStage = new Stage(gameEngine, STAGE_TYPE.CASTLE, BGM.castleLevel);
     castleStage.parseLevelFile(AM.getAsset("./txt/castle-stage.txt").split("\n"), AM);
+    
+    var testPlatform = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testPlatform2 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testPlatform3 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testPlatform4 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testCirclePath = Platform.getCircularPath(100, 40, 2);
+    var testPlatformArray = [testPlatform, testPlatform2, testPlatform3, testPlatform4];
+    Platform.addPlatformsToPath(testCirclePath, testPlatformArray);
+    castleStage.entityList.push(testPlatform);
+    castleStage.entityList.push(testPlatform2);
+    castleStage.entityList.push(testPlatform3);
+    castleStage.entityList.push(testPlatform4);
     
     gameEngine.addStage(forestStage);
     gameEngine.addStage(castleStage);

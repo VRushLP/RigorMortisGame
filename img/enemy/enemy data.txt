@@ -29,7 +29,7 @@ run right
 	0, 118
 	3 frames
 ----------
-archer.png (INCLUDES ARROW)
+archer.png (NO LONGER INCLUDES ARROW)
 ----------
 all sprites - (73, 64)
 idle left
