@@ -112,6 +112,12 @@ Platform.prototype = {
         this.entity.moveable = true;
         this.movePatterns.push({amountX: amountX, velocityX: velocityX,
                                amountY: amountY, velocityY: velocityY});
+    },
+    
+    readInput : function (input) {
+        if (input === "reset") {
+            this.currentMovePattern = 0;
+        }
     }
 }
 
