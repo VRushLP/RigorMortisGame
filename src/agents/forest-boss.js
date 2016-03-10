@@ -74,11 +74,12 @@ var FB_ATTR = {
  * As the player strikes the core, the Forest Boss will alternate which of its patterns
  * it utilizes, and send signals to its arms accordingly.
  */
-function ForestBoss(game, AM, x, y, stage) {
+function ForestBoss(game, AM, x, y, stage, stateTrigger) {
     this.entity = new Entity(x, y, 0, 0);
     this.game = game;
     this.entity.collidable = false;
     this.exitAgents = [];
+    this.stateTrigger = stateTrigger;
 
     //Set the default states of the forest boss.
     this.speed = 0;
@@ -269,16 +270,22 @@ ForestBoss.prototype = {
             this.retreatPattern();
         }
         
-        if (this.health === FB_ATTR.PHASE_1_HEALTH) this.phase = 1;
-        if (this.health === FB_ATTR.PHASE_2_HEALTH) this.phase = 2;
-
-        if (this.phase === 1) this.currentAttackAnim = FB_ANIM.NORMAL;
-        if (this.phase === 2) this.currentAttackAnim = FB_ANIM.WIDE;
+        if (this.health === FB_ATTR.PHASE_1_HEALTH) {
+            this.phase = 1;
+            this.stateTrigger.readInput("advance");
+            this.currentAttackAnim = FB_ANIM.NORMAL;
+        } 
+        if (this.health === FB_ATTR.PHASE_2_HEALTH) {
+            this.phase = 2;
+            this.stateTrigger.readInput("advance");
+            this.currentAttackAnim = FB_ANIM.WIDE;
+        } 
     },
     
     //Remove the Forest Boss arms, core, and the controller from world and switch the music back..
     selfDestruct: function () {
         var gameEngine = this.game;
+        this.stateTrigger.readInput("advance");
         for (var i = 0; i < this.arms.length; i++) {
             this.arms[i].entity.removeFromWorld = true;
         }

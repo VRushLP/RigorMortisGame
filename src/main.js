@@ -11,55 +11,51 @@ var RM_GLOBALS = {
     },
 };
 
-//This should eventually be moved into the data for an individual level
-//Perhaps these could be passed in to levels as we make them and then we can call <StageVar>.playBGM() ?
-//One area of concern is that the way these currently loaded in to the page. It's probably embedded music in the page queueing and finishing that causes the burst of slowdown.
-//I don't mind the magic numbers so much here, since I think they're only used here and they have particular timestamps, but we could make them globals if enough people hate them.
 var BGM = {
    forestLevel : new Howl({
-        urls: ['./snd/bloody_tears.mp3'],
+        src: ['./snd/bloody_tears.mp3'],
         volume: .1,
         loop: true
    }),
 
    forestBoss: new Howl({
-       urls: ['./snd/stronger_monsters.mp3'],
-       volume: .1,
-       loop: true,
-       //onend: function () {
-       //    BGM.forestBoss.pos(10.322); //Skips the intro
-       //}
-   }),
-
-   townBoss: new Howl({
-       urls: ['./snd/cornered.mp3'],
+       src: ['./snd/stronger_monsters.mp3'],
        volume: .1,
        loop: true,
        onend: function () {
-           BGM.townBoss.pos(7.27); //Skips the intro
+           BGM.forestBoss.seek(10.322); //Skips the intro
+       }
+   }),
+
+   townBoss: new Howl({
+       src: ['./snd/cornered.mp3'],
+       volume: .1,
+       loop: true,
+       onend: function () {
+           BGM.townBoss.seek(7.27); //Skips the intro
        }
    }),
 
     castleLevel : new Howl({
-    urls: ['./snd/awake.mp3'],
-    volume: .1,
-    loop: true,
-    onend: function () {
-        BGM.castleLevel.pos(17.93); //Skips the intro
+        src: ['./snd/awake.mp3'],
+        volume: .1,
+        loop: true,
+        onend: function () {
+            BGM.castleLevel.seek(17.93); //Skips the intro
         }
     }),
 
     hellBossFinal: new Howl({
-        urls: ['./snd/megalovania.mp3'],
+        src: ['./snd/megalovania.mp3'],
         volume: .15,
         loop: true,
         onend: function () {
-            BGM.hellBossFinal.pos(1.966);
+            BGM.hellBossFinal.seek(1.966);
         }
     }),
     
     victoryFanfare: new Howl({
-        urls: ['./snd/fanfare.mp3'],
+        src: ['./snd/fanfare.mp3'],
         volume: .15,
         loop: false,
     })
@@ -79,6 +75,7 @@ AM.queueDownload("./img/forest-stage/forest block.png");
 AM.queueDownload("./img/castle-stage/castle block.png");
 AM.queueDownload("./img/enemy/chaser.png");
 AM.queueDownload("./img/enemy/archer.png");
+AM.queueDownload("./img/enemy/arrow.png");
 AM.queueDownload("./img/enemy/wisp.png");
 AM.queueDownload("./img/enemy/death anim.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss spike 50px.png");
@@ -89,6 +86,9 @@ AM.queueDownload("./img/enemy/forest boss/forest boss weak point.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss background.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss statue idle.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss statue active.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss statue active 1.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss statue active 2.png");
+AM.queueDownload("./img/enemy/forest boss/forest boss statue active 3.png");
 AM.queueDownload("./img/other/victory screen.png");
 AM.queueDownload("./img/other/title screen.png");
 
@@ -111,8 +111,16 @@ AM.downloadAll(function () {
 
     var graveyard = new backgroundObject(gameEngine, AM, 3101, 1671, "./img/enemy/forest boss/forest boss background.png");
     forestStage.entityList.push(graveyard);
+    
     var forestBossStatueIdle = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue idle.png");
     var forestBossStatueActive = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active.png");
+    var forestBossStatueActive1 = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active 1.png");
+    var forestBossStatueActive2 = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active 2.png");
+    var forestBossStatueActive3 = new backgroundObject(gameEngine, AM, 3351, 1701, "./img/enemy/forest boss/forest boss statue active 3.png");
+    var forestBossStates = [forestBossStatueIdle, forestBossStatueActive, 
+                            forestBossStatueActive1, forestBossStatueActive2,
+                            forestBossStatueActive3];
+    
     forestStage.entityList.push(forestBossStatueIdle);
 
     forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
@@ -144,12 +152,13 @@ AM.downloadAll(function () {
     forestStage.entityList.push(bossMusicTrigger);
     forestStage.entityList.push(spawnTrigger);
     
-    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2250, forestStage);
+    var bossStateSwitchTrigger = new EntitySwitchTrigger(gameEngine, 3149, 2000, 1100, 100, forestBossStates);
+    
+    var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2250, forestStage, bossStateSwitchTrigger);
     var bossSpawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, forestBoss);
+    
     forestStage.entityList.push(bossSpawnTrigger);
-
-    var bossActivateTrigger = new EntitySwitchTrigger(gameEngine, 3149, 2000, 1100, 100, forestBossStatueActive, forestBossStatueIdle);
-    forestStage.entityList.push(bossActivateTrigger);
+    forestStage.entityList.push(bossStateSwitchTrigger);
     
     for (var i = 0; i < 3; i ++) {
         var exitBlock = new Block(gameEngine, AM, 4251, 2101 + i * 50);
@@ -162,6 +171,18 @@ AM.downloadAll(function () {
     
     var castleStage = new Stage(gameEngine, STAGE_TYPE.CASTLE, BGM.castleLevel);
     castleStage.parseLevelFile(AM.getAsset("./txt/castle-stage.txt").split("\n"), AM);
+    
+    var testPlatform = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testPlatform2 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testPlatform3 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testPlatform4 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.FOREST);
+    var testCirclePath = Platform.getCircularPath(100, 40, 2);
+    var testPlatformArray = [testPlatform, testPlatform2, testPlatform3, testPlatform4];
+    Platform.addPlatformsToPath(testCirclePath, testPlatformArray);
+    castleStage.entityList.push(testPlatform);
+    castleStage.entityList.push(testPlatform2);
+    castleStage.entityList.push(testPlatform3);
+    castleStage.entityList.push(testPlatform4);
     
     gameEngine.addStage(forestStage);
     gameEngine.addStage(castleStage);

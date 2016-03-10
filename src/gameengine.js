@@ -54,6 +54,9 @@ function GameEngine() {
     this.agents = [];
     this.removedAgents = [];
 
+    this.jukebox = new Map();
+    this.muted = false;
+
     this.currentMusic = null;
     this.healthBarVisible = false;
     this.stageReset = false;
@@ -65,7 +68,6 @@ function GameEngine() {
 
     this.DEBUG_MODE = 1;
 }
-
 GameEngine.prototype = {
 
     camera: {
@@ -147,15 +149,18 @@ GameEngine.prototype = {
         this.stageReset = true;
     },
 
-    switchMusic : function (newMusic) {
+    switchMusic: function (newMusic) {
+        if (!this.jukebox.has(newMusic._src)) {
+            this.jukebox.set(newMusic._src, newMusic);
+        }
+
         if (this.music !== null && typeof(this.music) !== "undefined") {
             if (this.music === newMusic) return; //Do not restart if the song is already playing.
-            else this.music.stop();
+            else this.jukebox.get(this.music._src).stop();
         }
-        this.music = newMusic;
-        this.music.play();
+        this.music = this.jukebox.get(newMusic._src);
+        this.jukebox.get(newMusic._src).play();
     },
-
 
      /*****************
      * Input Handling *
@@ -213,6 +218,9 @@ GameEngine.prototype = {
                     break;
                 case 32: //SPACE
                     that.pressSpace = false;
+                    break;
+                case 77: //M;
+                    Howler.mute(that.muted = !that.muted);
                     break;
             }
             //console.log(e.which);
@@ -384,6 +392,15 @@ GameEngine.prototype = {
             if (other === entity) continue;
             //Skip if this entity is collidable.
             if (!other.collidable) continue;
+            
+            //Skip if this entity is prespecified to not collide with the moving entity.
+            var nonColliderDetected = false;
+            if (typeof(entity.nonColliders) !== 'undefined' && entity.nonColliders.length > 0) {
+                for (var j = 0; j < entity.nonColliders.length; j++) {
+                    if (other === entity.nonColliders[j]) nonColliderDetected = true;
+                }
+            }
+            if (nonColliderDetected) continue;
 
             var xMoveValid = true;
             var yMoveValid = true;
