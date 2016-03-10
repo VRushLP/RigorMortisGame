@@ -185,8 +185,8 @@ AM.downloadAll(function () {
     castleStage.entityList.push(testPlatform3);
     castleStage.entityList.push(testPlatform4);
     
-    gameEngine.addStage(castleStage);
     gameEngine.addStage(forestStage);
+    gameEngine.addStage(castleStage);
 
     gameEngine.playerAgent = knight;
     gameEngine.cameraAgent = knight;
