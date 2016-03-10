@@ -190,17 +190,23 @@ Stage.prototype = {
     },
     
     equalizeForestBlocks: function (blockArray, row, column) {
-        var blockLeft = blockArray[row][column - 1];
-        var blockRight = blockArray[row][column + 1];
         var currentBlock = blockArray[row][column];
         
         if (currentBlock.depth > 1 && column != 0) {
+            var blockAbove = blockArray[row - 1][column];
+            var blockLeft = blockArray[row][column - 1];
+            var blockRight = blockArray[row][column + 1];
+            
             if (blockLeft.depth < currentBlock.depth && blockRight.depth < currentBlock.depth) {
                 currentBlock.depth = Math.min(blockLeft.depth, blockRight.depth);
             }
             if (blockLeft.depth === 0 || blockRight.depth === 0) {
                 currentBlock.depth = 1;
             }
+            if (blockAbove.depth === 2) currentBlock.depth = 3;
+            if (blockAbove.depth === 1 && currentBlock.depth === 3) currentBlock.depth = 2;
+            if (blockAbove.depth === 3 && currentBlock.depth === 5) currentBlock.depth = 4;
+            if (currentBlock.depth - blockAbove.depth > 1) currentBlock = blockAbove.depth - 1;
         }
     },
     
