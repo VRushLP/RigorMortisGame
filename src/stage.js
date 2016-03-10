@@ -22,12 +22,15 @@ function Stage(gameEngine, stageType, music) {
     switch (stageType) {
         case (STAGE_TYPE.FOREST):
             this.placeBlock = this.placeForestBlock;
+            this.equalizeBlocks = this.equalizeForestBlocks;
             break;
         case (STAGE_TYPE.CASTLE):
             this.placeBlock = this.placeCastleBlock;
+            this.equalizeBlocks = this.equalizeCastleBlocks;
             break;
         default:
             this.placeBlocks = this.placeForestBlock;
+            this.equalizeBlocks = this.equalizeForestBlocks;
     }
 }
 
@@ -123,7 +126,7 @@ Stage.prototype = {
 
         this.stageHeight = currentY + 50;
         
-        //Scan through the loaded block array and place the blocks.
+        //Scan through the loaded block array and set the block depths.
         for (var row = 0; row < blockArray.length; row++) {
             for (var column = 0; column < blockArray[row].length; column++) {
                 if (blockArray[row][column].exists) {
@@ -131,11 +134,25 @@ Stage.prototype = {
                 }
             }
         }
+        
+        //Scan through the loaded block array and equalize the blocks. Then place them.
+        for (var row = 0; row < blockArray.length; row++) {
+            for (var column = 0; column < blockArray[row].length; column++) {
+                var currentBlock = blockArray[row][column];
+                if (currentBlock.exists) {
+                    this.equalizeBlocks(blockArray, row, column);                  
+                    
+                    this.entityList.push(new Block(this.gameEngine, AM, column * 50,
+                                        row * 50, this.stageType, currentBlock.depth)); 
+                }
+            }
+        }
     },
     
     placeForestBlock: function (blockArray, row, column) {
-        var blockAbove, blockLeft, blockRight;
-        var blockDepth = 0;
+        var blockAbove, blockLeft, blockRight, currentBlock;
+        
+        var currentBlock = blockArray[row][column];
         
         if (typeof(blockArray[row - 1]) !== 'undefined') {
             blockAbove = blockArray[row - 1][column];
@@ -145,18 +162,16 @@ Stage.prototype = {
         
         //If the block has a block above it, then it is not a surface block.
         if (typeof(blockAbove) !== 'undefined' && blockAbove.exists) {
-            blockDepth = 1;
+            currentBlock.depth = 1;
             
             //If the block has blocks to its left and right, then set its depth to be
             //one greater than the block above it.
-            if (typeof(blockLeft) !== 'undefined' && blockLeft.exists &&
-                typeof(blockRight) !== 'undefined' && blockRight.exists) {
-                blockDepth = blockAbove.depth + 1;
-            }
+            if (((typeof(blockLeft) !== 'undefined') && blockLeft.exists) || column === 0) {
+                if (typeof(blockRight) !== 'undefined' && blockRight.exists) {
+                    currentBlock.depth = blockAbove.depth + 1;
+                }
+            } 
         }
-        
-        this.entityList.push(new Block(this.gameEngine, AM,
-                                               column * 50, row * 50, STAGE_TYPE.FOREST, blockDepth)); 
     },
     
     placeCastleBlock: function (blockArray, row, column) {
@@ -172,8 +187,24 @@ Stage.prototype = {
         } else {
             var blockDepth = 0;
         }
+    },
+    
+    equalizeForestBlocks: function (blockArray, row, column) {
+        var blockLeft = blockArray[row][column - 1];
+        var blockRight = blockArray[row][column + 1];
+        var currentBlock = blockArray[row][column];
         
-        this.entityList.push(new Block(this.gameEngine, AM,
-                                               column * 50, row * 50, STAGE_TYPE.CASTLE, blockDepth)); 
+        if (currentBlock.depth > 1 && column != 0) {
+            if (blockLeft.depth < currentBlock.depth && blockRight.depth < currentBlock.depth) {
+                currentBlock.depth = Math.min(blockLeft.depth, blockRight.depth);
+            }
+            if (blockLeft.depth === 0 || blockRight.depth === 0) {
+                currentBlock.depth = 1;
+            }
+        }
+    },
+    
+    equalizeCastleBlocks : function (blockArray, row, column) {
+        //Castle blocks do not require equalization.   
     }
 }
