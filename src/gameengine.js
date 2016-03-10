@@ -55,6 +55,7 @@ function GameEngine() {
     this.removedAgents = [];
 
     this.jukebox = new Map();
+    this.muted = false;
 
     this.currentMusic = null;
     this.healthBarVisible = false;
@@ -217,6 +218,10 @@ GameEngine.prototype = {
                     break;
                 case 32: //SPACE
                     that.pressSpace = false;
+                    break;
+                case 77: //M
+                    that.muted = !that.muted;
+                    Howler.mute(that.muted);
                     break;
             }
             //console.log(e.which);
