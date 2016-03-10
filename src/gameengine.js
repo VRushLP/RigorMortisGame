@@ -219,9 +219,8 @@ GameEngine.prototype = {
                 case 32: //SPACE
                     that.pressSpace = false;
                     break;
-                case 77: //M
-                    that.muted = !that.muted;
-                    Howler.mute(that.muted);
+                case 77: //M;
+                    Howler.mute(that.muted = !that.muted);
                     break;
             }
             //console.log(e.which);
