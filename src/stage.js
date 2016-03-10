@@ -177,15 +177,16 @@ Stage.prototype = {
     placeCastleBlock: function (blockArray, row, column) {
         
         var blockAbove;
+        var currentBlock = blockArray[row][column];
         if (typeof(blockArray[row - 1]) !== 'undefined') {
             blockAbove = blockArray[row - 1][column];
         }
         
         //If the block has a block above it, then it has a depth of 1.
         if (typeof(blockAbove) !== 'undefined' && blockAbove.exists) {
-            var blockDepth = 1;
+            currentBlock.depth = 1;
         } else {
-            var blockDepth = 0;
+            currentBlock.depth = 0;
         }
     },
     
