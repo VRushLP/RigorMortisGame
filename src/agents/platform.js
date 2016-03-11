@@ -25,7 +25,7 @@ function Platform(game, AM, x, y, width, height, stageType) {
             break;
         case STAGE_TYPE.CASTLE:
             NormalState = new Animation(AM.getAsset("./img/castle-stage/castle block.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
-            blockStart = 50;
+            blockStart = 0;
             break;
     }
     
@@ -112,6 +112,12 @@ Platform.prototype = {
         this.entity.moveable = true;
         this.movePatterns.push({amountX: amountX, velocityX: velocityX,
                                amountY: amountY, velocityY: velocityY});
+    },
+    
+    readInput : function (input) {
+        if (input === "reset") {
+            this.currentMovePattern = 0;
+        }
     }
 }
 
