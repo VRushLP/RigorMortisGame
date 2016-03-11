@@ -55,6 +55,7 @@ function GameEngine() {
     this.removedAgents = [];
 
     this.jukebox = new Map();
+    this.muted = false;
 
     this.currentMusic = null;
     this.healthBarVisible = false;
@@ -217,6 +218,9 @@ GameEngine.prototype = {
                     break;
                 case 32: //SPACE
                     that.pressSpace = false;
+                    break;
+                case 77: //M;
+                    Howler.mute(that.muted = !that.muted);
                     break;
             }
             //console.log(e.which);
@@ -632,6 +636,7 @@ GameEngine.prototype.loop = function () {
             if(this.pressDown) this.agents[i].readInput("down");
             if(this.pressUp) this.agents[i].readInput("up");
             if(this.pressLeft && !this.pressRight) this.agents[i].readInput("left");
+            if(this.pressLeft && this.pressRight) this.agents[i].readInput("none");
             if(this.pressN) this.agents[i].readInput('n');
             if(this.pressSpace) this.agents[i].readInput("space");
 

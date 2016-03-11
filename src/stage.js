@@ -115,6 +115,9 @@ Stage.prototype = {
                     case "w":
                         this.entityList.push(new Wisp(this.gameEngine, AM, currentX, currentY));
                         break;
+                    case "h":
+                        this.entityList.push(new HealthPotion(this.gameEngine, AM, currentX, currentY));
+                        break;
                     default: break;
                 }
                 currentX += 50;
