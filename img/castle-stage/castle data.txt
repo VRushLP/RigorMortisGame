@@ -1,5 +1,6 @@
 CTRL-F YOUR DESIRED ASSET!
 castle block.png
+castle background.png
 
 ----------------
 castle block.png
@@ -12,3 +13,9 @@ surface block
 underground block
 	size : (50, 50)
 	location (0, 50)
+
+
+castle background.png (150, 150)
+
+all doors (50, 250)
+all switches (including pressed) (50, 50)
