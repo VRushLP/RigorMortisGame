@@ -2,57 +2,62 @@
  * All triggers are invisible entities that cause the game engine to
  * act in an unique way.
  */
-
-/*
- * A camera trigger causes the game engine to change its camera focus upon collision.
- */
-function CameraTrigger(game, AM, x, y, width, height, focus, type, speedX, speedY) {
+function Trigger(game, x, y, width, height) {
     this.entity = new Entity(x, y, width, height);
     this.game = game;
-    this.focus = focus;
-    this.type = type;
-    this.speedX = speedX;
-    this.speedY = speedY;
-    
     this.entity.intangible = true;
 }
 
-CameraTrigger.prototype = { 
+Trigger.prototype = {
     draw: function () {
         //Nothing to do.
     },
     
     update: function () {
         //Nothing to do.
-    },
-    
-    checkListeners: function(agent) {
-        if (agent.entity.controllable) {
-            var game = this.game;
-            //If the game is already focusing on this trigger's focus, return.
-            if (game.cameraAgent === this.focus) return;
-    
-            game.camera.frozen = true;
-            game.camera.mode = this.type;
-            game.cameraAgent = this.focus;
-            game.camera.speedX = this.speedX;
-            game.camera.speedY = this.speedY;
-            game.camera.frozen = false;
-            this.entity.collidable = false;
-        }
-    },
-    
-    readInput: function (input) {
-        if (input === "reset") {
-            this.entity.collidable = true;
-        }
     }
 }
 
 /*
+ * A camera trigger causes the game engine to change its camera focus upon collision.
+ */
+function CameraTrigger(game, x, y, width, height, focus, type, speedX, speedY) {
+    Trigger.call(this, game, x, y, width, height);
+    this.focus = focus;
+    this.type = type;
+    this.speedX = speedX;
+    this.speedY = speedY;
+}
+
+CameraTrigger.prototype = Object.create(Trigger.prototype);
+
+CameraTrigger.prototype.checkListeners = function(agent) {
+    if (agent.entity.controllable) {
+        var game = this.game;
+        //If the game is already focusing on this trigger's focus, return.
+        if (game.cameraAgent === this.focus) return;
+
+        game.camera.frozen = true;
+        game.camera.mode = this.type;
+        game.cameraAgent = this.focus;
+        game.camera.speedX = this.speedX;
+        game.camera.speedY = this.speedY;
+        game.camera.frozen = false;
+        this.entity.collidable = false;
+    }
+}
+    
+CameraTrigger.prototype.readInput = function(input) {
+    if (input === "reset") {
+        this.entity.collidable = true;
+    }
+}
+
+
+/*
  * A focus trigger is what a camera trigger will ask the game engine to focus its camera on.
  */
-function FocusTrigger(game, AM, x, y) {
+function FocusTrigger(game, x, y) {
     this.entity = new Entity(x, y, 1, 1);
 }
 
@@ -70,7 +75,7 @@ FocusTrigger.prototype = {
 /*
  * A music trigger causes the game engine to change the current song upon collision.
  */
-function MusicTrigger(game, AM, x, y, width, height, music) {
+function MusicTrigger(game, x, y, width, height, music) {
     this.entity = new Entity(x, y, width, height);
     this.game = game;
     this.music = music;
@@ -106,7 +111,7 @@ MusicTrigger.prototype = {
 /*
  *
  */
-function SpawnTrigger(game, AM, x, y, width, height, agent) {
+function SpawnTrigger(game, x, y, width, height, agent) {
     this.entity = new Entity(x, y, width, height);
     this.game = game;
     this.spawnAgent = agent;
@@ -153,7 +158,7 @@ SpawnTrigger.prototype = {
 /*
  * A music trigger causes the game engine to change the current song upon collision.
  */
-function StageTrigger(game, AM, x, y, width, height, stageNumber) {
+function StageTrigger(game, x, y, width, height, stageNumber) {
     this.entity = new Entity(x, y, width, height);
     this.game = game;
     this.stageNumber = stageNumber;
