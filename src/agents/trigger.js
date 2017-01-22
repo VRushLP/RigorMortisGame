@@ -58,53 +58,35 @@ CameraTrigger.prototype.readInput = function(input) {
  * A focus trigger is what a camera trigger will ask the game engine to focus its camera on.
  */
 function FocusTrigger(game, x, y) {
-    this.entity = new Entity(x, y, 1, 1);
+    Trigger.call(this, game, x, y, 1, 1);
 }
 
-FocusTrigger.prototype = {
-    draw: function () {
-        //Nothing to do.
-    },
-    
-    update: function () {
-        //Nothing to do.
-    }
-}
+FocusTrigger.prototype = Object.create(Trigger.prototype);
 
 
 /*
  * A music trigger causes the game engine to change the current song upon collision.
  */
 function MusicTrigger(game, x, y, width, height, music) {
-    this.entity = new Entity(x, y, width, height);
-    this.game = game;
+    Trigger.call(this, game, x, y, width, height);
     this.music = music;
-    this.entity.intangible = true;
 }
 
-MusicTrigger.prototype = { 
-    draw: function () {
-        //Nothing to do.
-    },
+MusicTrigger.prototype = Object.create(Trigger.prototype);
     
-    update: function () {
-        //Nothing to do.
-    },
-    
-    checkListeners: function(agent) {
-        if (agent.entity.controllable) {
-            //Only change the music if it is not currently the one playing.
-            if (this.game.music !== this.music) {
-                this.game.switchMusic(this.music);
-                this.entity.collidable = false;
-            }
+MusicTrigger.prototype.checkListeners = function(agent) {
+    if (agent.entity.controllable) {
+        //Only change the music if it is not currently the one playing.
+        if (this.game.music !== this.music) {
+            this.game.switchMusic(this.music);
+            this.entity.collidable = false;
         }
-    },
-    
-    readInput: function (input) {
-        if (input === "reset") {
-            this.entity.collidable = true;
-        }
+    }
+}
+
+MusicTrigger.prototype.readInput = function(input) {
+    if (input === "reset") {
+        this.entity.collidable = true;
     }
 }
 
@@ -112,46 +94,37 @@ MusicTrigger.prototype = {
  *
  */
 function SpawnTrigger(game, x, y, width, height, agent) {
-    this.entity = new Entity(x, y, width, height);
-    this.game = game;
+    Trigger.call(this, game, x, y, width, height);
     this.spawnAgent = agent;
     this.spawnAgent.entity.removeUponReset = true;
-    this.entity.intangible = true;
     this.agentSpawned = false;
 }
 
-SpawnTrigger.prototype = { 
-    draw: function () {
-        //Nothing to do.
-    },
-    
-    update: function () {
-        //Nothing to do.
-    },
-    
-    checkListeners: function(agent) {
-        if (agent.entity.controllable) {
-            if (!this.agentSpawned) {
-                this.game.agents.push(this.spawnAgent);
-            } else {
-                var removedAgents = this.game.removedAgents;
-                for (var i = 0; i < removedAgents.length; i++) {
-                    if (removedAgents[i] === this.spawnAgent) {
-                        this.game.agents.push(removedAgents[i]);
-                        removedAgents.splice(i, 1);
-                        break;
-                    }
+SpawnTrigger.prototype = Object.create(Trigger.prototype);
+
+
+SpawnTrigger.prototype.checkListeners = function(agent) {
+    if (agent.entity.controllable) {
+        if (!this.agentSpawned) {
+            this.game.agents.push(this.spawnAgent);
+        } else {
+            var removedAgents = this.game.removedAgents;
+            for (var i = 0; i < removedAgents.length; i++) {
+                if (removedAgents[i] === this.spawnAgent) {
+                    this.game.agents.push(removedAgents[i]);
+                    removedAgents.splice(i, 1);
+                    break;
                 }
             }
-            this.entity.collidable = false;
-            this.agentSpawned = true;
         }
-    },
-    
-    readInput: function (input) {
-        if (input === "reset") {
-            this.entity.collidable = true;
-        }
+        this.entity.collidable = false;
+        this.agentSpawned = true;
+    }
+}
+
+SpawnTrigger.prototype.readInput = function(input) {
+    if (input === "reset") {
+        this.entity.collidable = true;
     }
 }
 
@@ -159,84 +132,65 @@ SpawnTrigger.prototype = {
  * A music trigger causes the game engine to change the current song upon collision.
  */
 function StageTrigger(game, x, y, width, height, stageNumber) {
-    this.entity = new Entity(x, y, width, height);
-    this.game = game;
+    Trigger.call(this, game, x, y, width, height);
     this.stageNumber = stageNumber;
-    this.entity.intangible = true;
 }
 
-StageTrigger.prototype = { 
-    draw: function () {
-        //Nothing to do.
-    },
+StageTrigger.prototype = Object.create(Trigger.prototype);
     
-    update: function () {
-        //Nothing to do.
-    },
-    
-    checkListeners: function(agent) {
-        if (agent.entity.controllable) {
-            //Only change the stage if it is not the current one.
-            if (this.game.currentStage !== this.stageNumber) {
-                this.entity.collidable = false;
-                this.game.loadStage(this.stageNumber);
-            }
-        }
-    },
-    
-    readInput: function (input) {
-        if (input === "reset") {
-            this.entity.collidable = true;
+StageTrigger.prototype.checkListeners = function(agent) {
+    if (agent.entity.controllable) {
+        //Only change the stage if it is not the current one.
+        if (this.game.currentStage !== this.stageNumber) {
+            this.entity.collidable = false;
+            this.game.loadStage(this.stageNumber);
         }
     }
 }
 
+StageTrigger.prototype.readInput = function (input) {
+    if (input === "reset") {
+        this.entity.collidable = true;
+    }
+}
+
+
 function EntitySwitchTrigger(game, x, y, width, height, entities) {
-    this.game = game;
-    this.entity = new Entity(x, y, width, height);
-    this.entity.intangible = true;
+    Trigger.call(this, game, x, y, width, height);
     this.entities = entities;
     this.currentEntity = 0;
 }
 
-EntitySwitchTrigger.prototype = {
-    draw: function () {
-        //Do nothing
-    },
+EntitySwitchTrigger.prototype = Object.create(Trigger.prototype);
 
-    update: function () {
-        //Do nothing
-    },
+EntitySwitchTrigger.prototype.checkListeners = function (agent) {
+    if (agent.entity.controllable) 
+    {
+        this.entity.collidable = false;
+        this.readInput("advance");
+    }
+}
 
-    checkListeners: function (agent) {
-        if (agent.entity.controllable) 
-        {
-            this.entity.collidable = false;
-            this.readInput("advance");
+EntitySwitchTrigger.prototype.readInput = function(input) {
+    if (input === "reset") {
+        this.entity.collidable = true;
+        var index = this.game.agents.indexOf(this.entities[this.currentEntity]);
+        if (index > -1) {
+            this.game.agents[index] = this.entities[0];
+            //Swap entities back on reset
         }
-    },
+        this.currentEntity = 0;
+    }
 
-    readInput: function (input) {
-        if (input === "reset") {
-            this.entity.collidable = true;
-            var index = this.game.agents.indexOf(this.entities[this.currentEntity]);
-            if (index > -1) {
-                this.game.agents[index] = this.entities[0];
-                //Swap entities back on reset
-            }
-            this.currentEntity = 0;
+    //Advance the current entity present.
+    if (input === "advance") {
+        if (this.currentEntity + 1 >= this.entities.length) {
+            return;
         }
-        
-        //Advance the current entity present.
-        if (input === "advance") {
-            if (this.currentEntity + 1 >= this.entities.length) {
-                return;
-            }
-            var index = this.game.agents.indexOf(this.entities[this.currentEntity]);
-            if (index > -1) {
-                this.game.agents[index] = this.entities[++this.currentEntity];
-                //Swap entities
-            }
+        var index = this.game.agents.indexOf(this.entities[this.currentEntity]);
+        if (index > -1) {
+            this.game.agents[index] = this.entities[++this.currentEntity];
+            //Swap entities
         }
     }
 }
