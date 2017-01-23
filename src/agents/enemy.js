@@ -240,7 +240,7 @@ Wisp.prototype = {
             }
 
             if (this.invulnerableTime > 0) {
-                this.invulnerableTime-=timeDiff;
+                this.invulnerableTime-= timeDiff;
                 if (this.invulnerableTime <= 0) {
                     this.invulnerableTime = 0;
                 }

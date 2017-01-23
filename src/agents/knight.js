@@ -34,7 +34,7 @@ var KNIGHT_DIR = {
 
 var KNIGHT_ATTR = {
     STARTING_HEALTH: 5,
-    INVULNERABILITY_FRAMES: 30,
+    INVULNERABLITY_TIME: .5, //previously 30 frames
 }
 
 //Physics Constants
@@ -66,7 +66,7 @@ function Knight(game, AM, x, y) {
     this.yVelocity = 0;
     this.xVelocity = 0;
     this.direction = KNIGHT_DIR.RIGHT;
-    
+
     this.canJump = true;
     this.attacking = false;
     this.noclip = false;
@@ -128,13 +128,14 @@ Knight.prototype.draw = function (game, cameraX, cameraY) {
  * Update the Knight agent.
  */
 Knight.prototype.update = function() {
-    
+    gameDiff = this.game.clockTick
+
     if(this.invulnerableFrames > 0) {
-        this.invulnerableFrames--;
+        this.invulnerableFrames-= gameDiff;
     }
 
     //Update the knight's attack state.
-    var currentAnimation = this.entity.currentAnimation;   
+    var currentAnimation = this.entity.currentAnimation;
     if (currentAnimation === KNIGHT_ANIM.ATTACK_RIGHT ||
         currentAnimation === KNIGHT_ANIM.ATTACK_LEFT) {
         if (!this.entity.animationList[currentAnimation].isFinalFrame()) {
@@ -175,7 +176,7 @@ Knight.prototype.update = function() {
         //If the knight is attacking, keep them in the attack animation.
         if (this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_LEFT &&
            this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_RIGHT) {
-            
+
             if (this.yVelocity > 0) {
                 if(this.direction === KNIGHT_DIR.RIGHT) {
                     this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
@@ -191,11 +192,11 @@ Knight.prototype.update = function() {
             }
         }
     }
-    
+
     //Move the player independently in both directions, otherwise it will feel off.
     this.game.requestMove(this, this.xVelocity, 0);
     this.game.requestMove(this, 0, this.yVelocity);
-    
+
     //Move the sword hitbox with the player.
     if (this.attacking && this.swordHitbox !== null) {
         this.game.requestMove(this.swordHitbox, this.xVelocity, 0);
@@ -313,14 +314,14 @@ Knight.prototype.readInput = function(input, modifier) {
     if (input === "left_released" && this.entity.currentAnimation === KNIGHT_ANIM.WALKING_LEFT) {
         this.rest();
     }
-    
+
     if (input === "left_and_right_released") {
         this.slowDown();
     }
 
     if (input === "damage") {
-        if (this.invulnerableFrames === 0) {
-            this.invulnerableFrames = KNIGHT_ATTR.INVULNERABILITY_FRAMES;
+        if (this.invulnerableFrames <= 0) {
+            this.invulnerableFrames = KNIGHT_ATTR.INVULNERABLITY_TIME;
             this.health--;
 
             //Knock the player back.
@@ -333,7 +334,7 @@ Knight.prototype.readInput = function(input, modifier) {
                 this.yVelocity = -6;
             }
         }
-        
+
         if (this.health <= 0) {
             this.entity.removeFromWorld = true;
         }
@@ -342,7 +343,7 @@ Knight.prototype.readInput = function(input, modifier) {
     if (input === "heal") {
         this.health = KNIGHT_ATTR.STARTING_HEALTH;
     }
-    
+
     if (input === "reset") {
         this.health = KNIGHT_ATTR.STARTING_HEALTH;
         this.xVelocity = 0;
@@ -361,9 +362,9 @@ Knight.prototype.readInput = function(input, modifier) {
 Knight.prototype.adjustXVelocity = function (amount) {
     var maxVelocity = KNIGHT_PHYSICS.TERMINAL_X_VELOCITY;
     this.xVelocity += amount;
-    
+
     if (this.invulnerableFrames > 0) maxVelocity = KNIGHT_PHYSICS.KNOCKBACK_VELOCITY;
-    
+
     if (this.xVelocity > maxVelocity) {
         this.xVelocity = maxVelocity;
     }
@@ -374,13 +375,13 @@ Knight.prototype.adjustXVelocity = function (amount) {
 
 Knight.prototype.slowDown = function () {
     var maxSlowdown = 1;
-    if (this.invulnerableFrames > 0) maxSlowdown = .45; 
-        
+    if (this.invulnerableFrames > 0) maxSlowdown = .45;
+
     if (this.xVelocity > 0) {
-         this.adjustXVelocity(Math.max(maxSlowdown * -1, this.xVelocity * -1)); 
+         this.adjustXVelocity(Math.max(maxSlowdown * -1, this.xVelocity * -1));
     } else if (this.xVelocity < 0) {
           this.adjustXVelocity(Math.min(maxSlowdown, this.xVelocity * -1));
-    } 
+    }
 }
 
 /**
