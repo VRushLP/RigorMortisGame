@@ -29,7 +29,7 @@ var FB_ATTR = {
     ARM_STRIDE: 250,
     //The absolute maximum height that an arm should ever reach.
     ARM_MAX_HEIGHT: 500,
-    
+
     //The forest boss transitions between phases based on its health.
     //Phases increase speed and width of spikes.
     MAX_HEALTH: 7,
@@ -38,21 +38,21 @@ var FB_ATTR = {
 
     //The amount of distance between the core and the left edge of the platform it's on.
     CORE_BUFFER : 50,
-    
+
     //Phase Number: Added Speed
     PHASE_SPEED_BUFF: {
         0: 0,
         1: 1,
         2: 2
     },
-    
+
     //Phase Number: Rest Time
     PHASE_REST_TIME: {
-        0: 125,
-        1: 100,
-        2: 75
+        0: 2.083, //  125
+        1: 1.667, // 100
+        2: 1.25 // 75
     },
-    
+
     NEUTRAL_BASE_SPEED: 2,
     RETREAT_BASE_SPEED: 8,
     //Each arm has a different attack speed.
@@ -62,8 +62,8 @@ var FB_ATTR = {
         2: 5,
         3: 6
     },
-    
-    SPAWN_TIME: 150,
+
+    SPAWN_TIME: 2.5, // 150 frames
     HELPER_PLATFORM_HEIGHT: 350,
 }
 
@@ -86,38 +86,39 @@ function ForestBoss(game, AM, x, y, stage, stateTrigger) {
     this.phase = 0;
     this.spawnTimeRemaining = FB_ATTR.SPAWN_TIME;
     this.health = FB_ATTR.MAX_HEALTH;
-    this.pattern = FB_PATTERN.NEUTRAL;    
+    this.pattern = FB_PATTERN.NEUTRAL;
     this.currentAttackAnim = FB_ANIM.THIN;
-    
+
     //Initialize the forest boss arms and core.
     this.arms = [];
     for (var i = 0; i < 4; i++) {
-        this.arms.push(new ForestBossArm(game, AM,  x + FB_ATTR.LEFT_SIDE_BUFFER + i * FB_ATTR.ARM_STRIDE,  y));
+        this.arms.push(new ForestBossArm(game, AM, x + FB_ATTR.LEFT_SIDE_BUFFER + i * FB_ATTR.ARM_STRIDE, y));
         this.arms[i].setSize(this.currentAttackAnim);
         //Arms are shuffled and unshuffled, so they need to keep track of their original position.
         this.arms[i].originalPos = i;
         stage.entityList.push(this.arms[i]);
     }
-    
+
     this.core = new ForestBossCore(game, AM, x, y, this);
     stage.entityList.push(this.core);
-    
+
     this.setNormalDistro();
     this.neutralPattern();
 }
 
 ForestBoss.prototype = {
-    
+
     //The Forest Boss waits for all of its arms to return to the hidden state
     //before determining which distribution and pattern they should assume next.
-    update: function () {    
-        
+    update: function () {
+        timeDiff = this.game.clockTick;
+
         //If the Forest Boss has not spawned yet, do not do anything.
-        if (this.spawnTimeRemaining > 0) {
-            this.spawnTimeRemaining--;
+        if (this.spawnTimeRemaining >= 0) {
+            this.spawnTimeRemaining -=timeDiff;
             return;
         }
-        
+
         if (this.allArmsHidden()) {
 
             if (this.pattern === FB_PATTERN.RETREAT) {
@@ -125,26 +126,25 @@ ForestBoss.prototype = {
                 if (this.health <= 0) {
                     this.selfDestruct();
                     return;
-                }                
+                }
                 this.setAttackDistro();
                 this.attackPattern();
 
             } else if (this.pattern === FB_PATTERN.ATTACK) {
                 this.setNormalDistro();
                 this.neutralPattern();
-                
+
             } else if (this.pattern === FB_PATTERN.NEUTRAL) {
-                this.setNormalDistro();            
+                this.setNormalDistro();
                 this.neutralPattern();
             }
         }
     },
-    
-    
+
     /************
      * Patterns *
      ************/
-    
+
     //The neutral pattern raises all arms at the same speed.
     neutralPattern: function () {
         this.pattern = FB_PATTERN.NEUTRAL;
@@ -154,7 +154,7 @@ ForestBoss.prototype = {
             this.arms[i].currentState = FB_ARM_STATE.RISING;
         }
     },
-    
+
     //The retreat pattern immediately lowers all arms at a fast speed.
     retreatPattern: function () {
         this.pattern = FB_PATTERN.RETREAT;
@@ -163,38 +163,38 @@ ForestBoss.prototype = {
             this.arms[i].currentState = FB_ARM_STATE.FALLING;
         }
     },
-    
+
     //The attack pattern shuffles the arms and raises them at varying speeds.
     attackPattern: function () {
         this.pattern = FB_PATTERN.ATTACK;
-        
-        this.shuffleArms();        
+
+        this.shuffleArms();
         for (var i = 0; i < this.arms.length; i++) {
             this.arms[i].speed = FB_ATTR.ATTACK_BASE_SPEED[i] + FB_ATTR.PHASE_SPEED_BUFF[this.phase];
             this.arms[i].restTime = 0;
             this.arms[i].currentState = FB_ARM_STATE.RISING;
-        }        
+        }
         this.unshuffleArms();
     },
-    
-    
+
+
     /*****************
      * Distributions *
      *****************/
-    
+
     //The normal distribution randomly assigns two adjacent platforms, one containing
     //the core, and two damaging spikes.
     setNormalDistro: function () {
         var corePos = Math.floor(Math.random() * 4);
         this.core.arm = this.arms[corePos];
-        
+
         var supportPlatform;
-        
+
         switch (corePos) {
             case 0:
                 supportPlatform = 1;
                 break;
-            case 1: 
+            case 1:
                 if (Math.floor(Math.random()) * 2 === 0) supportPlatform = 0;
                 else supportPlatform = 2;
                 break;
@@ -206,37 +206,36 @@ ForestBoss.prototype = {
                 supportPlatform = 2;
                 break;
         }
-        
+
         for (var i = 0; i < 4; i++) {
             //Reset platform height
             this.arms[i].maxHeight = FB_ATTR.ARM_MAX_HEIGHT;
-            
+
             if (i === corePos) this.arms[i].setSize(FB_ANIM.PLATFORM);
             else if (i === supportPlatform) {
                 this.arms[i].setSize(FB_ANIM.PLATFORM);
                 this.arms[i].maxHeight = FB_ATTR.HELPER_PLATFORM_HEIGHT;
-            } 
+            }
             else this.arms[i].setSize(this.currentAttackAnim);
         }
     },
-    
+
     //The Attack Distribution sets all arms to damaging spikes.
     setAttackDistro: function () {
         this.core.arm = null;
         for (var i = 0; i < this.arms.length; i++) {
             //Reset platform height
             this.arms[i].maxHeight = FB_ATTR.ARM_MAX_HEIGHT;
-            
+
             this.arms[i].setSize(this.currentAttackAnim);
         }
     },
-    
-    
-    
+
+
     /***********
      * Utility *
      ***********/
-    
+
     //Shuffle the arms array into a new random order.
     shuffleArms: function () {
         for (var i = this.arms.length - 1; i > 0; i--) {
@@ -246,14 +245,14 @@ ForestBoss.prototype = {
             this.arms[j] = temp;
         }
     },
-    
+
     //Resets the arms array to its original order.
     unshuffleArms: function () {
         //Create a copy of the arms array called newArms.
         var newArms = [];
         for (var i = 0; i < this.arms.length; i++) {
             newArms.push(this.arms[i]);
-        }        
+        }
         //Re-arrange newArms into the original order.
         for (var i = 0; i < this.arms.length; i++) {
             newArms[this.arms[i].originalPos] = this.arms[i];
@@ -261,7 +260,7 @@ ForestBoss.prototype = {
         //Set the arms array to be the sorted newArms.
         this.arms = newArms;
     },
-    
+
     //Lower health and preemptively go into a retreat pattern.
     //Check here if current health should cause a phase change.
     takeDamage: function () {
@@ -269,19 +268,19 @@ ForestBoss.prototype = {
         for (var i = 0; i < this.arms.length; i++) {
             this.retreatPattern();
         }
-        
+
         if (this.health === FB_ATTR.PHASE_1_HEALTH) {
             this.phase = 1;
             this.stateTrigger.readInput("advance");
             this.currentAttackAnim = FB_ANIM.NORMAL;
-        } 
+        }
         if (this.health === FB_ATTR.PHASE_2_HEALTH) {
             this.phase = 2;
             this.stateTrigger.readInput("advance");
             this.currentAttackAnim = FB_ANIM.WIDE;
-        } 
+        }
     },
-    
+
     //Remove the Forest Boss arms, core, and the controller from world and switch the music back..
     selfDestruct: function () {
         var gameEngine = this.game;
@@ -291,11 +290,11 @@ ForestBoss.prototype = {
         }
         this.core.entity.removeFromWorld = true;
         this.entity.removeFromWorld = true;
-        
+
         var originalBGM = this.game.stages[this.game.currentStage].stageMusic;
         this.game.switchMusic(originalBGM);
         this.openExit();
-        
+
         gameEngine.camera.frozen = true;
         gameEngine.camera.mode = CAMERA_MODE.PAN_THEN_INSTANT;
         gameEngine.camera.speedX = 3;
@@ -303,7 +302,7 @@ ForestBoss.prototype = {
         gameEngine.cameraAgent = gameEngine.playerAgent;
         gameEngine.camera.frozen = false;
     },
-    
+
     //Return true if the current state of all arms is hidden.
     allArmsHidden: function () {
         for (var i = 0; i < this.arms.length; i++) {
@@ -311,7 +310,7 @@ ForestBoss.prototype = {
         }
         return true;
     },
-    
+
     readInput: function(input, modifier) {
         if (input === "reset") {
             this.health = FB_ATTR.MAX_HEALTH;
@@ -319,10 +318,10 @@ ForestBoss.prototype = {
             this.currentAttackAnim = FB_ANIM.THIN;
         }
     },
-    
+
     openExit: function () {
         for (var i = 0; i < this.exitAgents.length; i++) {
-            this.exitAgents[i].entity.removeFromWorld = true;   
+            this.exitAgents[i].entity.removeFromWorld = true;
         }
     }
 }
@@ -337,7 +336,7 @@ function ForestBossArm(game, AM, x, y) {
     this.game = game;
     this.entity.moveable = true;
     this.entity.pushesOnly = true;
-    
+
     this.currentState = FB_ARM_STATE.HIDING;
     //OriginY is the base of the arm, and is used for calculating its height/return points.
     this.originY = y;
@@ -346,32 +345,33 @@ function ForestBossArm(game, AM, x, y) {
     //Original Position is relative to the arms, and is used when unshuffling them.
     this.originalPos = 0;
     this.maxHeight = FB_ATTR.ARM_MAX_HEIGHT;
-    
+
     //Determines how long the arm waits between rising to its peak and then falling.
     this.restTime = 0;
     this.currentRest = 0;
-    
+
     var thinAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss spike 50px.png"), 50, 500, 1, true);
     thinAnimation.addFrame(0, 0);
     this.entity.addAnimation(thinAnimation);
-    
+
     var normalAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss spike 100px.png"), 100, 500, 1, true);
     normalAnimation.addFrame(0, 0);
     this.entity.addAnimation(normalAnimation);
-    
+
     var wideAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss spike 150px.png"), 150, 500, 1, true);
     wideAnimation.addFrame(0, 0);
     this.entity.addAnimation(wideAnimation);
-    
+
     var platformAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss platform.png"), 150, 500, 1, true);
     platformAnimation.addFrame(0, 0);
     this.entity.addAnimation(platformAnimation);
 }
 
 ForestBossArm.prototype = {
-    
+
     //On each update, check the current state and act accordingly.
-    update: function () {        
+    update: function () {
+        gameDiff = this.game.clockTick;
         //If the arm is hiding, its entity is practically removed from the game temporarily.
         if (this.currentState === FB_ARM_STATE.HIDING) {
             this.entity.height = 0;
@@ -382,7 +382,7 @@ ForestBossArm.prototype = {
             //Arm should always be collidable when it is above ground.
             this.entity.collidable = true;
         }
-        
+
         //If the arm is rising, increase its height by its speed.
         if (this.currentState === FB_ARM_STATE.RISING) {
             if (this.maxHeight - this.getHeight() <= this.speed) {
@@ -392,21 +392,21 @@ ForestBossArm.prototype = {
                 this.game.requestMove(this, 0, -1 * this.speed);
             }
         }
-        
+
         //If the arm is resting, it waits for a period of time before falling.
         if (this.currentState === FB_ARM_STATE.RESTING) {
             if (this.currentRest <= 0) {
                 this.currentState = FB_ARM_STATE.FALLING;
             } else {
-                this.currentRest--;
+                this.currentRest-= gameDiff;
             }
         }
-        
+
         //If the arm is falling, decrease its height by its speed, and drag any entities with it.
         if (this.currentState === FB_ARM_STATE.FALLING) {
             //Determine which agents are on top of the platform before moving.
             var agentsToDrag = this.game.getTopCollisions(this);
-            
+
             if (this.getHeight() <= this.speed) {
                 //The arm would fall past its base.
                 this.entity.height = 0;
@@ -414,58 +414,56 @@ ForestBossArm.prototype = {
             } else {
                 this.entity.height -= this.speed;
                 this.game.requestMove(this, 0, this.speed);
-            }            
-            
+            }
+
             //After moving, drag any agents on top of the platform down with it.
             for (var i = 0; i < agentsToDrag.length; i++) {
                 this.game.requestMove(agentsToDrag[i], 0, this.speed);
             }
         }
-        
-        
-        
+
         //Update the entity and animation based on the updated height.
         this.entity.height = this.getHeight() - 1;
         var anim = this.entity.animationList[this.entity.currentAnimation];
         anim.frameHeight = this.getHeight();
-        
+
         //An arm begins resting after reaching its max height while rising.
         if (this.getHeight() === this.maxHeight && this.currentState === FB_ARM_STATE.RISING) {
             this.currentState = FB_ARM_STATE.RESTING;
             this.currentRest = this.restTime;
         }
-        
+
         //An arm begins hiding after reaching its base while falling.
         if (this.getHeight() <= this.speed && this.currentState === FB_ARM_STATE.FALLING) {
             this.currentState = FB_ARM_STATE.HIDING;
         }
     },
-    
-    
+
+
     //Set the size by updating both the entity width and the animation.
     setSize: function (size) {
         this.entity.setAnimation(size);
         this.entity.width = this.entity.animationList[size].frameWidth;
     },
-    
+
     //Request for the arm to begin rising.
     rise: function () {
         this.currentState = FB_ARM_STATE.RISING;
     },
-    
+
     //Calculate the difference between the current top of the arm and its origin base.
     getHeight: function () {
         return this.originY - this.entity.y;
     },
-    
+
     checkListeners: function(agent) {
         if (agent.entity.controllable && this.entity.currentAnimation !== FB_ANIM.PLATFORM) {
             this.game.requestInputSend(agent, "damage", 1);
         }
     }
-    
+
 }
-    
+
 
 
 /*
@@ -482,7 +480,7 @@ function ForestBossCore(game, AM, x, y, callback) {
     this.arm;
     this.callback = callback;
     this.alive = true;
-    
+
     //The core is hidden by default, so set its initial height to zero.
     var normalAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss weak point.png"), 50, 0, 1, true);
     normalAnimation.addFrame(50, 0);
@@ -490,30 +488,30 @@ function ForestBossCore(game, AM, x, y, callback) {
 }
 
 ForestBossCore.prototype = {
-    
+
     update: function () {
         //The arm being set to null means that the core will not spawn.
         if (this.arm === null) return;
-        
+
         var animation = this.entity.animationList[this.entity.currentAnimation];
         //Spawn the core in the middle of the platform.
         this.entity.x = this.arm.entity.x + FB_ATTR.CORE_BUFFER;
-        
+
         //Emerge if the arm has reached its apex.
-        if (this.arm.currentState === FB_ARM_STATE.RESTING) { 
-            
+        if (this.arm.currentState === FB_ARM_STATE.RESTING) {
+
             //Quick fix to avoid collision bugs.
             if (animation.frameHeight === 0) {
                 this.entity.y = this.arm.entity.y - 1;
             }
-            
+
             //Determine how much to reveal the core, and change both the animation height
             //and entity height accordingly, and then move that entity upwards.
-            var moveUp = Math.min(10, 50 - animation.frameHeight);             
+            var moveUp = Math.min(10, 50 - animation.frameHeight);
             animation.frameHeight += moveUp;
             this.game.requestMove(this, 0, -1 * moveUp);
             this.entity.height += moveUp;
-            
+
             //By making the core intangible after it finishes rising, it pops up the player
             //momentarily but otherwise does not impede them.
             if (moveUp === 0) this.entity.intangible = true;
@@ -525,12 +523,12 @@ ForestBossCore.prototype = {
             this.entity.height -= moveDown;
             this.game.requestMove(this, 0, moveDown);
         }
-        
+
         //If the core has emerged, make it collidable.
         if (this.entity.height > 0) this.entity.collidable = true;
         else this.entity.collidable = false;
     },
-    
+
     readInput: function(input, modifier) {
         if (input === "damage") {
             if (this.callback.pattern !== FB_PATTERN.RETREAT) {
