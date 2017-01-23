@@ -143,12 +143,12 @@ AM.downloadAll(function () {
     secondPlatform.addMovePattern(450, 3, 0, 0);
     forestStage.entityList.push(secondPlatform);
     
-    var bossCameraFocus = new FocusTrigger(gameEngine, AM, 3660, 1940);
-    var bossCameraTrigger = new CameraTrigger(gameEngine, AM, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
-    var bossMusicTrigger = new MusicTrigger(gameEngine, AM, 3149, 1701, 50, 148, BGM.forestBoss);
+    var bossCameraFocus = new FocusTrigger(gameEngine, 3660, 1940);
+    var bossCameraTrigger = new CameraTrigger(gameEngine, 3149, 1701, 50, 148, bossCameraFocus, CAMERA_MODE.PAN, 3, 3);
+    var bossMusicTrigger = new MusicTrigger(gameEngine, 3149, 1701, 50, 148, BGM.forestBoss);
 
     var newInvisiwall = new Invisiblock(gameEngine, AM, 3051, 1701, 50, 148);
-    var spawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, newInvisiwall);
+    var spawnTrigger = new SpawnTrigger(gameEngine, 3149, 1701, 50, 148, newInvisiwall);
 
     forestStage.entityList.push(bossCameraTrigger);
     forestStage.entityList.push(bossMusicTrigger);
@@ -157,7 +157,7 @@ AM.downloadAll(function () {
     var bossStateSwitchTrigger = new EntitySwitchTrigger(gameEngine, 3149, 2000, 1100, 100, forestBossStates);
     
     var forestBoss = new ForestBoss(gameEngine, AM, 3101, 2250, forestStage, bossStateSwitchTrigger);
-    var bossSpawnTrigger = new SpawnTrigger(gameEngine, AM, 3149, 1701, 50, 148, forestBoss);
+    var bossSpawnTrigger = new SpawnTrigger(gameEngine, 3149, 1701, 50, 148, forestBoss);
     
     forestStage.entityList.push(bossSpawnTrigger);
     forestStage.entityList.push(bossStateSwitchTrigger);
@@ -168,7 +168,7 @@ AM.downloadAll(function () {
         forestStage.entityList.push(exitBlock);
     }
     
-    var castleStageTrigger = new StageTrigger(gameEngine, AM, 4550, 2101, 50, 148, 1);
+    var castleStageTrigger = new StageTrigger(gameEngine, 4550, 2101, 50, 148, 1);
     forestStage.entityList.push(castleStageTrigger);
     
     var castleStage = new Stage(gameEngine, STAGE_TYPE.CASTLE, BGM.castleLevel);
