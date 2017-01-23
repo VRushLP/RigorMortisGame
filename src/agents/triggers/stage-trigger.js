@@ -2,11 +2,11 @@
  * A stage trigger will change the current stage of the game.
  */
 function StageTrigger(game, x, y, width, height, stageNumber) {
-    Trigger.call(this, game, x, y, width, height);
+    AbstractTrigger.call(this, game, x, y, width, height);
     this.stageNumber = stageNumber;
 }
 
-StageTrigger.prototype = Object.create(Trigger.prototype);
+StageTrigger.prototype = Object.create(AbstractTrigger.prototype);
     
 StageTrigger.prototype.checkListeners = function(agent) {
     if (agent.entity.controllable) {

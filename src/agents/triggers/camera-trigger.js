@@ -2,14 +2,14 @@
  * A camera trigger causes the game engine to change its camera focus upon collision.
  */
 function CameraTrigger(game, x, y, width, height, focus, type, speedX, speedY) {
-    Trigger.call(this, game, x, y, width, height);
+    AbstractTrigger.call(this, game, x, y, width, height);
     this.focus = focus;
     this.type = type;
     this.speedX = speedX;
     this.speedY = speedY;
 }
 
-CameraTrigger.prototype = Object.create(Trigger.prototype);
+CameraTrigger.prototype = Object.create(AbstractTrigger.prototype);
 
 CameraTrigger.prototype.checkListeners = function(agent) {
     if (agent.entity.controllable) {

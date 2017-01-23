@@ -1,10 +1,10 @@
 function EntitySwitchTrigger(game, x, y, width, height, entities) {
-    Trigger.call(this, game, x, y, width, height);
+    AbstractTrigger.call(this, game, x, y, width, height);
     this.entities = entities;
     this.currentEntity = 0;
 }
 
-EntitySwitchTrigger.prototype = Object.create(Trigger.prototype);
+EntitySwitchTrigger.prototype = Object.create(AbstractTrigger.prototype);
 
 EntitySwitchTrigger.prototype.checkListeners = function (agent) {
     if (agent.entity.controllable) 

@@ -2,11 +2,11 @@
  * A music trigger causes the game engine to change the current song upon collision.
  */
 function MusicTrigger(game, x, y, width, height, music) {
-    Trigger.call(this, game, x, y, width, height);
+    AbstractTrigger.call(this, game, x, y, width, height);
     this.music = music;
 }
 
-MusicTrigger.prototype = Object.create(Trigger.prototype);
+MusicTrigger.prototype = Object.create(AbstractTrigger.prototype);
     
 MusicTrigger.prototype.checkListeners = function(agent) {
     if (agent.entity.controllable) {

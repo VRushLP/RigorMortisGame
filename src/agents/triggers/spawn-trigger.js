@@ -2,13 +2,13 @@
  * Spawn triggers will create an agent, often upon collision with the player character.
  */
 function SpawnTrigger(game, x, y, width, height, agent) {
-    Trigger.call(this, game, x, y, width, height);
+    AbstractTrigger.call(this, game, x, y, width, height);
     this.spawnAgent = agent;
     this.spawnAgent.entity.removeUponReset = true;
     this.agentSpawned = false;
 }
 
-SpawnTrigger.prototype = Object.create(Trigger.prototype);
+SpawnTrigger.prototype = Object.create(AbstractTrigger.prototype);
 
 
 SpawnTrigger.prototype.checkListeners = function(agent) {
