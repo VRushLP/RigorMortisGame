@@ -74,7 +74,7 @@ AM.queueDownload("./img/forest-stage/forest trees.png");
 AM.queueDownload("./img/forest-stage/forest block.png");
 AM.queueDownload("./img/forest-stage/forest ground tiles.png");
 AM.queueDownload("./img/castle-stage/castle block.png");
-AM.queueDownload("img/castle-stage/castle background.png");
+AM.queueDownload("./img/castle-stage/castle background.png");
 AM.queueDownload("./img/enemy/chaser.png");
 AM.queueDownload("./img/enemy/archer.png");
 AM.queueDownload("./img/enemy/arrow.png");
@@ -175,6 +175,7 @@ AM.downloadAll(function () {
 
     var castleStage = new Stage(gameEngine, STAGE_TYPE.CASTLE, BGM.castleLevel);
     castleStage.parseLevelFile(AM.getAsset("./txt/castle-stage.txt").split("\n"), AM);
+    castleStage.addBackground(AM.getAsset("./img/castle-stage/castle background.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
 
     var testPlatform = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.CASTLE);
     var testPlatform2 = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.CASTLE);
