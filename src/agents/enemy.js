@@ -17,7 +17,6 @@ var SKELETON_ANIM = {
 }
 
 var ARCHER_ATTR = {
-
     VISION_RADIUS: 4000,
     STARTING_HEALTH: 1,
     SHOOTING_TIME: 120,
@@ -53,6 +52,15 @@ var WISP_ANIM = {
     FLOATING_RIGHT: 0,
     FLOATING_LEFT: 1,
     DYING: 2
+}
+
+var BALL_ATTR = {
+  Y_ACCELERATION: .5,
+  TERMINAL_VELOCITY: 6
+}
+
+var BALL_ANIM = {
+
 }
 
 /**
@@ -101,7 +109,7 @@ Skeleton.prototype = {
                     this.confused = false;
                 }
             }
-            
+
             //Skeletons should always know if they're falling
             if (this.game.getBottomCollisions(this).length === 0) {
                 //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
@@ -231,7 +239,7 @@ Wisp.prototype = {
                 this.struckRecently = false;
                 this.entity.collidable = true;
             }
-            
+
             if (this.invulnerableFrames > 0) {
                 this.invulnerableFrames--;
             }
@@ -248,7 +256,7 @@ Wisp.prototype = {
             //If the knight is close enough, start chasing.
             var distanceToKnight = getDistance(wispPoint, knightPoint)
             if (distanceToKnight <= WISP_ATTR.ATTENTION_DISTANCE) {
-                
+
                 if (wispPoint.x - knightPoint.x !== 0) {
                     var movementVector = getNormalizedSlope(wispPoint, knightPoint, distanceToKnight);
 
@@ -366,7 +374,7 @@ Archer.prototype = {
 
             var angle = Math.atan2(-distanceY, distanceX);
             var distance = getDistance(archerPoint, knightPoint);
-            
+
             if (distance < this.vision) {
                 if (this.timeDurationNextArrow === ARCHER_ATTR.SHOOTING_TIME) {
                     this.setAnimationFromAngle(angle);
@@ -475,11 +483,11 @@ Arrow.prototype = {
             this.game.requestInputSend(agent, "damage", 1);
             this.entity.removeFromWorld = true;
         }
-        
+
         //If the entity collides, remove it from the world.
         if (!agent.entity.intangible) {
             this.entity.removeFromWorld = true;
-        }        
+        }
     },
 
     rotateAndCache: function (image) {

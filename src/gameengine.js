@@ -1,4 +1,5 @@
 var FOREST_STAGE = 0;
+var CASTLE_STAGE = 1;
 
 var CAMERA_MODE = {
     INSTANT: 0,
@@ -103,14 +104,14 @@ GameEngine.prototype = {
 
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
         this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
-        
+
         this.playerAgent.readInput("reset");
         this.agents.push(this.playerAgent);
 
         this.switchMusic(this.stages[this.currentStage].stageMusic);
         this.stageReset = true;
     },
-    
+
     resetStage : function () {
         //Re-add removed agents to the game.
         for (var i = 0; i < this.removedAgents.length; i++) {
@@ -120,30 +121,30 @@ GameEngine.prototype = {
             this.agents.push(this.removedAgents[i]);
         }
         this.removedAgents = [];
-        
+
         //Reset all agents.
         for (var i = 0; i < this.agents.length; i++) {
             if (typeof this.agents[i].readInput === 'function') {
                 this.agents[i].readInput("reset");
             }
-            
+
             if (this.agents[i].entity.removeUponReset) {
                 this.agents[i].entity.removeFromWorld = true;
             }
             this.agents[i].entity.x = this.agents[i].entity.originX;
             this.agents[i].entity.y = this.agents[i].entity.originY;
         }
-        
+
         //Reset the player's position.
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
         this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
-        
+
         //Reset the camera.
         this.camera.frozen = true;
         this.cameraAgent = this.playerAgent;
         this.camera.mode = CAMERA_MODE.INSTANT;
         this.camera.frozen = false;
-        
+
         //Request to switch to the stage music.
         this.switchMusic(this.stages[this.currentStage].stageMusic);
         this.stageReset = true;
@@ -253,7 +254,7 @@ GameEngine.prototype = {
                     this.removedAgents.push(removedAgent);
                     removedAgent.entity.removeFromWorld = false;
                 }
-                
+
                 //If the removed agent was the player, then respawn them.
                 if (removedAgent === this.playerAgent) {
                     this.respawnPlayer();
@@ -305,7 +306,7 @@ GameEngine.prototype = {
                 this.camera.y -= this.camera.speedY;
             }
         }
-        
+
         if (this.camera.mode === CAMERA_MODE.PAN_THEN_INSTANT) {
             if (Math.abs(this.camera.x - cameraAgentX) <= this.camera.speedX &&
                 Math.abs(this.camera.y - cameraAgentY) <= this.camera.speedY) {
@@ -392,7 +393,7 @@ GameEngine.prototype = {
             if (other === entity) continue;
             //Skip if this entity is collidable.
             if (!other.collidable) continue;
-            
+
             //Skip if this entity is prespecified to not collide with the moving entity.
             var nonColliderDetected = false;
             if (typeof(entity.nonColliders) !== 'undefined' && entity.nonColliders.length > 0) {
@@ -460,15 +461,15 @@ GameEngine.prototype = {
 
             //Collision detected.
             if (!xMoveValid && !yMoveValid) {
-                
+
                 //Temporary fix to allow platforms to move the player.
                 if(other.controllable && other.moveable && !agent.entity.intangible) {
                     this.requestMove(this.agents[i], amountX, amountY);
                     if (agent.entity.pushesOnly) {
-                       continue; 
-                    } 
+                       continue;
+                    }
                 }
-                
+
                 if (typeof this.agents[i].checkListeners === 'function') {
                     this.agents[i].checkListeners(agent);
                 }
@@ -540,7 +541,7 @@ GameEngine.prototype = {
             if (belowEntity) {
                 if (entity.y + entity.height >= other.y - 1 && entity.y + entity.height <= other.y + other.height) {
                     bottomCollisions.push(this.agents[i]);
-                    
+
                     if (typeof this.agents[i].checkListeners === 'function') {
                         this.agents[i].checkListeners(agent);
                     }
@@ -595,7 +596,7 @@ GameEngine.prototype = {
             if (aboveEntity) {
                 if (entity.y >= other.y && entity.y <= other.y + other.height + 1) {
                     topCollisions.push(this.agents[i]);
-                    
+
                     if (typeof this.agents[i].checkListeners === 'function') {
                         this.agents[i].checkListeners(agent);
                     }
@@ -679,7 +680,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.save();
     this.stages[this.currentStage].drawBackground(this.camera.x);
     for (var i = 0; i < this.agents.length; i++) {
-        
+
         if (this.isOnScreen(this.agents[i].entity)) {
             if (typeof this.agents[i].draw === 'function') {
                 this.agents[i].draw(this, this.camera.x, this.camera.y);
@@ -688,14 +689,14 @@ GameEngine.prototype.draw = function () {
             }
         }
     }
-    
+
     this.drawHealthBar();
     this.ctx.restore();
 }
 
 GameEngine.prototype.drawHealthBar = function () {
     if (!this.healthBarVisible) return;
-    
+
     var percent = this.playerAgent.health / KNIGHT_ATTR.STARTING_HEALTH;
     this.ctx.fillStyle = "#2C5D63";
     this.drawRoundedRect(10, 10, 520, 50);
