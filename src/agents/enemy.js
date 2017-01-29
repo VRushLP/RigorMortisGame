@@ -450,9 +450,9 @@ Archer.prototype = {
         }
     }
 }
-//TODO Should be : function Arrow(game, AM, x, y, distanceX, distanceY, angle)
+
 function Arrow(x, y, distanceX, distanceY, angle, game, callback) {
-    this.game = game;
+    this.game = callback.game;
     this.entity = new Entity(x, y, 25, 5);
     this.entity.temporary = true;
     this.entity.moveable = true;
@@ -471,10 +471,6 @@ function Arrow(x, y, distanceX, distanceY, angle, game, callback) {
 Arrow.prototype = {
 
     update: function () {
-        var temp = {
-            x: this.entity.x,
-            y: this.entity.y
-        }
         this.game.requestMove(this, this.xVel, this.yVel);
     },
 
@@ -503,6 +499,50 @@ Arrow.prototype = {
     }
 }
 
+function BallDropPoint(game, AM, x, y) {
+    this.game = game;
+    this.entity = new Entity(x, y, 0, 0);
+    this.entity.collidable = false;
+    this.ballSprite = new Animation(Am.getAsset("./img/enemy/iron ball.png"), 150, 150, .2, true)
+}
+
+BallDropPoint.prototype = {
+    update: function() {
+      // Check if it's time to drop another ball
+      // If it is, drop another ball
+      // else, nothing to do
+      // Do we check to see if the knight is close enough, or are they on a global timer?
+    },
+
+    dropBall: function() {
+
+    }
+}
+
+function IronBall(dropper){
+    this.game = dropper.game;
+    this.entity = new Entity(dropper.x,dropper,y, 150, 150);
+    this.entity.temporary = true;
+}
+
+IronBall.prototype = {
+    update : function() {
+      //fall
+    },
+
+    checkListeners: function (agent) {
+        if (agent.entity.controllable) {
+            this.game.requestInputSend(agent, "damage", 1);
+            this.entity.removeFromWorld = true;
+        }
+
+        //If the entity collides, remove it from the world.
+        if (!agent.entity.intangible) {
+            this.entity.removeFromWorld = true;
+        }
+    }
+}
+
 function HealthPotion(game, AM, x, y) {
     this.entity = new Entity(x, y, 50, 50);
     this.game = game;
@@ -515,7 +555,7 @@ function HealthPotion(game, AM, x, y) {
 HealthPotion.prototype = {
 
     update : function(){
-
+        // Nothing to do.
     },
 
     checkListeners: function (agent) {
