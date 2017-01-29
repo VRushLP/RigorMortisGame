@@ -81,6 +81,7 @@ AM.queueDownload("./img/enemy/arrow.png");
 AM.queueDownload("./img/enemy/potion.png");
 AM.queueDownload("./img/enemy/spike.png");
 AM.queueDownload("./img/enemy/wisp.png");
+AM.queueDownload("./img/enemy/iron ball.png");
 AM.queueDownload("./img/enemy/death anim.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss spike 50px.png");
 AM.queueDownload("./img/enemy/forest boss/forest boss spike 100px.png");

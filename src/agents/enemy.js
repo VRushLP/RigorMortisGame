@@ -56,7 +56,8 @@ var WISP_ANIM = {
 
 var BALL_ATTR = {
   Y_ACCELERATION: .5,
-  TERMINAL_VELOCITY: 6
+  TERMINAL_VELOCITY: 6,
+  DROP_FREQUENCY: 3 //seconds
 }
 
 var BALL_ANIM = {
@@ -502,42 +503,50 @@ Arrow.prototype = {
 function BallDropPoint(game, AM, x, y) {
     this.game = game;
     this.entity = new Entity(x, y, 0, 0);
+    this.nextBall = BALL_ATTR.DROP_FREQUENCY;
     this.entity.collidable = false;
-    this.ballSprite = new Animation(Am.getAsset("./img/enemy/iron ball.png"), 150, 150, .2, true)
+
+    this.ballAnimation = new Animation(AM.getAsset("./img/enemy/iron ball.png"), 150, 150, .2, true);
+    this.ballAnimation.addFrame(0, 0);
 }
 
 BallDropPoint.prototype = {
+  // Do we check to see if the knight is close enough, or are they on a global timer?
     update: function() {
       // Check if it's time to drop another ball
-      // If it is, drop another ball
+      this.nextBall -= this.game.clockTick;
+
+      if (this.nextBall <= 0) {
+        // If it is, drop another ball
+        this.nextBall = BALL_ATTR.DROP_FREQUENCY;
+        this.game.addAgent(new IronBall(this))
+      }
       // else, nothing to do
-      // Do we check to see if the knight is close enough, or are they on a global timer?
     },
-
-    dropBall: function() {
-
-    }
 }
 
 function IronBall(dropper){
     this.game = dropper.game;
-    this.entity = new Entity(dropper.x,dropper,y, 150, 150);
+    this.entity = new Entity(dropper.entity.x, dropper.entity.y, 150, 150);
+    this.entity.animationList.push(dropper.ballAnimation);
     this.entity.temporary = true;
+    this.entity.moveable = true;
+    this.entity.nonColliders = [dropper.entity];
+    this.yVelocity = 0;
 }
 
 IronBall.prototype = {
     update : function() {
-      //fall
+      this.yVelocity += BALL_ATTR.Y_ACCELERATION;
+      if (this.yVelocity > BALL_ATTR.TERMINAL_VELOCITY) this.yVelocity = BALL_ATTR.TERMINAL_VELOCITY;
+
+      this.game.requestMove(this, 0, this.yVelocity);
     },
 
     checkListeners: function (agent) {
         if (agent.entity.controllable) {
             this.game.requestInputSend(agent, "damage", 1);
-            this.entity.removeFromWorld = true;
-        }
-
-        //If the entity collides, remove it from the world.
-        if (!agent.entity.intangible) {
+        } else if (!agent.entity.intangible) {
             this.entity.removeFromWorld = true;
         }
     }

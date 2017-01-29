@@ -40,7 +40,7 @@ Animation.prototype = {
         var frames = numFrames || 1;
         //Scan through the spritesheet, adding frames at each index as we go.
         //Checks if we are at the end of a column, but not if we are at the end of all rows. TODO?
-        for (var i = 0; i < frames; i += 1) {
+        for (var i = 0; i < frames; i++) {
             if (scanForward === false) {
                 if (currentX < 0) {
                     currentX = this.spriteSheet.width - this.frameWidth;
@@ -118,10 +118,10 @@ Animation.prototype = {
         if (this.isDone()) {
             if (this.loop) this.elapsedTime = 0;
         }
-        
+
         //Drawing with a height or width of zero throws an IndexSizeError.
         if (this.frameWidth <= 0 || this.frameHeight <= 0) return;
-        
+
         var frame = this.currentFrame();
 
         if(this.frames.length > 0) {

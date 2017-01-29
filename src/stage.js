@@ -119,8 +119,10 @@ Stage.prototype = {
                         this.entityList.push(new HealthPotion(this.gameEngine, AM, currentX, currentY));
                         break;
                     case "^":
-                        this.entityList.push(new Spike(this.gameEngine, AM, currentX, currentY))
+                        this.entityList.push(new Spike(this.gameEngine, AM, currentX, currentY));
                         break;
+                    case "O":
+                        this.entityList.push(new BallDropPoint(this.gameEngine, AM, currentX, currentY));
                     default: break;
                 }
                 currentX += 50;
