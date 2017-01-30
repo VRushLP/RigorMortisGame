@@ -1,7 +1,7 @@
 var SKELETON_ATTR = {
-    STARTING_HEALTH: 1,
+    STARTING_HEALTH: 1, // TODO Increase and implement knockback on skeletons
     SPEED: 3,
-    INVULNERABILITY_FRAMES: 40,
+    INVULNERABILITY_TIME: .66, // Prev: 40 frames
     ATTENTION_DISTANCE: 400,
     VERTICAL_TOLERANCE: -250,
     Y_ACCELERATION: .5,
@@ -19,8 +19,8 @@ var SKELETON_ANIM = {
 var ARCHER_ATTR = {
     VISION_RADIUS: 4000,
     STARTING_HEALTH: 1,
-    SHOOTING_TIME: 120,
-    INVULNERABILITY_FRAMES: 40,
+    SHOOTING_TIME: 2, //Previously 120 frames
+    INVULNERABILITY_TIME: .66, //Prev: 40 frames
     ARROW_SPEED: 8,
 }
 
@@ -41,8 +41,9 @@ var WISP_ATTR = {
     SPEED: 2,
     ATTENTION_DISTANCE: 500,
     TOUCH_DISTANCE: 50,
-    FLEE_TIME: 45,
-    FLEE_ACCELERATION: 4
+    FLEE_TIME: .75, //Previously 45 frames
+    FLEE_ACCELERATION: 4,
+    INVULNERABILITY_TIME: .66
     //This should be true: SPEED*FLEE_TIME*FLEE_ACCELERATION < ATTENTION_DISTANCE
 }
 
@@ -67,7 +68,7 @@ function Skeleton(game, AM, x, y) {
     this.game = game;
 
     this.health = SKELETON_ATTR.STARTING_HEALTH;
-    this.invulnerableFrames = 0;
+    this.invulnerableTime = 0;
     this.yVelocity = 0;
     this.xDestination = x;
     this.yDestination = y;
@@ -95,13 +96,16 @@ function Skeleton(game, AM, x, y) {
 Skeleton.prototype = {
 
     update: function () {
-        if (this.entity.collidable) {
-            //compute updates that are independent of player distance
-            if (this.invulnerableFrames > 0) {
-                this.invulnerableFrames--;
+        timeDiff = this.game.clockTick;
 
-                if (this.invulnerableFrames === 0) {
+        //compute updates that are independent of player distance
+        if (this.entity.collidable) {
+            if (this.invulnerableTime >= 0) {
+                this.invulnerableTime -= timeDiff;
+
+                if (this.invulnerableTime < 0) {
                     this.confused = false;
+                    this.invulnerableTime = 0;
                 }
             }
 
@@ -137,7 +141,8 @@ Skeleton.prototype = {
                 }
 
                 if (this.entity.x !== this.xDestination) {
-                    var distance = -(this.entity.x - this.xDestination);                     //Reassign so negative values are to your left, positive values are to your right
+                    //Reassign so negative values are to your left, positive values are to your right
+                    var distance = -(this.entity.x - this.xDestination);
 
                     if (distance < 0) {
                         this.game.requestMove(this, Math.max(distance, -SKELETON_ATTR.SPEED), 0);
@@ -163,7 +168,7 @@ Skeleton.prototype = {
                 }
             }
          } else {
-             this.entity.setAnimation(SKELETON_ANIM.DYING); // DEATH_ANIMATION
+             this.entity.setAnimation(SKELETON_ANIM.DYING);
             if (this.entity.animationList[SKELETON_ANIM.DYING].isDone()) {
                 this.entity.removeFromWorld = true;
             }
@@ -172,8 +177,8 @@ Skeleton.prototype = {
 
     readInput: function (input, modifier) {
         if (input === "damage") {
-            if (this.invulnerableFrames === 0) {
-                this.invulnerableFrames = SKELETON_ATTR.INVULNERABILITY_FRAMES;
+            if (this.invulnerableTime === 0) {
+                this.invulnerableTime = SKELETON_ATTR.INVULNERABILITY_TIME;
                 this.health--;
                 if (this.health <= 0) {
                     this.entity.x += this.entity.width / 2;
@@ -210,7 +215,7 @@ function Wisp(game, AM, x, y) {
     this.struckRecently = false;
     this.timeToStrikeAgain = 0;
     this.health = WISP_ATTR.STARTING_HEALTH;
-    this.invulnerableFrames = 0;
+    this.invulnerableTime = 0;
 
     var wispRight = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.17, true);
     wispRight.addFrame(0, 50, 4);
@@ -227,22 +232,21 @@ function Wisp(game, AM, x, y) {
 Wisp.prototype = {
 
     update: function () {
+      timeDiff = this.game.clockTick;
+
         if (this.alive) {
             if (this.timeToStrikeAgain > 0) {
-                this.timeToStrikeAgain--;
+                this.timeToStrikeAgain-= timeDiff;
             } else {
                 this.struckRecently = false;
                 this.entity.collidable = true;
             }
 
-            if (this.invulnerableFrames > 0) {
-                this.invulnerableFrames--;
-            }
-
-            var knightPoint = this.game.playerAgent.entity.getCenter();
-
-            if (this.invulnerableFrames > 0) {
-                this.invulnerableFrames--;
+            if (this.invulnerableTime > 0) {
+                this.invulnerableTime-= timeDiff;
+                if (this.invulnerableTime <= 0) {
+                    this.invulnerableTime = 0;
+                }
             }
 
             var knightPoint = this.game.playerAgent.entity.getCenter();
@@ -294,8 +298,8 @@ Wisp.prototype = {
 
     readInput: function (input, modifier) {
         if (input === "damage") {
-            if (this.invulnerableFrames === 0) {
-                this.invulnerableFrames = WISP_ATTR.INVULNERABILITY_FRAMES;
+            if (this.invulnerableTime <= 0) {
+                this.invulnerableTime = WISP_ATTR.INVULNERABILITY_TIME;
                 this.health--;
                 if (this.health <= 0) {
                     this.entity.x += this.entity.width / 2;
@@ -310,7 +314,7 @@ Wisp.prototype = {
             this.alive = true;
             this.entity.collidable = true;
             this.health = WISP_ATTR.STARTING_HEALTH;
-            this.invulnerableFrames = 0;
+            this.invulnerableTime = 0;
             this.entity.animationList[WISP_ANIM.DYING].elapsedTime = 0;
         }
     },
@@ -320,13 +324,15 @@ function Archer (game, AM, x, y) {
     this.entity = new Entity(x, y, 68, 60);
     this.game = game;
 
-    this.timeDurationNextArrow = ARCHER_ATTR.SHOOTING_TIME;
+    this.timeUntilNextArrow = ARCHER_ATTR.SHOOTING_TIME;
     this.health = ARCHER_ATTR.STARTING_HEALTH;
     this.vision = ARCHER_ATTR.VISION_RADIUS;
-    this.invulnerableFrames = 0;
+    this.invulnerableTime = 0;
     this.center = this.entity.getCenter()
     // For passing to arrows
     this.arrowImg = AM.getAsset("./img/enemy/arrow.png");
+
+
 
     var archerImg = AM.getAsset("./img/enemy/archer.png");
     var archerRight = new Animation(archerImg, 73, 64, 0.05, true);
@@ -363,6 +369,8 @@ function Archer (game, AM, x, y) {
 Archer.prototype = {
 
     update: function () {
+      timeDiff = this.game.clockTick;
+
         if (this.entity.collidable) {
             var knightPoint = this.game.playerAgent.entity.getCenter();
 
@@ -373,15 +381,18 @@ Archer.prototype = {
             var distance = getDistance(this.center, knightPoint);
 
             if (distance < this.vision) {
-                if (this.timeDurationNextArrow === ARCHER_ATTR.SHOOTING_TIME) {
+                if (this.timeUntilNextArrow >= ARCHER_ATTR.SHOOTING_TIME) {
                     this.setAnimationFromAngle(angle);
                 }
-                this.timeDurationNextArrow--;
-                if (this.timeDurationNextArrow <= 0) {
-                    this.timeDurationNextArrow = ARCHER_ATTR.SHOOTING_TIME;
+                this.timeUntilNextArrow -= timeDiff;
+                if (this.timeUntilNextArrow <= 0) {
+                    this.timeUntilNextArrow = ARCHER_ATTR.SHOOTING_TIME;
                 }
             }
-            if (this.entity.currentAnimation !== ARCHER_ANIM.IDLE_LEFT && this.entity.currentAnimation !== ARCHER_ANIM.IDLE_RIGHT) {
+
+            if (this.entity.currentAnimation !== ARCHER_ANIM.IDLE_LEFT &&
+                this.entity.currentAnimation !== ARCHER_ANIM.IDLE_RIGHT) {
+
                 if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
                     this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
 

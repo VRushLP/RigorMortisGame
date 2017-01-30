@@ -24,7 +24,7 @@ window.requestAnimFrame = (function () {
 
 function Timer() {
     this.gameTime = 0;
-    this.maxStep = 0.05;
+    this.maxStep = 0.016;
     this.wallLastTimestamp = 0;
 }
 
