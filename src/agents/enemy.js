@@ -22,8 +22,6 @@ var ARCHER_ATTR = {
     SHOOTING_TIME: 120,
     INVULNERABILITY_FRAMES: 40,
     ARROW_SPEED: 8,
-    ARROW_LEFT_OFFSET: -10,
-    ARROW_RIGHT_OFFSET: 10
 }
 
 var ARCHER_ANIM = {
@@ -58,10 +56,6 @@ var BALL_ATTR = {
   Y_ACCELERATION: .5,
   TERMINAL_VELOCITY: 6,
   DROP_FREQUENCY: 3 //seconds
-}
-
-var BALL_ANIM = {
-
 }
 
 /**
@@ -330,6 +324,9 @@ function Archer (game, AM, x, y) {
     this.health = ARCHER_ATTR.STARTING_HEALTH;
     this.vision = ARCHER_ATTR.VISION_RADIUS;
     this.invulnerableFrames = 0;
+    this.center = this.entity.getCenter()
+    // For passing to arrows
+    this.arrowImg = AM.getAsset("./img/enemy/arrow.png");
 
     var archerImg = AM.getAsset("./img/enemy/archer.png");
     var archerRight = new Animation(archerImg, 73, 64, 0.05, true);
@@ -351,6 +348,7 @@ function Archer (game, AM, x, y) {
     var archerDeath = new Animation(AM.getAsset("./img/enemy/death anim.png"), 15, 15, 0.1, false);
     archerDeath.addFrame(0, 0, 7);
 
+
     this.entity.animationList.push(archerLeft);
     this.entity.animationList.push(archerRight);
     this.entity.animationList.push(archerLeftShooting);
@@ -368,13 +366,11 @@ Archer.prototype = {
         if (this.entity.collidable) {
             var knightPoint = this.game.playerAgent.entity.getCenter();
 
-            var archerPoint = this.entity.getCenter();
-
-            var distanceX = knightPoint.x - archerPoint.x;
-            var distanceY = knightPoint.y - archerPoint.y;
+            var distanceX = knightPoint.x - this.center.x;
+            var distanceY = knightPoint.y - this.center.y;
 
             var angle = Math.atan2(-distanceY, distanceX);
-            var distance = getDistance(archerPoint, knightPoint);
+            var distance = getDistance(this.center, knightPoint);
 
             if (distance < this.vision) {
                 if (this.timeDurationNextArrow === ARCHER_ATTR.SHOOTING_TIME) {
@@ -389,15 +385,9 @@ Archer.prototype = {
                 if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
                     this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
 
-                    if (this.entity.currentAnimation === ARCHER_ANIM.ATK_DOWN_LEFT ||
-                        this.entity.currentAnimation === ARCHER_ANIM.ATK_STRAIGHT_LEFT ||
-                        this.entity.currentAnimation === ARCHER_ANIM.ATK_UP_LEFT) {
-                        var arrow = new Arrow(archerPoint.x - ARCHER_ATTR.ARROW_LEFT_OFFSET, archerPoint.y, distanceX, distanceY, angle, this.game, this);
-                    } else {
-                        var arrow = new Arrow(archerPoint.x + ARCHER_ATTR.ARROW_RIGHT_OFFSET, archerPoint.y, distanceX, distanceY, angle, this.game, this);
-                    }
-
+                    var arrow = new Arrow(this, distanceX, distanceY, angle);
                     this.game.addAgent(arrow);
+
                     if (knightPoint.x > this.entity.x) {
                         this.entity.currentAnimation = ARCHER_ANIM.IDLE_RIGHT;
                     } else {
@@ -452,19 +442,19 @@ Archer.prototype = {
     }
 }
 
-function Arrow(x, y, distanceX, distanceY, angle, game, callback) {
-    this.game = callback.game;
-    this.entity = new Entity(x, y, 25, 5);
+function Arrow(archer, distanceX, distanceY, angle) {
+    this.game = archer.game;
+    this.entity = new Entity(archer.center.x, archer.center.y, 25, 5);
     this.entity.temporary = true;
     this.entity.moveable = true;
-    this.entity.nonColliders = [callback.entity];
+    this.entity.nonColliders = [archer.entity];
 
     var actualSpeed = ARCHER_ATTR.ARROW_SPEED / Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     this.xVel = distanceX * actualSpeed;
     this.yVel = distanceY * actualSpeed;
     this.angle = angle;
 
-    var arrowAnimation = new Animation(this.rotateAndCache(AM.getAsset("./img/enemy/arrow.png")), this.entity.width, this.entity.width, 0.2, true);
+    var arrowAnimation = new Animation(this.rotateAndCache(archer.arrowImg), this.entity.width, this.entity.width, 0.2, true);
     arrowAnimation.addFrame(0, 0);
     this.entity.animationList.push(arrowAnimation);
 }
