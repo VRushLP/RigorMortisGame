@@ -25,8 +25,8 @@ var ARCHER_ATTR = {
 }
 
 var ARCHER_ANIM = {
-    IDLE_LEFT: 0,
-    IDLE_RIGHT: 1,
+    IDLE_RIGHT: 0,
+    IDLE_LEFT: 1,
     ATK_STRAIGHT_LEFT: 2,
     ATK_STRAIGHT_RIGHT: 3,
     ATK_DOWN_LEFT: 4,
@@ -73,23 +73,7 @@ function Skeleton(game, AM, x, y) {
     this.xDestination = x;
     this.yDestination = y;
     this.confused = false;
-
-    var skeletonIdleRight = new Animation(AM.getAsset("./img/enemy/chaser.png"), 31, 59, 0.05, true);
-    skeletonIdleRight.addFrame(31, 0);
-    var skeletonIdleLeft = new Animation(AM.getAsset("./img/enemy/chaser.png"), 31, 59, 0.05, true);
-    skeletonIdleLeft.addFrame(0, 0);
-    var skeletonRunRight = new Animation(AM.getAsset("./img/enemy/chaser.png"), 52, 59, 0.1, true);
-    skeletonRunRight.addFrame(0, 118, 3);
-    var skeletonRunLeft = new Animation(AM.getAsset("./img/enemy/chaser.png"), 52, 59, 0.1, true);
-    skeletonRunLeft.addFrame(0, 59, 3);
-    var skeletonDeath = new Animation(AM.getAsset("./img/enemy/death anim.png"), 15, 15, 0.1, false);
-    skeletonDeath.addFrame(0, 0, 7);
-
-    this.entity.addAnimation(skeletonIdleRight);
-    this.entity.addAnimation(skeletonIdleLeft);
-    this.entity.addAnimation(skeletonRunRight);
-    this.entity.addAnimation(skeletonRunLeft);
-    this.entity.addAnimation(skeletonDeath);
+    this.entity.addAnimationSet(new AnimationSet(ANIMATION_SET.SKELETON, AM));
     this.entity.setAnimation(SKELETON_ANIM.STAND_RIGHT);
 }
 
@@ -216,17 +200,7 @@ function Wisp(game, AM, x, y) {
     this.timeToStrikeAgain = 0;
     this.health = WISP_ATTR.STARTING_HEALTH;
     this.invulnerableTime = 0;
-
-    var wispRight = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.17, true);
-    wispRight.addFrame(0, 50, 4);
-    var wispLeft = new Animation(AM.getAsset("./img/enemy/wisp.png"), 44, 50, 0.17, true);
-    wispLeft.addFrame(0, 0, 4);
-    var wispDie = new Animation(AM.getAsset("./img/enemy/death anim.png"), 15, 15, 0.1, false);
-    wispDie.addFrame(0, 0, 7);
-
-    this.entity.addAnimation(wispRight);
-    this.entity.addAnimation(wispLeft);
-    this.entity.addAnimation(wispDie);
+    this.entity.addAnimationSet(new AnimationSet(ANIMATION_SET.WISP, AM));
 }
 
 Wisp.prototype = {
@@ -329,41 +303,10 @@ function Archer (game, AM, x, y) {
     this.vision = ARCHER_ATTR.VISION_RADIUS;
     this.invulnerableTime = 0;
     this.center = this.entity.getCenter()
+    this.entity.addAnimationSet(new AnimationSet(ANIMATION_SET.ARCHER, AM));
+    
     // For passing to arrows
     this.arrowImg = AM.getAsset("./img/enemy/arrow.png");
-
-
-
-    var archerImg = AM.getAsset("./img/enemy/archer.png");
-    var archerRight = new Animation(archerImg, 73, 64, 0.05, true);
-    archerRight.addFrame(73, 0);
-    var archerLeft = new Animation(archerImg, 73, 64, 0.05, true);
-    archerLeft.addFrame(0, 0);
-    var archerLeftShooting = new Animation(archerImg, 73, 64, 0.2, false);
-    archerLeftShooting.addFrame(0, 64, 3);
-    var archerRightShooting = new Animation(archerImg, 73, 64, 0.2, false);
-    archerRightShooting.addFrame(0, 128, 3);
-    var archerLeftShootingDown = new Animation(archerImg, 73, 64, 0.2, false);
-    archerLeftShootingDown.addFrame(0, 192, 3);
-    var archerRightShootingDown = new Animation(archerImg, 73, 64, 0.2, false);
-    archerRightShootingDown.addFrame(0, 256, 3);
-    var archerLeftShootingUp = new Animation(archerImg, 73, 64, 0.2, false);
-    archerLeftShootingUp.addFrame(0, 320, 3);
-    var archerRightShootingUp = new Animation(archerImg, 73, 64, 0.2, false);
-    archerRightShootingUp.addFrame(0, 384, 3);
-    var archerDeath = new Animation(AM.getAsset("./img/enemy/death anim.png"), 15, 15, 0.1, false);
-    archerDeath.addFrame(0, 0, 7);
-
-
-    this.entity.animationList.push(archerLeft);
-    this.entity.animationList.push(archerRight);
-    this.entity.animationList.push(archerLeftShooting);
-    this.entity.animationList.push(archerRightShooting);
-    this.entity.animationList.push(archerLeftShootingDown);
-    this.entity.animationList.push(archerRightShootingDown);
-    this.entity.animationList.push(archerLeftShootingUp);
-    this.entity.animationList.push(archerRightShootingUp);
-    this.entity.animationList.push(archerDeath);
 }
 
 Archer.prototype = {
