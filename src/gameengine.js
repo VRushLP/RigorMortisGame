@@ -57,6 +57,7 @@ function GameEngine() {
 
     this.jukebox = new Map();
     this.muted = false;
+    this.inFocus = true;
 
     this.currentMusic = null;
     this.healthBarVisible = false;
@@ -69,6 +70,8 @@ function GameEngine() {
 
     this.DEBUG_MODE = 1;
 }
+
+
 GameEngine.prototype = {
 
     camera: {
@@ -227,6 +230,11 @@ GameEngine.prototype = {
             //console.log(e.which);
             e.preventDefault();
         }, false);
+
+        document.addEventListener("visibilitychange", function(){
+            that.inFocus = !that.inFocus;
+            console.log(that.inFocus);
+        })
     },
 
 
@@ -631,33 +639,35 @@ GameEngine.prototype.start = function () {
 
 //Only entities that respond to inputs should check for input.
 GameEngine.prototype.loop = function () {
-    for(var i = 0; i < this.agents.length; i++) {
-        if(this.agents[i].entity.controllable === true) {
-            if(this.pressRight && !this.pressLeft) this.agents[i].readInput("right");
-            if(this.pressDown) this.agents[i].readInput("down");
-            if(this.pressUp) this.agents[i].readInput("up");
-            if(this.pressLeft && !this.pressRight) this.agents[i].readInput("left");
-            if(this.pressLeft && this.pressRight) this.agents[i].readInput("none");
-            if(this.pressN) this.agents[i].readInput('n');
-            if(this.pressSpace) this.agents[i].readInput("space");
+    if (this.inFocus) {
+      for(var i = 0; i < this.agents.length; i++) {
+          if(this.agents[i].entity.controllable === true) {
+              if(this.pressRight && !this.pressLeft) this.agents[i].readInput("right");
+              if(this.pressDown) this.agents[i].readInput("down");
+              if(this.pressUp) this.agents[i].readInput("up");
+              if(this.pressLeft && !this.pressRight) this.agents[i].readInput("left");
+              if(this.pressLeft && this.pressRight) this.agents[i].readInput("none");
+              if(this.pressN) this.agents[i].readInput('n');
+              if(this.pressSpace) this.agents[i].readInput("space");
 
-            if(this.pressRight && this.pressLeft) {
-                this.agents[i].readInput("left_released");
-                this.agents[i].readInput("right_released");
-            }
-            if(!this.pressUp) this.agents[i].readInput("up_released");
-            if(!this.pressLeft) this.agents[i].readInput("left_released");
-            if(!this.pressRight) this.agents[i].readInput("right_released");
-            if(!this.pressSpace) this.agents[i].readInput("space_released");
-            if(!this.pressRight && !this.pressLeft) this.agents[i].readInput("left_and_right_released");
+              if(this.pressRight && this.pressLeft) {
+                  this.agents[i].readInput("left_released");
+                  this.agents[i].readInput("right_released");
+              }
+              if(!this.pressUp) this.agents[i].readInput("up_released");
+              if(!this.pressLeft) this.agents[i].readInput("left_released");
+              if(!this.pressRight) this.agents[i].readInput("right_released");
+              if(!this.pressSpace) this.agents[i].readInput("space_released");
+              if(!this.pressRight && !this.pressLeft) this.agents[i].readInput("left_and_right_released");
 
-            if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput("none");
-        }
+              if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput("none");
+          }
+      }
+
+      this.clockTick = this.timer.tick();
+      this.update();
+      this.draw();
     }
-
-    this.clockTick = this.timer.tick();
-    this.update();
-    this.draw();
 }
 
 GameEngine.prototype.drawRoundedRect = function(x, y, w, h) {
