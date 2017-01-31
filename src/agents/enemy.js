@@ -17,14 +17,11 @@ var SKELETON_ANIM = {
 }
 
 var ARCHER_ATTR = {
-
     VISION_RADIUS: 4000,
     STARTING_HEALTH: 1,
     SHOOTING_TIME: 2, //Previously 120 frames
     INVULNERABILITY_TIME: .66, //Prev: 40 frames
     ARROW_SPEED: 8,
-    ARROW_LEFT_OFFSET: -10,
-    ARROW_RIGHT_OFFSET: 10
 }
 
 var ARCHER_ANIM = {
@@ -54,6 +51,12 @@ var WISP_ANIM = {
     FLOATING_RIGHT: 0,
     FLOATING_LEFT: 1,
     DYING: 2
+}
+
+var BALL_ATTR = {
+  Y_ACCELERATION: .5,
+  TERMINAL_VELOCITY: 6,
+  DROP_FREQUENCY: 3 //seconds
 }
 
 /**
@@ -325,6 +328,11 @@ function Archer (game, AM, x, y) {
     this.health = ARCHER_ATTR.STARTING_HEALTH;
     this.vision = ARCHER_ATTR.VISION_RADIUS;
     this.invulnerableTime = 0;
+    this.center = this.entity.getCenter()
+    // For passing to arrows
+    this.arrowImg = AM.getAsset("./img/enemy/arrow.png");
+
+
 
     var archerImg = AM.getAsset("./img/enemy/archer.png");
     var archerRight = new Animation(archerImg, 73, 64, 0.05, true);
@@ -346,6 +354,7 @@ function Archer (game, AM, x, y) {
     var archerDeath = new Animation(AM.getAsset("./img/enemy/death anim.png"), 15, 15, 0.1, false);
     archerDeath.addFrame(0, 0, 7);
 
+
     this.entity.animationList.push(archerLeft);
     this.entity.animationList.push(archerRight);
     this.entity.animationList.push(archerLeftShooting);
@@ -364,13 +373,12 @@ Archer.prototype = {
 
         if (this.entity.collidable) {
             var knightPoint = this.game.playerAgent.entity.getCenter();
-            var archerPoint = this.entity.getCenter();
 
-            var distanceX = knightPoint.x - archerPoint.x;
-            var distanceY = knightPoint.y - archerPoint.y;
+            var distanceX = knightPoint.x - this.center.x;
+            var distanceY = knightPoint.y - this.center.y;
 
             var angle = Math.atan2(-distanceY, distanceX);
-            var distance = getDistance(archerPoint, knightPoint);
+            var distance = getDistance(this.center, knightPoint);
 
             if (distance < this.vision) {
                 if (this.timeUntilNextArrow >= ARCHER_ATTR.SHOOTING_TIME) {
@@ -381,22 +389,16 @@ Archer.prototype = {
                     this.timeUntilNextArrow = ARCHER_ATTR.SHOOTING_TIME;
                 }
             }
-            // TODO Refactor this
+
             if (this.entity.currentAnimation !== ARCHER_ANIM.IDLE_LEFT &&
                 this.entity.currentAnimation !== ARCHER_ANIM.IDLE_RIGHT) {
 
                 if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
                     this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
 
-                    if (this.entity.currentAnimation === ARCHER_ANIM.ATK_DOWN_LEFT ||
-                        this.entity.currentAnimation === ARCHER_ANIM.ATK_STRAIGHT_LEFT ||
-                        this.entity.currentAnimation === ARCHER_ANIM.ATK_UP_LEFT) {
-                        var arrow = new Arrow(archerPoint.x - ARCHER_ATTR.ARROW_LEFT_OFFSET, archerPoint.y, distanceX, distanceY, angle, this.game, this);
-                    } else {
-                        var arrow = new Arrow(archerPoint.x + ARCHER_ATTR.ARROW_RIGHT_OFFSET, archerPoint.y, distanceX, distanceY, angle, this.game, this);
-                    }
-
+                    var arrow = new Arrow(this, distanceX, distanceY, angle);
                     this.game.addAgent(arrow);
+
                     if (knightPoint.x > this.entity.x) {
                         this.entity.currentAnimation = ARCHER_ANIM.IDLE_RIGHT;
                     } else {
@@ -450,20 +452,20 @@ Archer.prototype = {
         }
     }
 }
-//TODO Should be : function Arrow(game, AM, x, y, distanceX, distanceY, angle)
-function Arrow(x, y, distanceX, distanceY, angle, game, shooting_archer) {
-    this.game = game;
-    this.entity = new Entity(x, y, 25, 5);
+
+function Arrow(archer, distanceX, distanceY, angle) {
+    this.game = archer.game;
+    this.entity = new Entity(archer.center.x, archer.center.y, 25, 5);
     this.entity.temporary = true;
     this.entity.moveable = true;
-    this.entity.nonColliders = [shooting_archer.entity];
+    this.entity.nonColliders = [archer.entity];
 
     var actualSpeed = ARCHER_ATTR.ARROW_SPEED / Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     this.xVel = distanceX * actualSpeed;
     this.yVel = distanceY * actualSpeed;
     this.angle = angle;
 
-    var arrowAnimation = new Animation(this.rotateAndCache(AM.getAsset("./img/enemy/arrow.png")), this.entity.width, this.entity.width, 0.2, true);
+    var arrowAnimation = new Animation(this.rotateAndCache(archer.arrowImg), this.entity.width, this.entity.width, 0.2, true);
     arrowAnimation.addFrame(0, 0);
     this.entity.animationList.push(arrowAnimation);
 }
@@ -471,10 +473,6 @@ function Arrow(x, y, distanceX, distanceY, angle, game, shooting_archer) {
 Arrow.prototype = {
 
     update: function () {
-        var temp = {
-            x: this.entity.x,
-            y: this.entity.y
-        }
         this.game.requestMove(this, this.xVel, this.yVel);
     },
 
@@ -503,6 +501,58 @@ Arrow.prototype = {
     }
 }
 
+function BallDropPoint(game, AM, x, y) {
+    this.game = game;
+    this.entity = new Entity(x, y, 0, 0);
+    this.nextBall = BALL_ATTR.DROP_FREQUENCY;
+    this.entity.collidable = false;
+
+    this.ballAnimation = new Animation(AM.getAsset("./img/enemy/iron ball.png"), 150, 150, .2, true);
+    this.ballAnimation.addFrame(0, 0);
+}
+
+BallDropPoint.prototype = {
+  // Do we check to see if the knight is close enough, or are they on a global timer?
+    update: function() {
+      // Check if it's time to drop another ball
+      this.nextBall -= this.game.clockTick;
+
+      if (this.nextBall <= 0) {
+        // If it is, drop another ball
+        this.nextBall = BALL_ATTR.DROP_FREQUENCY;
+        this.game.addAgent(new IronBall(this))
+      }
+      // else, nothing to do
+    },
+}
+
+function IronBall(dropper){
+    this.game = dropper.game;
+    this.entity = new Entity(dropper.entity.x, dropper.entity.y, 150, 150);
+    this.entity.animationList.push(dropper.ballAnimation);
+    this.entity.temporary = true;
+    this.entity.moveable = true;
+    this.entity.nonColliders = [dropper.entity];
+    this.yVelocity = 0;
+}
+
+IronBall.prototype = {
+    update : function() {
+      this.yVelocity += BALL_ATTR.Y_ACCELERATION;
+      if (this.yVelocity > BALL_ATTR.TERMINAL_VELOCITY) this.yVelocity = BALL_ATTR.TERMINAL_VELOCITY;
+
+      this.game.requestMove(this, 0, this.yVelocity);
+    },
+
+    checkListeners: function (agent) {
+        if (agent.entity.controllable) {
+            this.game.requestInputSend(agent, "damage", 1);
+        } else if (!agent.entity.intangible) {
+            this.entity.removeFromWorld = true;
+        }
+    }
+}
+
 function HealthPotion(game, AM, x, y) {
     this.entity = new Entity(x, y, 50, 50);
     this.game = game;
@@ -515,6 +565,7 @@ function HealthPotion(game, AM, x, y) {
 HealthPotion.prototype = {
 
     update : function(){
+        // Nothing to do.
     },
 
     checkListeners: function (agent) {

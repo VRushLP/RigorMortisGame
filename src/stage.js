@@ -12,13 +12,13 @@ function Stage(gameEngine, stageType, music) {
     this.backgroundList = [];
     this.stageMusic = null;
     this.stageHeight = 0;
-    
+
     if (typeof(music) !== "undefined") {
         this.stageMusic = music;
-    }    
+    }
     this.gameEngine = gameEngine;
     this.stageType = stageType;
-    
+
     switch (stageType) {
         case (STAGE_TYPE.FOREST):
             this.placeBlock = this.placeForestBlock;
@@ -56,7 +56,7 @@ Stage.prototype = {
         var ctx = this.gameEngine.ctx;
         var canvasWidth = this.gameEngine.ctx.canvas.width;
         var canvasHeight = this.gameEngine.ctx.canvas.height;
-        
+
         //Draw each background to the screen in the order that they were added.
         for(var i = 0; i < this.backgroundList.length; i++) {
             if(this.backgroundList[i].speed > 0) {
@@ -64,7 +64,7 @@ Stage.prototype = {
 
                 //Determine where the background should start based on where the camera is and its speed.
                 var backgroundLeftStart = (cameraX % this.backgroundList[i].speed) / (this.backgroundList[i].speed / canvasWidth);
-                
+
                 //Draw the background based on the above calculation.
                 ctx.drawImage(this.backgroundList[i].image,
                              backgroundLeftStart, 0,
@@ -88,7 +88,7 @@ Stage.prototype = {
         //When parsing the level file, put the blocks into this array so that
         //they can be optimized before building.
         var blockArray = [];
-        
+
         var currentX = 0;
         var currentY = 0;
 
@@ -118,6 +118,11 @@ Stage.prototype = {
                     case "h":
                         this.entityList.push(new HealthPotion(this.gameEngine, AM, currentX, currentY));
                         break;
+                    case "^":
+                        this.entityList.push(new Spike(this.gameEngine, AM, currentX, currentY));
+                        break;
+                    case "O":
+                        this.entityList.push(new BallDropPoint(this.gameEngine, AM, currentX, currentY));
                     default: break;
                 }
                 currentX += 50;
@@ -128,7 +133,7 @@ Stage.prototype = {
         }
 
         this.stageHeight = currentY + 50;
-        
+
         //Scan through the loaded block array and set the block depths.
         for (var row = 0; row < blockArray.length; row++) {
             for (var column = 0; column < blockArray[row].length; column++) {
@@ -137,54 +142,54 @@ Stage.prototype = {
                 }
             }
         }
-        
+
         //Scan through the loaded block array and equalize the blocks. Then place them.
         for (var row = 0; row < blockArray.length; row++) {
             for (var column = 0; column < blockArray[row].length; column++) {
                 var currentBlock = blockArray[row][column];
                 if (currentBlock.exists) {
-                    this.equalizeBlocks(blockArray, row, column);                  
-                    
+                    this.equalizeBlocks(blockArray, row, column);
+
                     this.entityList.push(new Block(this.gameEngine, AM, column * 50,
-                                        row * 50, this.stageType, currentBlock.depth)); 
+                                        row * 50, this.stageType, currentBlock.depth));
                 }
             }
         }
     },
-    
+
     placeForestBlock: function (blockArray, row, column) {
         var blockAbove, blockLeft, blockRight, currentBlock;
-        
+
         var currentBlock = blockArray[row][column];
-        
+
         if (typeof(blockArray[row - 1]) !== 'undefined') {
             blockAbove = blockArray[row - 1][column];
         }
         var blockLeft = blockArray[row][column - 1];
         var blockRight = blockArray[row][column + 1];
-        
+
         //If the block has a block above it, then it is not a surface block.
         if (typeof(blockAbove) !== 'undefined' && blockAbove.exists) {
             currentBlock.depth = 1;
-            
+
             //If the block has blocks to its left and right, then set its depth to be
             //one greater than the block above it.
             if (((typeof(blockLeft) !== 'undefined') && blockLeft.exists) || column === 0) {
                 if (typeof(blockRight) !== 'undefined' && blockRight.exists) {
                     currentBlock.depth = blockAbove.depth + 1;
                 }
-            } 
+            }
         }
     },
-    
+
     placeCastleBlock: function (blockArray, row, column) {
-        
+
         var blockAbove;
         var currentBlock = blockArray[row][column];
         if (typeof(blockArray[row - 1]) !== 'undefined') {
             blockAbove = blockArray[row - 1][column];
         }
-        
+
         //If the block has a block above it, then it has a depth of 1.
         if (typeof(blockAbove) !== 'undefined' && blockAbove.exists) {
             currentBlock.depth = 1;
@@ -192,15 +197,15 @@ Stage.prototype = {
             currentBlock.depth = 0;
         }
     },
-    
+
     equalizeForestBlocks: function (blockArray, row, column) {
         var currentBlock = blockArray[row][column];
-        
+
         if (currentBlock.depth > 1 && column != 0) {
             var blockAbove = blockArray[row - 1][column];
             var blockLeft = blockArray[row][column - 1];
             var blockRight = blockArray[row][column + 1];
-            
+
             if (blockLeft.depth < currentBlock.depth && blockRight.depth < currentBlock.depth) {
                 currentBlock.depth = Math.min(blockLeft.depth, blockRight.depth);
             }
@@ -213,8 +218,8 @@ Stage.prototype = {
             if (currentBlock.depth - blockAbove.depth > 1) currentBlock = blockAbove.depth - 1;
         }
     },
-    
+
     equalizeCastleBlocks : function (blockArray, row, column) {
-        //Castle blocks do not require equalization.   
+        //Castle blocks do not require equalization.
     }
 }

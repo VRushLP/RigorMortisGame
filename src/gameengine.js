@@ -1,4 +1,5 @@
 var FOREST_STAGE = 0;
+var CASTLE_STAGE = 1;
 
 var CAMERA_MODE = {
     INSTANT: 0,

@@ -2,18 +2,18 @@ var BLOCKS_GLOBALS = {
     WIDTH: 50,
     HEIGHT: 50,
     FRAME_DURATION: 1,
-}
+};
 
 var MAX_DEPTH = {
     FOREST: 5,
     CASTLE: 1
-}
+};
 
 var BLOCK_EDGE  = {
     NONE: 0,
     LEFT: 1,
     RIGHT: 2
-}
+};
 
 function Block(game, AM, x, y, stageType, depth) {
     this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
@@ -37,21 +37,21 @@ function Block(game, AM, x, y, stageType, depth) {
 
     this.entity.addAnimation(NormalState);
     this.entity.setAnimation(0);
-}
+};
 
 Block.prototype = {
 
     update: function () {
         //Nothing to do.
     }
-}
+};
 
 /*
  * Invisiblock is to be used for invisible walls/platforms of variable length.
  */
 function Invisiblock(game, AM, x, y, width, height) {
     this.entity = new Entity(x, y, width, height);
-}
+};
 
 Invisiblock.prototype = {
     draw: function () {
@@ -61,7 +61,7 @@ Invisiblock.prototype = {
     update: function () {
         //Nothing to do.
     }
-}
+};
 
 function backgroundObject(game, AM, x, y, imgSource) {
 
@@ -74,10 +74,25 @@ function backgroundObject(game, AM, x, y, imgSource) {
 
     this.entity.addAnimation(normalState);
     this.entity.setAnimation(0);
-}
+};
 
 backgroundObject.prototype = {
     update: function() {
 
     }
-}
+};
+
+function Spike(game, AM, x, y) {
+    this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
+    var spikeAnim = new Animation(AM.getAsset("./img/enemy/spike.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
+    this.game = game;
+    spikeAnim.addFrame(0, 0);
+    this.entity.addAnimation(spikeAnim);
+};
+
+Spike.prototype = {
+    checkListeners: function (agent) {
+        this.game.requestInputSend(agent, "damage", 1);
+    },
+    update : function () {}
+};
