@@ -57,7 +57,8 @@ function GameEngine() {
 
     this.jukebox = new Map();
     this.muted = false;
-    this.inFocus = true;
+    this.visible = true;
+    this.paused = false;
 
     this.currentMusic = null;
     this.healthBarVisible = false;
@@ -226,14 +227,22 @@ GameEngine.prototype = {
                 case 77: //M;
                     Howler.mute(that.muted = !that.muted);
                     break;
+                case 80: //P
+                    that.paused = !that.paused;
+                    break;
+                default:
+                    console.log(e.which);
             }
             //console.log(e.which);
             e.preventDefault();
         }, false);
 
         document.addEventListener("visibilitychange", function(){
-            that.inFocus = !that.inFocus;
-            console.log(that.inFocus);
+            if (document.visibilityState === 'visible') {
+              that.visible = true;
+            } else if (document.visibilityState === 'hidden') {
+              that.visible = false;
+            }
         })
     },
 
@@ -639,7 +648,7 @@ GameEngine.prototype.start = function () {
 
 //Only entities that respond to inputs should check for input.
 GameEngine.prototype.loop = function () {
-    if (this.inFocus) {
+    if (this.visible && !this.paused) {
       for(var i = 0; i < this.agents.length; i++) {
           if(this.agents[i].entity.controllable === true) {
               if(this.pressRight && !this.pressLeft) this.agents[i].readInput("right");
