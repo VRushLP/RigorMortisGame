@@ -238,19 +238,26 @@ GameEngine.prototype = {
             e.preventDefault();
         }, false);
 
-        this.ctx.canvas.addEventListener("blur", function(){
+        this.ctx.canvas.addEventListener("blur", function() {
             that.hasFocus = false;
         })
 
-        this.ctx.canvas.addEventListener("focus", function(){
+        this.ctx.canvas.addEventListener("focus", function() {
             that.hasFocus = true;
         })
 
-        document.addEventListener("visibilitychange", function(){
+        document.addEventListener("visibilitychange", function() {
             if (document.visibilityState === 'visible') {
-              that.visible = true;
+                that.visible = true;
+                if (that.music !== 'undefined') {
+                    that.music.play()
+                }
+
             } else if (document.visibilityState === 'hidden') {
-              that.visible = false;
+                that.visible = false;
+                if (that.music !== 'undefined') {
+                    that.music.pause()
+                }
             }
         })
     },
