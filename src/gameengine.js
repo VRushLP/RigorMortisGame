@@ -59,6 +59,7 @@ function GameEngine() {
     this.muted = false;
     this.visible = true;
     this.paused = false;
+    this.hasFocus = true;
 
     this.currentMusic = null;
     this.healthBarVisible = false;
@@ -236,6 +237,14 @@ GameEngine.prototype = {
             //console.log(e.which);
             e.preventDefault();
         }, false);
+
+        this.ctx.canvas.addEventListener("blur", function(){
+            that.hasFocus = false;
+        })
+
+        this.ctx.canvas.addEventListener("focus", function(){
+            that.hasFocus = true;
+        })
 
         document.addEventListener("visibilitychange", function(){
             if (document.visibilityState === 'visible') {
@@ -648,7 +657,7 @@ GameEngine.prototype.start = function () {
 
 //Only entities that respond to inputs should check for input.
 GameEngine.prototype.loop = function () {
-    if (this.visible && !this.paused) {
+    if (this.visible && this.hasFocus && !this.paused) {
       for(var i = 0; i < this.agents.length; i++) {
           if(this.agents[i].entity.controllable === true) {
               if(this.pressRight && !this.pressLeft) this.agents[i].readInput("right");
@@ -676,6 +685,8 @@ GameEngine.prototype.loop = function () {
       this.clockTick = this.timer.tick();
       this.update();
       this.draw();
+    } else {
+        // Deal with being paused here
     }
 }
 
