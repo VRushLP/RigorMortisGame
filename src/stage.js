@@ -29,7 +29,7 @@ function Stage(gameEngine, stageType, music) {
             this.equalizeBlocks = this.equalizeCastleBlocks;
             break;
         default:
-            this.placeBlocks = this.placeForestBlock;
+            this.placeBlock = this.placeForestBlock;
             this.equalizeBlocks = this.equalizeForestBlocks;
     }
 }

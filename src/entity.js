@@ -49,6 +49,13 @@ Entity.prototype = {
     addAnimation: function (newAnimation) {
         this.animationList.push(newAnimation);
     },
+    
+    addAnimationSet: function (animationSet) {
+        var animationArray = animationSet.getAnimationArray();
+        for (var i = 0; i < animationArray.length; i++) {
+            this.addAnimation(animationArray[i]);
+        }
+    },
 
     /*
      * Set the current animation that the entity will draw.
