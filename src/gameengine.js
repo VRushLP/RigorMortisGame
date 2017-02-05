@@ -57,6 +57,9 @@ function GameEngine() {
 
     this.jukebox = new Map();
     this.muted = false;
+    this.visible = true;
+    this.paused = false;
+    this.hasFocus = true;
 
     this.currentMusic = null;
     this.healthBarVisible = false;
@@ -69,6 +72,8 @@ function GameEngine() {
 
     this.DEBUG_MODE = 1;
 }
+
+
 GameEngine.prototype = {
 
     camera: {
@@ -223,10 +228,46 @@ GameEngine.prototype = {
                 case 77: //M;
                     Howler.mute(that.muted = !that.muted);
                     break;
+                case 80: //P
+                    that.paused = !that.paused;
+                    break;
+                default:
+                    console.log(e.which);
             }
             //console.log(e.which);
             e.preventDefault();
         }, false);
+
+        // "blur" is the name for the event when focus is lost.
+        // https://developer.mozilla.org/en-US/docs/Web/Events/blur
+        this.ctx.canvas.addEventListener("blur", function() {
+            that.hasFocus = false;
+        })
+
+        // the event for when focus is gained.
+        // https://developer.mozilla.org/en-US/docs/Web/Events/focus
+        this.ctx.canvas.addEventListener("focus", function() {
+            that.hasFocus = true;
+        })
+
+        // visibilitychange is an event on the document, not any particular element of the document
+        // "The visibilitychange event is fired when the content of a tab has become visible or has been hidden."
+        // This applies to both tab changes and when the browser itself is minimized.
+        // https://developer.mozilla.org/en-US/docs/Web/Events/visibilitychange
+        document.addEventListener("visibilitychange", function() {
+            if (document.visibilityState === 'visible') {
+                that.visible = true;
+                if (that.music !== 'undefined') {
+                    that.music.play()
+                }
+
+            } else if (document.visibilityState === 'hidden') {
+                that.visible = false;
+                if (that.music !== 'undefined') {
+                    that.music.pause()
+                }
+            }
+        })
     },
 
 
@@ -631,33 +672,37 @@ GameEngine.prototype.start = function () {
 
 //Only entities that respond to inputs should check for input.
 GameEngine.prototype.loop = function () {
-    for(var i = 0; i < this.agents.length; i++) {
-        if(this.agents[i].entity.controllable === true) {
-            if(this.pressRight && !this.pressLeft) this.agents[i].readInput("right");
-            if(this.pressDown) this.agents[i].readInput("down");
-            if(this.pressUp) this.agents[i].readInput("up");
-            if(this.pressLeft && !this.pressRight) this.agents[i].readInput("left");
-            if(this.pressLeft && this.pressRight) this.agents[i].readInput("none");
-            if(this.pressN) this.agents[i].readInput('n');
-            if(this.pressSpace) this.agents[i].readInput("space");
+    if (this.visible && this.hasFocus && !this.paused) {
+      for(var i = 0; i < this.agents.length; i++) {
+          if(this.agents[i].entity.controllable === true) {
+              if(this.pressRight && !this.pressLeft) this.agents[i].readInput("right");
+              if(this.pressDown) this.agents[i].readInput("down");
+              if(this.pressUp) this.agents[i].readInput("up");
+              if(this.pressLeft && !this.pressRight) this.agents[i].readInput("left");
+              if(this.pressLeft && this.pressRight) this.agents[i].readInput("none");
+              if(this.pressN) this.agents[i].readInput('n');
+              if(this.pressSpace) this.agents[i].readInput("space");
 
-            if(this.pressRight && this.pressLeft) {
-                this.agents[i].readInput("left_released");
-                this.agents[i].readInput("right_released");
-            }
-            if(!this.pressUp) this.agents[i].readInput("up_released");
-            if(!this.pressLeft) this.agents[i].readInput("left_released");
-            if(!this.pressRight) this.agents[i].readInput("right_released");
-            if(!this.pressSpace) this.agents[i].readInput("space_released");
-            if(!this.pressRight && !this.pressLeft) this.agents[i].readInput("left_and_right_released");
+              if(this.pressRight && this.pressLeft) {
+                  this.agents[i].readInput("left_released");
+                  this.agents[i].readInput("right_released");
+              }
+              if(!this.pressUp) this.agents[i].readInput("up_released");
+              if(!this.pressLeft) this.agents[i].readInput("left_released");
+              if(!this.pressRight) this.agents[i].readInput("right_released");
+              if(!this.pressSpace) this.agents[i].readInput("space_released");
+              if(!this.pressRight && !this.pressLeft) this.agents[i].readInput("left_and_right_released");
 
-            if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput("none");
-        }
+              if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput("none");
+          }
+      }
+
+      this.clockTick = this.timer.tick();
+      this.update();
+      this.draw();
+    } else {
+        // Deal with being paused here
     }
-
-    this.clockTick = this.timer.tick();
-    this.update();
-    this.draw();
 }
 
 GameEngine.prototype.drawRoundedRect = function(x, y, w, h) {
