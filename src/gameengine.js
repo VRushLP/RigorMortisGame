@@ -238,14 +238,22 @@ GameEngine.prototype = {
             e.preventDefault();
         }, false);
 
+        // "blur" is the name for the event when focus is lost.
+        // https://developer.mozilla.org/en-US/docs/Web/Events/blur
         this.ctx.canvas.addEventListener("blur", function() {
             that.hasFocus = false;
         })
 
+        // the event for when focus is gained.
+        // https://developer.mozilla.org/en-US/docs/Web/Events/focus
         this.ctx.canvas.addEventListener("focus", function() {
             that.hasFocus = true;
         })
 
+        // visibilitychange is an event on the document, not any particular element of the document
+        // "The visibilitychange event is fired when the content of a tab has become visible or has been hidden."
+        // This applies to both tab changes and when the browser itself is minimized.
+        // https://developer.mozilla.org/en-US/docs/Web/Events/visibilitychange
         document.addEventListener("visibilitychange", function() {
             if (document.visibilityState === 'visible') {
                 that.visible = true;
