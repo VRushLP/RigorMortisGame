@@ -171,7 +171,7 @@ AM.downloadAll(function () {
         forestStage.entityList.push(exitBlock);
     }
 
-    var castleStageTrigger = new StageTrigger(gameEngine, AM, 4550, 2101, 50, 148, 1);
+    var castleStageTrigger = new StageTrigger(gameEngine, 4550, 2101, 50, 148, 1);
 
     forestStage.entityList.push(castleStageTrigger);
 
