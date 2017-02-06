@@ -23,22 +23,19 @@ var KNIGHT_DIR = {
 var KNIGHT_ATTR = {
     STARTING_HEALTH: 5,
     INVULNERABLITY_TIME: .5, //previously 30 frames
+    PRESS_DOWN_SPEED : 2,
+    PRESS_UP_SPEED : 0.17,    
 }
 
 //Physics Constants
 var KNIGHT_PHYSICS = {
-    TERMINAL_Y_VELOCITY : 16,
     TERMINAL_X_VELOCITY : 5,
+    TERMINAL_Y_VELOCITY : 16,
     KNOCKBACK_VELOCITY : 12,
-    //Initial jump velocity for tapping jump.
-    JUMP_VELOCITY : 8,
-    //Gravity's downward acceleration
+    INITIAL_X_VELOCITY : 5,
+    INITIAL_Y_VELOCITY : 8,
     Y_ACCELERATION : 0.35,
-    RUNNING_SPEED : 5,
-    //Extra velocity added for holding down while falling.
-    PRESS_DOWN_SPEED : 2,
-    //Gravity reduction for holding up while rising.
-    PRESS_UP_SPEED : 0.17,
+    X_ACCELRATION : 0,
 }
 
 /**
@@ -47,6 +44,7 @@ var KNIGHT_PHYSICS = {
  * and also attach to it all animations.
  */
 function Knight(game, AM, x, y) {
+    AbstractAgent.call(this, game, x, y, KNIGHT_PHYSICS);
     this.entity = new Entity(x, y, 48, 50);
     this.game = game;
     this.swordHitbox = null;
@@ -63,6 +61,8 @@ function Knight(game, AM, x, y) {
     this.health = KNIGHT_ATTR.STARTING_HEALTH;
     this.entity.addAnimationSet(new AnimationSet(ANIMATION_SET.KNIGHT, AM));
 };
+
+Knight.prototype = Object.create(AbstractAgent.prototype);
 
 Knight.prototype.draw = function (game, cameraX, cameraY) {
     this.entity.draw(this.game, cameraX, cameraY);
@@ -154,7 +154,7 @@ Knight.prototype.update = function() {
 Knight.prototype.jump = function() {
     //Allow the jump only if the agent is on the ground.
     if(this.game.getBottomCollisions(this).length > 0 && this.canJump) {
-        this.yVelocity = -(KNIGHT_PHYSICS.JUMP_VELOCITY);
+        this.yVelocity = -(KNIGHT_PHYSICS.INITIAL_Y_VELOCITY);
     }
     //The player must actively press up to jump, they can't just hold it.
     this.canJump = false;
@@ -179,12 +179,12 @@ Knight.prototype.rest = function () {
 Knight.prototype.readInput = function(input, modifier) {
     if (input === "down") {
         if(this.attacking) return;
-        this.game.requestMove(this, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
+        this.game.requestMove(this, 0, KNIGHT_ATTR.PRESS_DOWN_SPEED);
     }
     if (input === "up") {
         if(this.attacking) return;
         //Add upwards velocity if the player is holding up while jumping.
-        if (this.yVelocity < 0) this.yVelocity -= KNIGHT_PHYSICS.PRESS_UP_SPEED;
+        if (this.yVelocity < 0) this.yVelocity -= KNIGHT_ATTR.PRESS_UP_SPEED;
         this.jump();
 
         //Allows no-clip debugging.
@@ -300,20 +300,6 @@ Knight.prototype.readInput = function(input, modifier) {
             this.noclip = !this.noclip;
             this.entity.collidable = !this.entity.collidable;
         }
-    }
-}
-
-Knight.prototype.adjustXVelocity = function (amount) {
-    var maxVelocity = KNIGHT_PHYSICS.TERMINAL_X_VELOCITY;
-    this.xVelocity += amount;
-
-    if (this.invulnerableFrames > 0) maxVelocity = KNIGHT_PHYSICS.KNOCKBACK_VELOCITY;
-
-    if (this.xVelocity > maxVelocity) {
-        this.xVelocity = maxVelocity;
-    }
-    if (this.xVelocity < -1 * maxVelocity) {
-        this.xVelocity = -1 * maxVelocity;
     }
 }
 
