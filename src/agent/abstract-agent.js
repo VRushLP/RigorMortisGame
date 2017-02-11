@@ -34,7 +34,7 @@ AbstractAgent.prototype = {
         }
 
         //If the agent has a max velocity, do not allow the agent to exceed it.
-        if (this.maxVelocity != 0) {
+        if (maxVelocity != 0) {
             if (this.xVelocity > maxVelocity) {
                 this.xVelocity = maxVelocity;
             }
@@ -43,6 +43,45 @@ AbstractAgent.prototype = {
             }
         }
         
+    },
+    
+    adjustYVelocity: function (amount) {
+        var maxVelocity = this.physicsMap.TERMINAL_Y_VELOCITY;
+        this.yVelocity += amount;
+        
+        if (maxVelocity != 0) {
+            if (this.yVelocity > maxVelocity) {
+                this.yVelocity = maxVelocity;
+            }
+        }
+    },
+    
+    
+    
+    updateFallingState: function () {
+
+        if (this.game.getBottomCollisions(this).length === 0) {
+            //No bottom collision: Agent is in the air, and should accelerate downwards.
+            this.adjustYVelocity(KNIGHT_PHYSICS.Y_ACCELERATION);    
+        } else if (this.yVelocity > 0) {
+            //Bottom Collision: Agent is on the ground, and should have no downwards velocity.
+            this.yVelocity = 0;
+
+            //If the knight previously had a jumping/falling animation, request the knight to go into a rest state.
+            if(this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_RIGHT ||
+                   this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_LEFT ||
+                   this.entity.currentAnimation === KNIGHT_ANIM.FALLING_RIGHT ||
+                   this.entity.currentAnimation === KNIGHT_ANIM.FALLING_LEFT) {
+                       this.rest();
+                }
+        }
+
+        //If the agent is jumping, check for top collisions.
+        if(this.yVelocity < 0) {
+            if (this.game.getTopCollisions(this).length > 0) {
+                this.yVelocity = 0;
+            }
+        }
     }
 };
 

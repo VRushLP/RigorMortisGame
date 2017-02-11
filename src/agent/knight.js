@@ -85,29 +85,17 @@ Knight.prototype.update = function() {
             this.rest();
         }
     }
+    
+    this.updateFallingState();
 
-    //Update the Knight's falling state.
-    if (this.game.getBottomCollisions(this).length === 0) {
-        //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
-        this.yVelocity += KNIGHT_PHYSICS.Y_ACCELERATION;
-        if (this.yVelocity >= KNIGHT_PHYSICS.TERMINAL_Y_VELOCITY) this.yVelocity = KNIGHT_PHYSICS.TERMINAL_Y_VELOCITY;
-    } else if (this.yVelocity > 0) {
-        //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
-        this.yVelocity = 0;
-
-        //If the knight previously had a jumping/falling animation, request the knight to go into a rest state.
-        if(this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_RIGHT ||
+    if (this.game.getBottomCollisions(this).length !== 0) {
+        if (this.yVelocity > 0) {
+            if(this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_RIGHT ||
                this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_LEFT ||
                this.entity.currentAnimation === KNIGHT_ANIM.FALLING_RIGHT ||
                this.entity.currentAnimation === KNIGHT_ANIM.FALLING_LEFT) {
                    this.rest();
             }
-    }
-
-    //If the agent is jumping, check for top collisions.
-    if(this.yVelocity < 0) {
-        if (this.game.getTopCollisions(this).length > 0) {
-            this.yVelocity = 0;
         }
     }
 
@@ -150,7 +138,7 @@ Knight.prototype.update = function() {
 Knight.prototype.jump = function() {
     //Allow the jump only if the agent is on the ground.
     if(this.game.getBottomCollisions(this).length > 0 && this.canJump) {
-        this.yVelocity = -(KNIGHT_PHYSICS.INITIAL_Y_VELOCITY);
+        this.adjustYVelocity(-1 * (KNIGHT_PHYSICS.INITIAL_Y_VELOCITY));
     }
     //The player must actively press up to jump, they can't just hold it.
     this.canJump = false;
