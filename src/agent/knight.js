@@ -10,7 +10,7 @@ var KNIGHT_ANIM = {
     FALLING_LEFT: 7,
     ATTACK_RIGHT: 8,
     ATTACK_LEFT: 9,
-    FRAME_DURATION: .1,
+    FRAME_DURATION: 0.1,
     FRAME_RUN_DURATION: .085,
 }
 
@@ -22,8 +22,8 @@ var KNIGHT_DIR = {
 
 var KNIGHT_ATTR = {
     STARTING_HEALTH: 5,
-    INVULNERABLITY_TIME: .5, //previously 30 frames
-    PRESS_DOWN_SPEED : 2,
+    INVULNERABLITY_TIME: 0.25, //previously 30 frames
+    PRESS_DOWN_SPEED : 0.5,
     PRESS_UP_SPEED : 0.17,    
 }
 
@@ -32,7 +32,7 @@ var KNIGHT_PHYSICS = {
     TERMINAL_X_VELOCITY : 5,
     TERMINAL_Y_VELOCITY : 16,
     KNOCKBACK_VELOCITY : 12,
-    INITIAL_X_VELOCITY : 5,
+    INITIAL_X_VELOCITY : 2,
     INITIAL_Y_VELOCITY : 8,
     Y_ACCELERATION : 0.35,
     X_ACCELRATION : 0,
@@ -163,12 +163,12 @@ Knight.prototype.rest = function () {
 Knight.prototype.readInput = function(input, modifier) {
     if (input === "down") {
         if(this.attacking) return;
-        this.game.requestMove(this, 0, KNIGHT_ATTR.PRESS_DOWN_SPEED);
+        this.adjustYVelocity(KNIGHT_ATTR.PRESS_DOWN_SPEED);
     }
     if (input === "up") {
         if(this.attacking) return;
         //Add upwards velocity if the player is holding up while jumping.
-        if (this.yVelocity < 0) this.yVelocity -= KNIGHT_ATTR.PRESS_UP_SPEED;
+        if (this.yVelocity < 0) this.adjustYVelocity(-1 * KNIGHT_ATTR.PRESS_UP_SPEED);
         this.jump();
 
         //Allows no-clip debugging.
@@ -183,9 +183,8 @@ Knight.prototype.readInput = function(input, modifier) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
         }
-        if (this.xVelocity >= KNIGHT_PHYSICS.TERMINAL_X_VELOCITY * -1) {
-            this.adjustXVelocity(-2);
-        } else {
+        this.adjustXVelocity(-1 * KNIGHT_PHYSICS.INITIAL_X_VELOCITY);
+        if (this.xVelocity < KNIGHT_PHYSICS.TERMINAL_X_VELOCITY * -1) {
             //Terminal Velocity is exceeding during knockback, so only slow down here.
             this.slowDown();
         }
@@ -197,9 +196,8 @@ Knight.prototype.readInput = function(input, modifier) {
         if(this.game.getBottomCollisions(this).length > 0) {
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }
-        if (this.xVelocity <= KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
-            this.adjustXVelocity(2);
-        } else {
+        this.adjustXVelocity(KNIGHT_PHYSICS.INITIAL_X_VELOCITY);
+        if (this.xVelocity > KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
             this.slowDown();
         }
     }
@@ -289,7 +287,7 @@ Knight.prototype.readInput = function(input, modifier) {
 
 Knight.prototype.slowDown = function () {
     var maxSlowdown = 1;
-    if (this.invulnerableFrames > 0) maxSlowdown = .45;
+    //if (this.invulnerableFrames > 0) maxSlowdown = .45;
 
     if (this.xVelocity > 0) {
          this.adjustXVelocity(Math.max(maxSlowdown * -1, this.xVelocity * -1));
