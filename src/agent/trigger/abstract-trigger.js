@@ -8,11 +8,7 @@ function AbstractTrigger(game, x, y, width, height) {
     this.entity.intangible = true;
 }
 
-AbstractTrigger.prototype = {
-    draw: function () {
-        //Nothing to do.
-    },
-    
+AbstractTrigger.prototype = {    
     update: function () {
         //Nothing to do.
     }

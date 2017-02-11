@@ -64,10 +64,6 @@ function Knight(game, AM, x, y) {
 
 Knight.prototype = Object.create(AbstractAgent.prototype);
 
-Knight.prototype.draw = function (game, cameraX, cameraY) {
-    this.entity.draw(this.game, cameraX, cameraY);
-};
-
 /**
  * Update the Knight agent.
  */
@@ -337,10 +333,6 @@ SwordHitbox.prototype = {
         }
         //Does not move the entity, but simply checks if it is currently colliding.
         this.game.requestMove(this, 0, 0);
-    },
-
-    draw: function() {
-        this.entity.draw();
     },
 
     checkListeners: function(agent) {

@@ -725,7 +725,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.save();
     this.stages[this.currentStage].drawBackground(this.camera.x);
     for (var i = 0; i < this.agents.length; i++) {
-
+        //Currently none do, but agents may override their entity's draw.
         if (this.isOnScreen(this.agents[i].entity)) {
             if (typeof this.agents[i].draw === 'function') {
                 this.agents[i].draw(this, this.camera.x, this.camera.y);
