@@ -23,6 +23,7 @@ function Skeleton(game, AM, x, y) {
     this.entity = new Entity(x, y, 52, 59);
     this.entity.moveable = true;
     this.game = game;
+    this.input_types = game.input_types;
 
     this.health = SKELETON_ATTR.STARTING_HEALTH;
     this.invulnerableTime = 0;
@@ -117,7 +118,7 @@ Skeleton.prototype = {
     },
 
     readInput: function (input, modifier) {
-        if (input === "damage") {
+        if (input === this.input_types.DAMAGE) {
             if (this.invulnerableTime === 0) {
                 this.invulnerableTime = SKELETON_ATTR.INVULNERABILITY_TIME;
                 this.health--;
@@ -130,7 +131,7 @@ Skeleton.prototype = {
                 }
             }
         }
-        if (input === "reset") {
+        if (input === this.input_types.RESET) {
             this.entity.collidable = true;
             this.health = SKELETON_ATTR.STARTING_HEALTH;
             this.entity.currentAnimation = SKELETON_ANIM.STAND_RIGHT;
@@ -143,7 +144,7 @@ Skeleton.prototype = {
 
     checkListeners: function (agent) {
         if (agent.entity.controllable) {
-            this.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
         }
     }
 }

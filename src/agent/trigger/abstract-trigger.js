@@ -5,6 +5,7 @@
 function AbstractTrigger(game, x, y, width, height) {
     this.entity = new Entity(x, y, width, height);
     this.game = game;
+    this.input_types = game.input_types;
     this.entity.intangible = true;
 }
 
@@ -12,7 +13,7 @@ AbstractTrigger.prototype = {
     draw: function () {
         //Nothing to do.
     },
-    
+
     update: function () {
         //Nothing to do.
     }

@@ -32,6 +32,8 @@ var INPUT_TYPES = {
   DAMAGE: "damage",
   HEAL: "heal",
 
+  ADVANCE: "advance",
+
 }
 
 window.requestAnimFrame = (function () {
