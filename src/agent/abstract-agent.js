@@ -104,6 +104,27 @@ AbstractAgent.prototype = {
         }
     },
     
+    jump: function () {
+        if (this.game.getBottomCollisions(this).length > 0) {
+            if(this.direction === DIRECTION.RIGHT) {
+                this.entity.setAnimation(STANDARD_ANIM.JUMPING_RIGHT);
+            } else {
+                this.entity.setAnimation(STANDARD_ANIM.JUMPING_LEFT);
+            }
+            
+            this.adjustYVelocity(-1 * (KNIGHT_PHYSICS.INITIAL_Y_VELOCITY));
+        }
+    },
+    
+    attack: function () {
+        if(this.direction === DIRECTION.RIGHT) {
+            this.entity.setAnimation(STANDARD_ANIM.ATTACK_RIGHT);
+        } else {
+            this.entity.setAnimation(STANDARD_ANIM.ATTACK_LEFT);
+        }
+        this.slowDown();
+    },
+    
     slowDown: function () {
         var maxSlowdown = 1;
 
@@ -117,21 +138,48 @@ AbstractAgent.prototype = {
     
     updateFallingState: function () {
 
+        //Falling Logic.
         if (this.game.getBottomCollisions(this).length === 0) {
             //Agent is in the air and should accelerate downwards.
-            this.adjustYVelocity(KNIGHT_PHYSICS.Y_ACCELERATION);    
+            this.adjustYVelocity(KNIGHT_PHYSICS.Y_ACCELERATION);
         } else if (this.yVelocity > 0) {
             //Agent is on the ground, and should have no downwards velocity.
             this.yVelocity = 0;
         }
 
-        //If the agent is jumping, check for top collisions.
+        //Rising Logic.
         if(this.yVelocity < 0) {
+            //Agent is rising.
             if (this.game.getTopCollisions(this).length > 0) {
+                //Agent has hit a ceiling.
                 this.yVelocity = 0;
             }
         }
-    }
+        
+        this.updateFallingAnimation();
+    },
+    
+    updateFallingAnimation: function () {
+        //If the agent is attacking, keep them in the attack animation.
+        if (this.entity.currentAnimation !== STANDARD_ANIM.ATTACK_LEFT &&
+            this.entity.currentAnimation !== STANDARD_ANIM.ATTACK_RIGHT) {
+            
+            if (this.yVelocity > 0) {
+                if(this.direction === DIRECTION.RIGHT) {
+                    this.entity.setAnimation(STANDARD_ANIM.FALLING_RIGHT);
+                } else {
+                    this.entity.setAnimation(STANDARD_ANIM.FALLING_LEFT);
+                }
+                
+            } else if (this.yVelocity < 0) {
+                if(this.direction === DIRECTION.RIGHT) {
+                    this.entity.setAnimation(STANDARD_ANIM.JUMPING_RIGHT);
+                } else {
+                    this.entity.setAnimation(STANDARD_ANIM.JUMPING_LEFT);
+                }
+            }
+        }
+    },
 };
 
 function getDistance(myPoint, theirPoint) {

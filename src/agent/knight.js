@@ -91,28 +91,6 @@ Knight.prototype.update = function() {
         }
     }
 
-    //If downwards velocity is present, set the player into a jumping or falling animation.
-    if(this.yVelocity !== 0) {
-        //If the knight is attacking, keep them in the attack animation.
-        if (this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_LEFT &&
-           this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_RIGHT) {
-
-            if (this.yVelocity > 0) {
-                if(this.direction === DIRECTION.RIGHT) {
-                    this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
-                } else {
-                    this.entity.setAnimation(KNIGHT_ANIM.FALLING_LEFT);
-                }
-            } else {
-                if(this.direction === DIRECTION.RIGHT) {
-                    this.entity.setAnimation(KNIGHT_ANIM.JUMPING_RIGHT);
-                } else {
-                    this.entity.setAnimation(KNIGHT_ANIM.JUMPING_LEFT);
-                }
-            }
-        }
-    }
-
     //Move the player independently in both directions, otherwise it will feel off.
     this.game.requestMove(this, this.xVelocity, 0);
     this.game.requestMove(this, 0, this.yVelocity);
@@ -122,18 +100,6 @@ Knight.prototype.update = function() {
         this.game.requestMove(this.swordHitbox, this.xVelocity, 0);
         this.game.requestMove(this.swordHitbox, 0, this.yVelocity);
     }
-}
-
-/**
- * Request the Knight agent to jump.
- */
-Knight.prototype.jump = function() {
-    //Allow the jump only if the agent is on the ground.
-    if(this.game.getBottomCollisions(this).length > 0 && this.canJump) {
-        this.adjustYVelocity(-1 * (KNIGHT_PHYSICS.INITIAL_Y_VELOCITY));
-    }
-    //The player must actively press up to jump, they can't just hold it.
-    this.canJump = false;
 }
 
 /**
@@ -161,7 +127,11 @@ Knight.prototype.readInput = function(input, modifier) {
         if(this.attacking) return;
         //Add upwards velocity if the player is holding up while jumping.
         if (this.yVelocity < 0) this.adjustYVelocity(-1 * KNIGHT_ATTR.PRESS_UP_SPEED);
-        this.jump();
+        
+        if (this.canJump) {
+            this.jump();
+            this.canJump = false;
+        }
 
         //Allows no-clip debugging.
         if(this.noclip) {
@@ -178,12 +148,7 @@ Knight.prototype.readInput = function(input, modifier) {
         this.walkRight();
     }
     if (input === "space") {
-        if(this.direction === DIRECTION.RIGHT) {
-            this.entity.setAnimation(KNIGHT_ANIM.ATTACK_RIGHT);
-        } else {
-            this.entity.setAnimation(KNIGHT_ANIM.ATTACK_LEFT);
-        }
-        this.slowDown();
+        this.attack();
 
         //Create a new sword hitbox if the knight is not currently attacking.
         if (!this.attacking) {
