@@ -21,6 +21,12 @@ var KNIGHT_SIZE = {
     ATTACK_LEFT_OFFSET_X: -40
 };
 
+//Frame duration constants
+var FRAME_DURATION = {
+    KNIGHT_STANDARD: 0.1,
+    KNIGHT_RUN: 0.085
+}
+
 function AnimationSet(animationSetType, AM) {
     this.animationSet = [];
     this.AM = AM;
@@ -47,42 +53,42 @@ AnimationSet.prototype = {
     
     createKnightSet: function () {
         var KnightStandRight = new Animation(this.AM.getAsset("./img/knight/knight standing.png"),
-        KNIGHT_SIZE.STAND_WIDTH, KNIGHT_SIZE.STAND_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
+        KNIGHT_SIZE.STAND_WIDTH, KNIGHT_SIZE.STAND_HEIGHT, FRAME_DURATION.KNIGHT_STANDARD, true);
         KnightStandRight.addFrame(0, 0);
         this.animationSet.push(KnightStandRight);
         
         var KnightStandLeft = new Animation(this.AM.getAsset("./img/knight/knight standing flipped.png"),
-            KNIGHT_SIZE.STAND_WIDTH, KNIGHT_SIZE.STAND_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
+            KNIGHT_SIZE.STAND_WIDTH, KNIGHT_SIZE.STAND_HEIGHT, FRAME_DURATION.KNIGHT_STANDARD, true);
         KnightStandLeft.addFrame(0, 0);
         this.animationSet.push(KnightStandLeft);
 
         var KnightWalkRight = new Animation(this.AM.getAsset("./img/knight/knight run.png"),
-            KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, KNIGHT_ANIM.FRAME_RUN_DURATION, true);
+            KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, FRAME_DURATION.KNIGHT_RUN, true);
         KnightWalkRight.addFrame(0, 0, 8);
         this.animationSet.push(KnightWalkRight);
         
         var KnightWalkLeft = new Animation(this.AM.getAsset("./img/knight/knight run flipped.png"),
-            KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, KNIGHT_ANIM.FRAME_RUN_DURATION, true);
+            KNIGHT_SIZE.WALK_WIDTH, KNIGHT_SIZE.WALK_HEIGHT, FRAME_DURATION.KNIGHT_RUN, true);
         KnightWalkLeft.addFrame(0, 0, 8);
         this.animationSet.push(KnightWalkLeft);
 
         var KnightJumpRight = new Animation(this.AM.getAsset("./img/knight/knight jump.png"),
-            KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
+            KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, FRAME_DURATION.KNIGHT_STANDARD, true);
         KnightJumpRight.addFrame(0, 0);
         this.animationSet.push(KnightJumpRight);
         
         var KnightJumpLeft = new Animation(this.AM.getAsset("./img/knight/knight jump flipped.png"),
-            KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
+            KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, FRAME_DURATION.KNIGHT_STANDARD, true);
         KnightJumpLeft.addFrame(0, 0);
         this.animationSet.push(KnightJumpLeft);
 
         var KnightFallRight = new Animation(this.AM.getAsset("./img/knight/knight jump.png"),
-            KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
+            KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, FRAME_DURATION.KNIGHT_STANDARD, true);
         KnightFallRight.addFrame(KNIGHT_SIZE.JUMP_WIDTH, 0);
         this.animationSet.push(KnightFallRight);
         
         var KnightFallLeft = new Animation(this.AM.getAsset("./img/knight/knight jump flipped.png"),
-            KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, KNIGHT_ANIM.FRAME_DURATION, true);
+            KNIGHT_SIZE.JUMP_WIDTH, KNIGHT_SIZE.JUMP_HEIGHT, FRAME_DURATION.KNIGHT_STANDARD, true);
         KnightFallLeft.addFrame(KNIGHT_SIZE.JUMP_WIDTH, 0);
         this.animationSet.push(KnightFallLeft);
 

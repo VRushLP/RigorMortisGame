@@ -9,15 +9,7 @@ var KNIGHT_ANIM = {
     FALLING_RIGHT: 6,
     FALLING_LEFT: 7,
     ATTACK_RIGHT: 8,
-    ATTACK_LEFT: 9,
-    FRAME_DURATION: 0.1,
-    FRAME_RUN_DURATION: .085,
-}
-
-//Direction Constants
-var KNIGHT_DIR = {
-    LEFT: 0,
-    RIGHT: 1,
+    ATTACK_LEFT: 9
 }
 
 var KNIGHT_ATTR = {
@@ -51,7 +43,7 @@ function Knight(game, AM, x, y) {
 
     this.yVelocity = 0;
     this.xVelocity = 0;
-    this.direction = KNIGHT_DIR.RIGHT;
+    this.direction = DIRECTION.RIGHT;
 
     this.canJump = true;
     this.attacking = false;
@@ -106,13 +98,13 @@ Knight.prototype.update = function() {
            this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_RIGHT) {
 
             if (this.yVelocity > 0) {
-                if(this.direction === KNIGHT_DIR.RIGHT) {
+                if(this.direction === DIRECTION.RIGHT) {
                     this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
                 } else {
                     this.entity.setAnimation(KNIGHT_ANIM.FALLING_LEFT);
                 }
             } else {
-                if(this.direction === KNIGHT_DIR.RIGHT) {
+                if(this.direction === DIRECTION.RIGHT) {
                     this.entity.setAnimation(KNIGHT_ANIM.JUMPING_RIGHT);
                 } else {
                     this.entity.setAnimation(KNIGHT_ANIM.JUMPING_LEFT);
@@ -149,7 +141,7 @@ Knight.prototype.jump = function() {
   */
 Knight.prototype.rest = function () {
     if(this.attacking) return;
-    if(this.direction === KNIGHT_DIR.RIGHT) {
+    if(this.direction === DIRECTION.RIGHT) {
         this.entity.setAnimation(KNIGHT_ANIM.STAND_RIGHT);
     } else {
         this.entity.setAnimation(KNIGHT_ANIM.STAND_LEFT);
@@ -178,7 +170,7 @@ Knight.prototype.readInput = function(input, modifier) {
     }
     if (input === "left") {
         if(this.attacking) return;
-        this.direction = KNIGHT_DIR.LEFT;
+        this.direction = DIRECTION.LEFT;
         if(this.game.getBottomCollisions(this).length > 0) {
             //An agent should only walk if it is not in the air.
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
@@ -192,7 +184,7 @@ Knight.prototype.readInput = function(input, modifier) {
     //Uses the same logic as input left.
     if(input === "right") {
         if(this.attacking) return;
-        this.direction = KNIGHT_DIR.RIGHT;
+        this.direction = DIRECTION.RIGHT;
         if(this.game.getBottomCollisions(this).length > 0) {
             this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
         }
@@ -202,7 +194,7 @@ Knight.prototype.readInput = function(input, modifier) {
         }
     }
     if (input === "space") {
-        if(this.direction === KNIGHT_DIR.RIGHT) {
+        if(this.direction === DIRECTION.RIGHT) {
             this.entity.setAnimation(KNIGHT_ANIM.ATTACK_RIGHT);
         } else {
             this.entity.setAnimation(KNIGHT_ANIM.ATTACK_LEFT);
@@ -212,7 +204,7 @@ Knight.prototype.readInput = function(input, modifier) {
         //Create a new sword hitbox if the knight is not currently attacking.
         if (!this.attacking) {
             this.attacking = true;
-            if(this.direction === KNIGHT_DIR.RIGHT) {
+            if(this.direction === DIRECTION.RIGHT) {
                 this.swordHitbox = new SwordHitbox(this.game, this.entity.x + this.entity.width - 29, this.entity.y, this);
             } else {
                 this.swordHitbox = new SwordHitbox(this.game, this.entity.x - this.entity.width + 5,
@@ -252,7 +244,7 @@ Knight.prototype.readInput = function(input, modifier) {
 
             //Knock the player back.
             //TODO: Knock player back based on direction that damage came from.
-            if (this.direction === KNIGHT_DIR.LEFT) {
+            if (this.direction === DIRECTION.LEFT) {
                 this.xVelocity = KNIGHT_PHYSICS.KNOCKBACK_VELOCITY;
                 this.yVelocity = -6;
             } else {
@@ -285,16 +277,7 @@ Knight.prototype.readInput = function(input, modifier) {
     }
 }
 
-Knight.prototype.slowDown = function () {
-    var maxSlowdown = 1;
-    //if (this.invulnerableFrames > 0) maxSlowdown = .45;
 
-    if (this.xVelocity > 0) {
-         this.adjustXVelocity(Math.max(maxSlowdown * -1, this.xVelocity * -1));
-    } else if (this.xVelocity < 0) {
-          this.adjustXVelocity(Math.min(maxSlowdown, this.xVelocity * -1));
-    }
-}
 
 /**
   * Create a new sword hitbox.

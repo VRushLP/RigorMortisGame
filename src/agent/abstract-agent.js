@@ -8,6 +8,11 @@ var ABSTRACT_PHYSICS = {
     X_ACCELRATION : 0
 };
 
+var DIRECTION = {
+    LEFT: 0,
+    RIGHT: 1
+}
+
 /*
  * An agent is the behavioral component to an entity.
  */
@@ -58,22 +63,26 @@ AbstractAgent.prototype = {
     
     
     
+    
+    slowDown: function () {
+        var maxSlowdown = 1;
+
+        if (this.xVelocity > 0) {
+             this.adjustXVelocity(Math.max(maxSlowdown * -1, this.xVelocity * -1));
+        } else if (this.xVelocity < 0) {
+              this.adjustXVelocity(Math.min(maxSlowdown, this.xVelocity * -1));
+        }
+    },
+    
+    
     updateFallingState: function () {
 
         if (this.game.getBottomCollisions(this).length === 0) {
-            //No bottom collision: Agent is in the air, and should accelerate downwards.
+            //Agent is in the air and should accelerate downwards.
             this.adjustYVelocity(KNIGHT_PHYSICS.Y_ACCELERATION);    
         } else if (this.yVelocity > 0) {
-            //Bottom Collision: Agent is on the ground, and should have no downwards velocity.
+            //Agent is on the ground, and should have no downwards velocity.
             this.yVelocity = 0;
-
-            //If the knight previously had a jumping/falling animation, request the knight to go into a rest state.
-            if(this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_RIGHT ||
-                   this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_LEFT ||
-                   this.entity.currentAnimation === KNIGHT_ANIM.FALLING_RIGHT ||
-                   this.entity.currentAnimation === KNIGHT_ANIM.FALLING_LEFT) {
-                       this.rest();
-                }
         }
 
         //If the agent is jumping, check for top collisions.
