@@ -1,4 +1,4 @@
-//Animation Constants
+//TODO: Finish migration of these to abstract-agent.js
 var KNIGHT_ANIM = {
     STAND_RIGHT: 0,
     STAND_LEFT: 1,
@@ -9,7 +9,7 @@ var KNIGHT_ANIM = {
     FALLING_RIGHT: 6,
     FALLING_LEFT: 7,
     ATTACK_RIGHT: 8,
-    ATTACK_LEFT: 9
+    ATTACK_LEFT: 9,
 }
 
 var KNIGHT_ATTR = {
@@ -170,28 +170,12 @@ Knight.prototype.readInput = function(input, modifier) {
     }
     if (input === "left") {
         if(this.attacking) return;
-        this.direction = DIRECTION.LEFT;
-        if(this.game.getBottomCollisions(this).length > 0) {
-            //An agent should only walk if it is not in the air.
-            this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
-        }
-        this.adjustXVelocity(-1 * KNIGHT_PHYSICS.INITIAL_X_VELOCITY);
-        if (this.xVelocity < KNIGHT_PHYSICS.TERMINAL_X_VELOCITY * -1) {
-            //Terminal Velocity is exceeding during knockback, so only slow down here.
-            this.slowDown();
-        }
+        this.walkLeft();
     }
     //Uses the same logic as input left.
     if(input === "right") {
         if(this.attacking) return;
-        this.direction = DIRECTION.RIGHT;
-        if(this.game.getBottomCollisions(this).length > 0) {
-            this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
-        }
-        this.adjustXVelocity(KNIGHT_PHYSICS.INITIAL_X_VELOCITY);
-        if (this.xVelocity > KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
-            this.slowDown();
-        }
+        this.walkRight();
     }
     if (input === "space") {
         if(this.direction === DIRECTION.RIGHT) {

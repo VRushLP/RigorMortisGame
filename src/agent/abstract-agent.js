@@ -1,3 +1,4 @@
+//Default physics set for all agents.
 var ABSTRACT_PHYSICS = {
     TERMINAL_X_VELOCITY : 0,
     TERMINAL_Y_VELOCITY : 0,
@@ -11,6 +12,20 @@ var ABSTRACT_PHYSICS = {
 var DIRECTION = {
     LEFT: 0,
     RIGHT: 1
+}
+
+//Standard set of animations for all agents.
+var STANDARD_ANIM = {
+    STAND_RIGHT: 0,
+    STAND_LEFT: 1,
+    WALKING_RIGHT: 2,
+    WALKING_LEFT: 3,
+    JUMPING_RIGHT: 4,
+    JUMPING_LEFT: 5,
+    FALLING_RIGHT: 6,
+    FALLING_LEFT: 7,
+    ATTACK_RIGHT: 8,
+    ATTACK_LEFT: 9,
 }
 
 /*
@@ -62,7 +77,32 @@ AbstractAgent.prototype = {
     },
     
     
+    walkLeft: function () {
+        this.direction = DIRECTION.LEFT;
+        
+        if(this.game.getBottomCollisions(this).length > 0) {
+            //An agent should only walk if it is not in the air.
+            this.entity.setAnimation(STANDARD_ANIM.WALKING_LEFT);
+        }
+        
+        this.adjustXVelocity(-1 * this.physicsMap.INITIAL_X_VELOCITY);
+        if (this.xVelocity < this.physicsMap.TERMINAL_X_VELOCITY * -1) {
+            //Terminal Velocity is exceeding during knockback, so only slow down here.
+            this.slowDown();
+        }
+    },
     
+    walkRight: function () {
+        this.direction = DIRECTION.RIGHT;
+        
+        if(this.game.getBottomCollisions(this).length > 0) {
+            this.entity.setAnimation(STANDARD_ANIM.WALKING_RIGHT);
+        }
+        this.adjustXVelocity(this.physicsMap.INITIAL_X_VELOCITY);
+        if (this.xVelocity > this.physicsMap.TERMINAL_X_VELOCITY) {
+            this.slowDown();
+        }
+    },
     
     slowDown: function () {
         var maxSlowdown = 1;
