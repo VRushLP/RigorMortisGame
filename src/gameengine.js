@@ -16,6 +16,7 @@ var INPUT_TYPES = {
   UP: "up",
 
   NOCLIP: "noclip",
+  // TODO Combine attack and space so it's easier to read.
   ATTACK: "attack",
   ATTACK_RELEASED: "attack_released",
   SPACE: "space",
@@ -27,6 +28,9 @@ var INPUT_TYPES = {
   UP_RELEASED: "up_released",
   DOWN_RELEASED: "down_released",
   LEFT_AND_RIGHT_RELEASED: "left_and_right_released",
+
+  DAMAGE: "damage",
+  HEAL: "heal",
 
 }
 
