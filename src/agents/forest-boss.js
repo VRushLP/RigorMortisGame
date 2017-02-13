@@ -89,10 +89,16 @@ function ForestBoss(game, AM, x, y, stage, stateTrigger) {
     this.pattern = FB_PATTERN.NEUTRAL;
     this.currentAttackAnim = FB_ANIM.THIN;
 
+    var cloudAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss cloud.png"), 50, 50, 1, true);
+    cloudAnimation.addFrame(0, 0);
+    this.entity.addAnimation(cloudAnimation);
+
     //Initialize the forest boss arms and core.
     this.arms = [];
     for (var i = 0; i < 4; i++) {
-        this.arms.push(new ForestBossArm(game, AM, x + FB_ATTR.LEFT_SIDE_BUFFER + i * FB_ATTR.ARM_STRIDE, y));
+        var adjustedX = x + FB_ATTR.LEFT_SIDE_BUFFER + i * FB_ATTR.ARM_STRIDE;
+        this.arms.push(new Cloud(game, AM, adjustedX, y, false));
+        this.arms.push(new ForestBossArm(game, AM, adjustedX, y));
         this.arms[i].setSize(this.currentAttackAnim);
         //Arms are shuffled and unshuffled, so they need to keep track of their original position.
         this.arms[i].originalPos = i;
@@ -156,20 +162,23 @@ ForestBoss.prototype = {
     },
 
     //The retreat pattern immediately lowers all arms at a fast speed.
+    //remove clouds.
     retreatPattern: function () {
         this.pattern = FB_PATTERN.RETREAT;
         for (var i = 0; i < this.arms.length; i++) {
+            this.arms[i].cloud.isVisible = false;
             this.arms[i].speed = FB_ATTR.RETREAT_BASE_SPEED;
             this.arms[i].currentState = FB_ARM_STATE.FALLING;
         }
     },
 
     //The attack pattern shuffles the arms and raises them at varying speeds.
+    //create clouds at arms[i].position(?)
     attackPattern: function () {
         this.pattern = FB_PATTERN.ATTACK;
-
         this.shuffleArms();
         for (var i = 0; i < this.arms.length; i++) {
+            this.arms[i].cloud.isVisible = true;
             this.arms[i].speed = FB_ATTR.ATTACK_BASE_SPEED[i] + FB_ATTR.PHASE_SPEED_BUFF[this.phase];
             this.arms[i].restTime = 0;
             this.arms[i].currentState = FB_ARM_STATE.RISING;
@@ -250,9 +259,6 @@ ForestBoss.prototype = {
     unshuffleArms: function () {
         //Create a copy of the arms array called newArms.
         var newArms = [];
-        for (var i = 0; i < this.arms.length; i++) {
-            newArms.push(this.arms[i]);
-        }
         //Re-arrange newArms into the original order.
         for (var i = 0; i < this.arms.length; i++) {
             newArms[this.arms[i].originalPos] = this.arms[i];
@@ -464,6 +470,30 @@ ForestBossArm.prototype = {
 
 }
 
+function ForestBossArm(game, AM, x, y) {
+    this.entity = new Entity(x, y, 0, 0);
+    this.game = game;
+    this.entity.temporary = true;
+    this.entity.moveable = true;
+}
+
+function Cloud(game, AM, x, y) {
+    this.entity = new Entity(x, y, 0, 0);
+    this.game = game;
+    this.entity.temporary = true;
+    this.isVisible = false;
+//    this.entity.moveable = true;
+}
+
+Cloud.prototype = {
+    update: function() {
+        if (isVisible) {
+            this.entity.currentAnimation = 0;
+        } else {
+            this.entity.currentAnimation = 1;
+        }
+    }
+}
 
 
 /*
