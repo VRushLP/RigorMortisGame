@@ -89,7 +89,7 @@ function ForestBoss(game, AM, x, y, stage, stateTrigger) {
     this.pattern = FB_PATTERN.NEUTRAL;
     this.currentAttackAnim = FB_ANIM.THIN;
 
-    var cloudAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss cloud.png"), 50, 50, 1, true);
+    var cloudAnimation = new Animation(AM.getAsset("./img/enemy/forest boss/forest boss cloud.png"), 100, 50, 2, true);
     cloudAnimation.addFrame(0, 0);
     this.entity.addAnimation(cloudAnimation);
 
@@ -468,13 +468,6 @@ ForestBossArm.prototype = {
         }
     }
 
-}
-
-function ForestBossArm(game, AM, x, y) {
-    this.entity = new Entity(x, y, 0, 0);
-    this.game = game;
-    this.entity.temporary = true;
-    this.entity.moveable = true;
 }
 
 function Cloud(game, AM, x, y) {
