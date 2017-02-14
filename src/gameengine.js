@@ -22,13 +22,13 @@ window.requestAnimFrame = (function () {
  * Timer *
  *********/
 
-function Timer() {
+function EngineTimer() {
     this.gameTime = 0;
     this.maxStep = 0.016;
     this.wallLastTimestamp = 0;
 }
 
-Timer.prototype = {
+EngineTimer.prototype = {
 
     tick: function () {
         var wallCurrent = Date.now();
@@ -90,7 +90,7 @@ GameEngine.prototype = {
         this.surfaceWidth = this.ctx.canvas.width;
         this.surfaceHeight = this.ctx.canvas.height;
         this.startInput();
-        this.timer = new Timer();
+        this.timer = new EngineTimer();
     },
 
     addAgent : function (agent) {

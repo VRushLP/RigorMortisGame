@@ -14,7 +14,10 @@ var KNIGHT_ANIM = {
 
 var KNIGHT_ATTR = {
     STARTING_HEALTH: 5,
-    INVULNERABLITY_TIME: 0.25, //previously 30 frames
+    INVULNERABILITY_TIME: 0.5, //previously 30 frames
+}
+
+var KNIGHT_UNIQUE_ATTR = {
     PRESS_DOWN_SPEED : 0.5,
     PRESS_UP_SPEED : 0.17,    
 }
@@ -36,7 +39,7 @@ var KNIGHT_PHYSICS = {
  * and also attach to it all animations.
  */
 function Knight(game, AM, x, y) {
-    AbstractAgent.call(this, game, x, y, KNIGHT_PHYSICS);
+    AbstractAgent.call(this, game, x, y, KNIGHT_PHYSICS, KNIGHT_ATTR);
     this.entity = new Entity(x, y, 48, 50);
     this.game = game;
     this.swordHitbox = null;
@@ -49,7 +52,6 @@ function Knight(game, AM, x, y) {
     this.attacking = false;
     this.noclip = false;
 
-    this.invulnerableFrames = 0;
     this.health = KNIGHT_ATTR.STARTING_HEALTH;
     this.entity.addAnimationSet(new AnimationSet(ANIMATION_SET.KNIGHT, AM));
 };
@@ -60,11 +62,7 @@ Knight.prototype = Object.create(AbstractAgent.prototype);
  * Update the Knight agent.
  */
 Knight.prototype.update = function() {
-    gameDiff = this.game.clockTick
-
-    if(this.invulnerableFrames > 0) {
-        this.invulnerableFrames-= gameDiff;
-    }
+    this.invulnerableTimer.update();
 
     //Update the knight's attack state.
     var currentAnimation = this.entity.currentAnimation;
@@ -121,12 +119,12 @@ Knight.prototype.rest = function () {
 Knight.prototype.readInput = function(input, modifier) {
     if (input === "down") {
         if(this.attacking) return;
-        this.adjustYVelocity(KNIGHT_ATTR.PRESS_DOWN_SPEED);
+        this.adjustYVelocity(KNIGHT_UNIQUE_ATTR.PRESS_DOWN_SPEED);
     }
     if (input === "up") {
         if(this.attacking) return;
         //Add upwards velocity if the player is holding up while jumping.
-        if (this.yVelocity < 0) this.adjustYVelocity(-1 * KNIGHT_ATTR.PRESS_UP_SPEED);
+        if (this.yVelocity < 0) this.adjustYVelocity(-1 * KNIGHT_UNIQUE_ATTR.PRESS_UP_SPEED);
         
         if (this.canJump) {
             this.jump();
@@ -187,8 +185,8 @@ Knight.prototype.readInput = function(input, modifier) {
     }
 
     if (input === "damage") {
-        if (this.invulnerableFrames <= 0) {
-            this.invulnerableFrames = KNIGHT_ATTR.INVULNERABLITY_TIME;
+        if (!this.invulnerable) {
+            this.toggleInvulnerability(true);
             this.health--;
 
             //Knock the player back.

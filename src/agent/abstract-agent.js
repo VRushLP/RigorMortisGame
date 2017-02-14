@@ -9,10 +9,15 @@ var ABSTRACT_PHYSICS = {
     X_ACCELRATION : 0
 };
 
+var ABSTRACT_ATTRIBUTES = {
+    STARTING_HEALTH: 0,
+    INVULNERABILITY_TIME: 0
+};
+
 var DIRECTION = {
     LEFT: 0,
     RIGHT: 1
-}
+};
 
 //Standard set of animations for all agents.
 var STANDARD_ANIM = {
@@ -26,19 +31,24 @@ var STANDARD_ANIM = {
     FALLING_LEFT: 7,
     ATTACK_RIGHT: 8,
     ATTACK_LEFT: 9,
-}
+};
 
 /*
  * An agent is the behavioral component to an entity.
  */
-function AbstractAgent(game, x, y, physicsMap) {
+function AbstractAgent(game, x, y, physicsMap, attributesMap) {
     this.game = game;
+    this.invulnerable = false;
     
     this.physicsMap = ABSTRACT_PHYSICS;
     for (var attribute in physicsMap) { this.physicsMap[attribute] = physicsMap[attribute]; }
     
+    this.attributesMap = ABSTRACT_ATTRIBUTES;
+    for (var attribute in attributesMap) { this.attributesMap[attribute] = attributesMap[attribute]; }
+    
     this.xVelocity = 0;
     this.yVelocity = 0;
+    this.invulnerableTimer = new Timer(this.game, 0, this.toggleInvulnerability, this, false);
 }
 
 AbstractAgent.prototype = {
@@ -112,7 +122,7 @@ AbstractAgent.prototype = {
                 this.entity.setAnimation(STANDARD_ANIM.JUMPING_LEFT);
             }
             
-            this.adjustYVelocity(-1 * (KNIGHT_PHYSICS.INITIAL_Y_VELOCITY));
+            this.adjustYVelocity(-1 * (this.physicsMap.INITIAL_Y_VELOCITY));
         }
     },
     
@@ -180,6 +190,13 @@ AbstractAgent.prototype = {
             }
         }
     },
+    
+    toggleInvulnerability: function (isInvulnerable) {
+        this.invulnerable = isInvulnerable;
+        if (this.invulnerable) {
+            this.invulnerableTimer.reset(false, this.attributesMap.INVULNERABILITY_TIME);
+        }
+    }
 };
 
 function getDistance(myPoint, theirPoint) {

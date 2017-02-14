@@ -8,6 +8,11 @@ var SKELETON_ATTR = {
     TERMINAL_VELOCITY: 6
 }
 
+var SKELETON_STANDARD_ATTR = {
+    STARTING_HEALTH: 1,
+    INVULNERABILITY_TIME: .66
+}
+
 var SKELETON_ANIM = {
     STAND_RIGHT: 0,
     STAND_LEFT: 1,
@@ -30,7 +35,7 @@ var SKELETON_PHYSICS = {
   * Create a new Normal Skeleton.
   */
 function Skeleton(game, AM, x, y) {
-    AbstractAgent.call(this, game, x, y, SKELETON_PHYSICS);
+    AbstractAgent.call(this, game, x, y, SKELETON_PHYSICS, SKELETON_STANDARD_ATTR);
     this.entity = new Entity(x, y, 52, 59);
     this.entity.moveable = true;
     this.game = game;
