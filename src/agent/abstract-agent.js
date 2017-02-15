@@ -48,7 +48,7 @@ function AbstractAgent(game, x, y, physicsMap, attributesMap) {
     
     this.xVelocity = 0;
     this.yVelocity = 0;
-    this.invulnerableTimer = new Timer(this.game, 0, this.toggleInvulnerability, this, false);
+    this.invulnerableTimer = new Timer(this.game, 0, false, this.toggleInvulnerability, this, false);
 }
 
 AbstractAgent.prototype = {
@@ -87,7 +87,7 @@ AbstractAgent.prototype = {
     },
     
     
-    walkLeft: function () {
+    genericWalkLeft: function () {
         this.direction = DIRECTION.LEFT;
         
         if(this.game.getBottomCollisions(this).length > 0) {
@@ -102,7 +102,7 @@ AbstractAgent.prototype = {
         }
     },
     
-    walkRight: function () {
+    genericWalkRight: function () {
         this.direction = DIRECTION.RIGHT;
         
         if(this.game.getBottomCollisions(this).length > 0) {
@@ -114,7 +114,7 @@ AbstractAgent.prototype = {
         }
     },
     
-    jump: function () {
+    genericJump: function () {
         if (this.game.getBottomCollisions(this).length > 0) {
             if(this.direction === DIRECTION.RIGHT) {
                 this.entity.setAnimation(STANDARD_ANIM.JUMPING_RIGHT);
@@ -126,18 +126,32 @@ AbstractAgent.prototype = {
         }
     },
     
-    attack: function () {
+    genericAttack: function () {
+        this.attacking = true;
+        this.updateAttackAnimation();
+        this.setAttackTimer();
+        this.slowDown();
+    },
+    
+    updateAttackAnimation: function () {
         if(this.direction === DIRECTION.RIGHT) {
             this.entity.setAnimation(STANDARD_ANIM.ATTACK_RIGHT);
         } else {
             this.entity.setAnimation(STANDARD_ANIM.ATTACK_LEFT);
         }
-        this.slowDown();
+    },
+    
+    setAttackTimer: function () {
+        var animation = this.entity.animationList[this.entity.currentAnimation];
+        if (this.attackTimer === undefined) {
+            this.attackTimer = new Timer(this.game, animation, true, this.setAttacking, this, false);
+        } else {
+            this.attackTimer.reset(false, animation);
+        }
     },
     
     slowDown: function () {
         var maxSlowdown = 1;
-
         if (this.xVelocity > 0) {
              this.adjustXVelocity(Math.max(maxSlowdown * -1, this.xVelocity * -1));
         } else if (this.xVelocity < 0) {
@@ -196,6 +210,10 @@ AbstractAgent.prototype = {
         if (this.invulnerable) {
             this.invulnerableTimer.reset(false, this.attributesMap.INVULNERABILITY_TIME);
         }
+    },
+    
+    setAttacking: function (isAttacking) {
+        //Abstract
     }
 };
 

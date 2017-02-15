@@ -63,18 +63,23 @@ Knight.prototype = Object.create(AbstractAgent.prototype);
  */
 Knight.prototype.update = function() {
     this.invulnerableTimer.update();
+    if (this.attackTimer !== undefined) {
+        this.attackTimer.update();
+    }
+    
+    if (this.attacking) this.slowDown();
 
     //Update the knight's attack state.
-    var currentAnimation = this.entity.currentAnimation;
-    if (currentAnimation === KNIGHT_ANIM.ATTACK_RIGHT ||
-        currentAnimation === KNIGHT_ANIM.ATTACK_LEFT) {
-        if (!this.entity.animationList[currentAnimation].isFinalFrame()) {
-            this.attacking = true;
-        } else {
-            this.attacking = false;
-            this.rest();
-        }
-    }
+//    var currentAnimation = this.entity.currentAnimation;
+//    if (currentAnimation === KNIGHT_ANIM.ATTACK_RIGHT ||
+//        currentAnimation === KNIGHT_ANIM.ATTACK_LEFT) {
+//        if (!this.entity.animationList[currentAnimation].isFinalFrame()) {
+//            this.attacking = true;
+//        } else {
+//            this.attacking = false;
+//            this.rest();
+//        }
+    //}
     
     this.updateFallingState();
 
@@ -113,6 +118,15 @@ Knight.prototype.rest = function () {
     this.slowDown();
 }
 
+Knight.prototype.setAttacking = function (isAttacking) {
+    if (this.attacking && !isAttacking) {
+        this.attacking = false;
+        this.rest();
+    } else {
+        this.attacking = isAttacking;
+    }
+}
+
 /**
  * Request the agent to process an input.
  */
@@ -122,12 +136,12 @@ Knight.prototype.readInput = function(input, modifier) {
         this.adjustYVelocity(KNIGHT_UNIQUE_ATTR.PRESS_DOWN_SPEED);
     }
     if (input === "up") {
-        if(this.attacking) return;
+        if (this.attacking) return;
         //Add upwards velocity if the player is holding up while jumping.
         if (this.yVelocity < 0) this.adjustYVelocity(-1 * KNIGHT_UNIQUE_ATTR.PRESS_UP_SPEED);
         
         if (this.canJump) {
-            this.jump();
+            this.genericJump();
             this.canJump = false;
         }
 
@@ -137,29 +151,26 @@ Knight.prototype.readInput = function(input, modifier) {
         }
     }
     if (input === "left") {
-        if(this.attacking) return;
-        this.walkLeft();
+        if (this.attacking) return;
+        this.genericWalkLeft();
     }
     //Uses the same logic as input left.
     if(input === "right") {
-        if(this.attacking) return;
-        this.walkRight();
+        if (this.attacking) return;
+        this.genericWalkRight();
     }
     if (input === "space") {
-        this.attack();
-
         //Create a new sword hitbox if the knight is not currently attacking.
-        if (!this.attacking) {
-            this.attacking = true;
-            if(this.direction === DIRECTION.RIGHT) {
-                this.swordHitbox = new SwordHitbox(this.game, this.entity.x + this.entity.width - 29, this.entity.y, this);
-            } else {
-                this.swordHitbox = new SwordHitbox(this.game, this.entity.x - this.entity.width + 5,
-                                                this.entity.y, this);
-            }
-
-            this.game.addAgent(this.swordHitbox);
+        if (this.attacking) return;
+        this.genericAttack();
+        if(this.direction === DIRECTION.RIGHT) {
+            this.swordHitbox = new SwordHitbox(this.game, this.entity.x + this.entity.width - 29, this.entity.y, this);
+        } else {
+            this.swordHitbox = new SwordHitbox(this.game, this.entity.x - this.entity.width + 5,
+                                            this.entity.y, this);
         }
+
+        this.game.addAgent(this.swordHitbox);
     }
     if (input === "none") {
         this.rest();

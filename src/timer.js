@@ -8,8 +8,8 @@
  * toggleFunctionArguments is an array of arguments that will be passed in (but not as an array).
  */
 
-function Timer(game, source, toggleFunction, toggleThis, toggleFunctionArguments) {
-    if (typeof source !== "number" && source.isDone() === "undefined") {
+function Timer(game, source, startOnCreate, toggleFunction, toggleThis, toggleFunctionArguments) {
+    if (typeof source !== "number" && source.isDone() === undefined) {
         console.log("Timer Error: Timer source must be either a number or an animation.");
         return;
     }
@@ -24,7 +24,13 @@ function Timer(game, source, toggleFunction, toggleThis, toggleFunctionArguments
     this.toggleFunction = toggleFunction;
     this.toggleThis = toggleThis;
     this.toggleFunctionArguments = toggleFunctionArguments;
-    this.isDone = false;
+    
+    if (startOnCreate) {
+        this.isDone = false;
+    }
+     else {
+         this.isDone = true;
+     }
     
     this.initialValue = 0;
     if (typeof this.source === "number") {
@@ -35,30 +41,24 @@ function Timer(game, source, toggleFunction, toggleThis, toggleFunctionArguments
 Timer.prototype = {
     update: function () {
         if (this.isDone) return;
-        
         if (typeof this.source === "number") {
-            //TESTED.
             this.source -= this.game.clockTick;
             if (this.source <= 0) {
                 this.source = 0;
                 this.execute();
             }
         } else {
-            //Assume that this is an animation.
-            //UNTESTED.
-            if (this.source.isDone()) {
+            if (this.source.isFinalFrame()) {
                 this.execute();
             }
         }
     },
     
     execute: function () {
-        if (this.toggleFunction !== "undefined") {
+        if (this.toggleFunction !== undefined) {
             if (typeof this.toggleFunctionArguments  === "object") {
-                //UNTESTED.
                 this.toggleFunction.apply(this.toggleThis, this.toggleFunctionArguments);
             } else {
-                //TESTED.
                 this.toggleFunction.call(this.toggleThis, this.toggleFunctionArguments);
             }
             
@@ -66,11 +66,17 @@ Timer.prototype = {
         this.isDone = true;
     },
     
+    /**
+      * Reset the timer.
+      * By default, this will simply allow the timer execute again once the source reaches its end, but does not affect the source.
+      * Set resetSource to true to reset a number source. This will result in an error if used for an animation.
+      * You may also pass in a new source, either a number or animation. If you do so, resetSource will be ignored.
+      */
     reset: function (resetSource, source) {
-        if (source !== "undefined") {
+        if (source !== undefined) {
             this.source = source;
         } else {
-            if (this.resetSource === true) {
+            if (resetSource === true) {
                 if (typeof this.source !== "number") {
                     console.log("Timer Error: Timer may be reset, but the source of the timer cannot if it is an animation.");
                 } else {
