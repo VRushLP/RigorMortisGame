@@ -521,7 +521,7 @@ GameEngine.prototype = {
                 //Temporary fix to allow intangible objects, like camera triggers, to activate,
                 //but not affect the player's movement. Not optimized, as this will activate at any time
                 //the player may have collided with it, even if another entity is closer and blocks them.
-                if (typeof(other.intangible) !== "undefined" && other.intangible) {
+                if (typeof(other.intangible) !== undefined && other.intangible) {
                     continue;
                 }
 
@@ -563,7 +563,7 @@ GameEngine.prototype = {
             if (other === entity) continue; //Prevent an entity from detecting itself.
 
             //Intangible entities are only for events like triggers, and should not register here.
-            if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            if (typeof(other.intangible) !== undefined && other.intangible) continue;
             //An entity must be collidable to count as a collision.
             if (!other.collidable) continue;
 
@@ -610,7 +610,7 @@ GameEngine.prototype = {
             if (other === entity) continue; //Prevent the entity from detecting itself.
 
             //Intangible entities are only for events like triggers, and should not register here.
-            if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            if (typeof(other.intangible) !== undefined && other.intangible) continue;
             //An entity must be collidable to count as a collision.
             if (!other.collidable) continue;
 
