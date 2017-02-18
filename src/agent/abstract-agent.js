@@ -38,6 +38,7 @@ var STANDARD_ANIM = {
  */
 function AbstractAgent(game, x, y, physicsMap, attributesMap) {
     this.game = game;
+    this.attacking = false;
     this.invulnerable = false;
     
     this.physicsMap = ABSTRACT_PHYSICS;
@@ -48,10 +49,25 @@ function AbstractAgent(game, x, y, physicsMap, attributesMap) {
     
     this.xVelocity = 0;
     this.yVelocity = 0;
+    this.health = this.attributesMap.STARTING_HEALTH;
     this.invulnerableTimer = new Timer(this.game, 0, false, this.toggleInvulnerability, this, false);
 }
 
 AbstractAgent.prototype = {
+    
+    genericUpdate: function () {
+        this.invulnerableTimer.update();
+        this.updateFallingState();
+    },
+    
+    
+    //Generic update routine for agents.
+    //Meant to be called at the end of an agent's update routine, such that velocity changes are immediately seen by the engine.
+    genericPostUpdate: function () {
+        //Move the player independently in both directions, otherwise it will feel off.
+         this.game.requestMove(this, this.xVelocity, 0);
+        this.game.requestMove(this, 0, this.yVelocity);
+    },
     
     adjustXVelocity: function (amount) {
         var maxVelocity = this.physicsMap.TERMINAL_X_VELOCITY;
@@ -130,7 +146,6 @@ AbstractAgent.prototype = {
         this.attacking = true;
         this.updateAttackAnimation();
         this.setAttackTimer();
-        this.slowDown();
     },
     
     updateAttackAnimation: function () {

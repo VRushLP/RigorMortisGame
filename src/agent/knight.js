@@ -41,18 +41,12 @@ var KNIGHT_PHYSICS = {
 function Knight(game, AM, x, y) {
     AbstractAgent.call(this, game, x, y, KNIGHT_PHYSICS, KNIGHT_ATTR);
     this.entity = new Entity(x, y, 48, 50);
-    this.game = game;
     this.swordHitbox = null;
-
-    this.yVelocity = 0;
-    this.xVelocity = 0;
     this.direction = DIRECTION.RIGHT;
 
     this.canJump = true;
-    this.attacking = false;
     this.noclip = false;
 
-    this.health = KNIGHT_ATTR.STARTING_HEALTH;
     this.entity.addAnimationSet(new AnimationSet(ANIMATION_SET.KNIGHT, AM));
 };
 
@@ -62,27 +56,12 @@ Knight.prototype = Object.create(AbstractAgent.prototype);
  * Update the Knight agent.
  */
 Knight.prototype.update = function() {
-    this.invulnerableTimer.update();
+    this.genericUpdate();
+    
     if (this.attackTimer !== undefined) {
-        this.attackTimer.update();
+            this.attackTimer.update();
     }
-    
     if (this.attacking) this.slowDown();
-
-    //Update the knight's attack state.
-//    var currentAnimation = this.entity.currentAnimation;
-//    if (currentAnimation === KNIGHT_ANIM.ATTACK_RIGHT ||
-//        currentAnimation === KNIGHT_ANIM.ATTACK_LEFT) {
-//        if (!this.entity.animationList[currentAnimation].isFinalFrame()) {
-//            this.attacking = true;
-//        } else {
-//            this.attacking = false;
-//            this.rest();
-//        }
-    //}
-    
-    this.updateFallingState();
-
     if (this.game.getBottomCollisions(this).length !== 0) {
         if (this.yVelocity > 0) {
             if(this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_RIGHT ||
@@ -93,10 +72,8 @@ Knight.prototype.update = function() {
             }
         }
     }
-
-    //Move the player independently in both directions, otherwise it will feel off.
-    this.game.requestMove(this, this.xVelocity, 0);
-    this.game.requestMove(this, 0, this.yVelocity);
+    
+    this.genericPostUpdate();
 
     //Move the sword hitbox with the player.
     if (this.attacking && this.swordHitbox !== null) {
