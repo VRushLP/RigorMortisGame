@@ -51,13 +51,13 @@ window.requestAnimFrame = (function () {
  * Timer *
  *********/
 
-function Timer() {
+function EngineTimer() {
     this.gameTime = 0;
     this.maxStep = 0.016;
     this.wallLastTimestamp = 0;
 }
 
-Timer.prototype = {
+EngineTimer.prototype = {
 
     tick: function () {
         var wallCurrent = Date.now();
@@ -93,6 +93,8 @@ function GameEngine() {
     this.currentMusic = null;
     this.healthBarVisible = false;
     this.stageReset = false;
+    
+    this.input_types = INPUT_TYPES;
 
     this.input_types = INPUT_TYPES;
 
@@ -121,7 +123,7 @@ GameEngine.prototype = {
         this.surfaceWidth = this.ctx.canvas.width;
         this.surfaceHeight = this.ctx.canvas.height;
         this.startInput();
-        this.timer = new Timer();
+        this.timer = new EngineTimer();
     },
 
     addAgent : function (agent) {
@@ -550,7 +552,7 @@ GameEngine.prototype = {
                 //Temporary fix to allow intangible objects, like camera triggers, to activate,
                 //but not affect the player's movement. Not optimized, as this will activate at any time
                 //the player may have collided with it, even if another entity is closer and blocks them.
-                if (typeof(other.intangible) !== "undefined" && other.intangible) {
+                if (typeof(other.intangible) !== undefined && other.intangible) {
                     continue;
                 }
 
@@ -592,7 +594,7 @@ GameEngine.prototype = {
             if (other === entity) continue; //Prevent an entity from detecting itself.
 
             //Intangible entities are only for events like triggers, and should not register here.
-            if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            if (typeof(other.intangible) !== undefined && other.intangible) continue;
             //An entity must be collidable to count as a collision.
             if (!other.collidable) continue;
 
@@ -639,7 +641,7 @@ GameEngine.prototype = {
             if (other === entity) continue; //Prevent the entity from detecting itself.
 
             //Intangible entities are only for events like triggers, and should not register here.
-            if (typeof(other.intangible) !== "undefined" && other.intangible) continue;
+            if (typeof(other.intangible) !== undefined && other.intangible) continue;
             //An entity must be collidable to count as a collision.
             if (!other.collidable) continue;
 
@@ -709,7 +711,6 @@ GameEngine.prototype.loop = function () {
               if(this.pressUp) this.agents[i].readInput(this.input_types.UP);
               if(this.pressLeft && !this.pressRight) this.agents[i].readInput(this.input_types.LEFT);
               if(this.pressLeft && this.pressRight) this.agents[i].readInput(this.input_types.NONE);
-
               if(this.pressN) this.agents[i].readInput(this.input_types.NOCLIP);
               if(this.pressSpace) this.agents[i].readInput(this.input_types.SPACE);
 
@@ -724,7 +725,9 @@ GameEngine.prototype.loop = function () {
               if(!this.pressRight) this.agents[i].readInput(this.input_types.RIGHT_RELEASED);
               if(!this.pressSpace) this.agents[i].readInput(this.input_types.SPACE_RELEASED);
 
-              if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput(this.input_types.NONE);
+              if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) {
+                  this.agents[i].readInput(this.input_types.NONE);
+              } 
           }
       }
 
@@ -756,7 +759,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.save();
     this.stages[this.currentStage].drawBackground(this.camera.x);
     for (var i = 0; i < this.agents.length; i++) {
-
+        //Currently none do, but agents may override their entity's draw.
         if (this.isOnScreen(this.agents[i].entity)) {
             if (typeof this.agents[i].draw === 'function') {
                 this.agents[i].draw(this, this.camera.x, this.camera.y);

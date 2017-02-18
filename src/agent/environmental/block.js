@@ -54,9 +54,6 @@ function Invisiblock(game, AM, x, y, width, height) {
 };
 
 Invisiblock.prototype = {
-    draw: function () {
-        //Nothing to do.
-    },
 
     update: function () {
         //Nothing to do.

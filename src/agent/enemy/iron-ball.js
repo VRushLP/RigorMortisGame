@@ -4,6 +4,16 @@ var BALL_ATTR = {
   DROP_FREQUENCY: 3 //seconds
 }
 
+var IRON_BALL_PHYSICS = {
+    TERMINAL_X_VELOCITY : 0,
+    TERMINAL_Y_VELOCITY : 6,
+    KNOCKBACK_VELOCITY : 0,
+    INITIAL_X_VELOCITY : 0,
+    INITIAL_Y_VELOCITY : 0,
+    Y_ACCELERATION : 0.5,
+    X_ACCELRATION : 0,
+}
+
 
 function BallDropPoint(game, AM, x, y) {
     this.game = game;

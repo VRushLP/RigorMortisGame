@@ -1,4 +1,4 @@
-//Animation Constants
+//TODO: Finish migration of these to abstract-agent.js
 var KNIGHT_ANIM = {
     STAND_RIGHT: 0,
     STAND_LEFT: 1,
@@ -10,35 +10,27 @@ var KNIGHT_ANIM = {
     FALLING_LEFT: 7,
     ATTACK_RIGHT: 8,
     ATTACK_LEFT: 9,
-    FRAME_DURATION: .1,
-    FRAME_RUN_DURATION: .085,
-}
-
-//Direction Constants
-var KNIGHT_DIR = {
-    LEFT: 0,
-    RIGHT: 1,
 }
 
 var KNIGHT_ATTR = {
     STARTING_HEALTH: 5,
-    INVULNERABLITY_TIME: .5, //previously 30 frames
+    INVULNERABILITY_TIME: 0.5, //previously 30 frames
+}
+
+var KNIGHT_UNIQUE_ATTR = {
+    PRESS_DOWN_SPEED : 0.5,
+    PRESS_UP_SPEED : 0.17,    
 }
 
 //Physics Constants
 var KNIGHT_PHYSICS = {
-    TERMINAL_Y_VELOCITY : 16,
     TERMINAL_X_VELOCITY : 5,
+    TERMINAL_Y_VELOCITY : 16,
     KNOCKBACK_VELOCITY : 12,
-    //Initial jump velocity for tapping jump.
-    JUMP_VELOCITY : 8,
-    //Gravity's downward acceleration
+    INITIAL_X_VELOCITY : 2,
+    INITIAL_Y_VELOCITY : 8,
     Y_ACCELERATION : 0.35,
-    RUNNING_SPEED : 5,
-    //Extra velocity added for holding down while falling.
-    PRESS_DOWN_SPEED : 2,
-    //Gravity reduction for holding up while rising.
-    PRESS_UP_SPEED : 0.17,
+    X_ACCELRATION : 0,
 }
 
 /**
@@ -47,100 +39,42 @@ var KNIGHT_PHYSICS = {
  * and also attach to it all animations.
  */
 function Knight(game, AM, x, y) {
+    AbstractAgent.call(this, game, x, y, KNIGHT_PHYSICS, KNIGHT_ATTR);
     this.entity = new Entity(x, y, 48, 50);
-    this.game = game;
     this.input_types = this.game.input_types;
     this.swordHitbox = null;
-
-    this.yVelocity = 0;
-    this.xVelocity = 0;
-    this.direction = KNIGHT_DIR.RIGHT;
+    this.direction = DIRECTION.RIGHT;
 
     this.canJump = true;
-    this.attacking = false;
     this.noclip = false;
 
-    this.invulnerableFrames = 0;
-    this.health = KNIGHT_ATTR.STARTING_HEALTH;
     this.entity.addAnimationSet(new AnimationSet(ANIMATION_SET.KNIGHT, AM));
 };
 
-Knight.prototype.draw = function (game, cameraX, cameraY) {
-    this.entity.draw(this.game, cameraX, cameraY);
-};
+Knight.prototype = Object.create(AbstractAgent.prototype);
 
 /**
  * Update the Knight agent.
  */
 Knight.prototype.update = function() {
-    gameDiff = this.game.clockTick
-
-    if(this.invulnerableFrames > 0) {
-        this.invulnerableFrames-= gameDiff;
+    this.genericUpdate();
+    
+    if (this.attackTimer !== undefined) {
+            this.attackTimer.update();
     }
-
-    //Update the knight's attack state.
-    var currentAnimation = this.entity.currentAnimation;
-    if (currentAnimation === KNIGHT_ANIM.ATTACK_RIGHT ||
-        currentAnimation === KNIGHT_ANIM.ATTACK_LEFT) {
-        if (!this.entity.animationList[currentAnimation].isFinalFrame()) {
-            this.attacking = true;
-        } else {
-            this.attacking = false;
-            this.rest();
-        }
-    }
-
-    //Update the Knight's falling state.
-    if (this.game.getBottomCollisions(this).length === 0) {
-        //If there is no bottom collision, then the agent is in the air, and should accelerate downwards.
-        this.yVelocity += KNIGHT_PHYSICS.Y_ACCELERATION;
-        if (this.yVelocity >= KNIGHT_PHYSICS.TERMINAL_Y_VELOCITY) this.yVelocity = KNIGHT_PHYSICS.TERMINAL_Y_VELOCITY;
-    } else if (this.yVelocity > 0) {
-        //If there is a bottom collision, then the agent is on the ground, and should have no downwards velocity.
-        this.yVelocity = 0;
-
-        //If the knight previously had a jumping/falling animation, request the knight to go into a rest state.
-        if(this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_RIGHT ||
+    if (this.attacking) this.slowDown();
+    if (this.game.getBottomCollisions(this).length !== 0) {
+        if (this.yVelocity > 0) {
+            if(this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_RIGHT ||
                this.entity.currentAnimation === KNIGHT_ANIM.JUMPING_LEFT ||
                this.entity.currentAnimation === KNIGHT_ANIM.FALLING_RIGHT ||
                this.entity.currentAnimation === KNIGHT_ANIM.FALLING_LEFT) {
                    this.rest();
             }
-    }
-
-    //If the agent is jumping, check for top collisions.
-    if(this.yVelocity < 0) {
-        if (this.game.getTopCollisions(this).length > 0) {
-            this.yVelocity = 0;
         }
     }
-
-    //If downwards velocity is present, set the player into a jumping or falling animation.
-    if(this.yVelocity !== 0) {
-        //If the knight is attacking, keep them in the attack animation.
-        if (this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_LEFT &&
-           this.entity.currentAnimation !== KNIGHT_ANIM.ATTACK_RIGHT) {
-
-            if (this.yVelocity > 0) {
-                if(this.direction === KNIGHT_DIR.RIGHT) {
-                    this.entity.setAnimation(KNIGHT_ANIM.FALLING_RIGHT);
-                } else {
-                    this.entity.setAnimation(KNIGHT_ANIM.FALLING_LEFT);
-                }
-            } else {
-                if(this.direction === KNIGHT_DIR.RIGHT) {
-                    this.entity.setAnimation(KNIGHT_ANIM.JUMPING_RIGHT);
-                } else {
-                    this.entity.setAnimation(KNIGHT_ANIM.JUMPING_LEFT);
-                }
-            }
-        }
-    }
-
-    //Move the player independently in both directions, otherwise it will feel off.
-    this.game.requestMove(this, this.xVelocity, 0);
-    this.game.requestMove(this, 0, this.yVelocity);
+    
+    this.genericPostUpdate();
 
     //Move the sword hitbox with the player.
     if (this.attacking && this.swordHitbox !== null) {
@@ -150,28 +84,25 @@ Knight.prototype.update = function() {
 }
 
 /**
- * Request the Knight agent to jump.
- */
-Knight.prototype.jump = function() {
-    //Allow the jump only if the agent is on the ground.
-    if(this.game.getBottomCollisions(this).length > 0 && this.canJump) {
-        this.yVelocity = -(KNIGHT_PHYSICS.JUMP_VELOCITY);
-    }
-    //The player must actively press up to jump, they can't just hold it.
-    this.canJump = false;
-}
-
-/**
   * Request the Knight to rest.
   */
 Knight.prototype.rest = function () {
     if(this.attacking) return;
-    if(this.direction === KNIGHT_DIR.RIGHT) {
+    if(this.direction === DIRECTION.RIGHT) {
         this.entity.setAnimation(KNIGHT_ANIM.STAND_RIGHT);
     } else {
         this.entity.setAnimation(KNIGHT_ANIM.STAND_LEFT);
     }
     this.slowDown();
+}
+
+Knight.prototype.setAttacking = function (isAttacking) {
+    if (this.attacking && !isAttacking) {
+        this.attacking = false;
+        this.rest();
+    } else {
+        this.attacking = isAttacking;
+    }
 }
 
 /**
@@ -180,13 +111,17 @@ Knight.prototype.rest = function () {
 Knight.prototype.readInput = function(input, modifier) {
     if (input === this.input_types.DOWN) {
         if(this.attacking) return;
-        this.game.requestMove(this, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
+        this.adjustYVelocity(KNIGHT_UNIQUE_ATTR.PRESS_DOWN_SPEED);
     }
     if (input === this.input_types.UP) {
-        if(this.attacking) return;
+        if (this.attacking) return;
         //Add upwards velocity if the player is holding up while jumping.
-        if (this.yVelocity < 0) this.yVelocity -= KNIGHT_PHYSICS.PRESS_UP_SPEED;
-        this.jump();
+        if (this.yVelocity < 0) this.adjustYVelocity(-1 * KNIGHT_UNIQUE_ATTR.PRESS_UP_SPEED);
+        
+        if (this.canJump) {
+            this.genericJump();
+            this.canJump = false;
+        }
 
         //Allows no-clip debugging. // TODO Fix NoClip
         if(this.noclip) {
@@ -194,52 +129,26 @@ Knight.prototype.readInput = function(input, modifier) {
         }
     }
     if (input === this.input_types.LEFT) {
-        if(this.attacking) return;
-        this.direction = KNIGHT_DIR.LEFT;
-        if(this.game.getBottomCollisions(this).length > 0) {
-            //An agent should only walk if it is not in the air.
-            this.entity.setAnimation(KNIGHT_ANIM.WALKING_LEFT);
-        }
-        if (this.xVelocity >= KNIGHT_PHYSICS.TERMINAL_X_VELOCITY * -1) {
-            this.adjustXVelocity(-2);
-        } else {
-            //Terminal Velocity is exceeding during knockback, so only slow down here.
-            this.slowDown();
-        }
+        if (this.attacking) return;
+        this.genericWalkLeft();
     }
     //Uses the same logic as input left.
     if(input === this.input_types.RIGHT) {
-        if(this.attacking) return;
-        this.direction = KNIGHT_DIR.RIGHT;
-        if(this.game.getBottomCollisions(this).length > 0) {
-            this.entity.setAnimation(KNIGHT_ANIM.WALKING_RIGHT);
-        }
-        if (this.xVelocity <= KNIGHT_PHYSICS.TERMINAL_X_VELOCITY) {
-            this.adjustXVelocity(2);
-        } else {
-            this.slowDown();
-        }
+        if (this.attacking) return;
+        this.genericWalkRight();
     }
     if (input === this.input_types.SPACE) {
-        if(this.direction === KNIGHT_DIR.RIGHT) {
-            this.entity.setAnimation(KNIGHT_ANIM.ATTACK_RIGHT);
-        } else {
-            this.entity.setAnimation(KNIGHT_ANIM.ATTACK_LEFT);
-        }
-        this.slowDown();
-
         //Create a new sword hitbox if the knight is not currently attacking.
-        if (!this.attacking) {
-            this.attacking = true;
-            if(this.direction === KNIGHT_DIR.RIGHT) {
-                this.swordHitbox = new SwordHitbox(this.game, this.entity.x + this.entity.width - 29, this.entity.y, this);
-            } else {
-                this.swordHitbox = new SwordHitbox(this.game, this.entity.x - this.entity.width + 5,
-                                                this.entity.y, this);
-            }
-
-            this.game.addAgent(this.swordHitbox);
+        if (this.attacking) return;
+        this.genericAttack();
+        if(this.direction === DIRECTION.RIGHT) {
+            this.swordHitbox = new SwordHitbox(this.game, this.entity.x + this.entity.width - 29, this.entity.y, this);
+        } else {
+            this.swordHitbox = new SwordHitbox(this.game, this.entity.x - this.entity.width + 5,
+                                            this.entity.y, this);
         }
+
+        this.game.addAgent(this.swordHitbox);
     }
     if (input === this.input_types.NONE) {
         this.rest();
@@ -265,13 +174,13 @@ Knight.prototype.readInput = function(input, modifier) {
     }
 
     if (input === this.input_types.DAMAGE) {
-        if (this.invulnerableFrames <= 0) {
-            this.invulnerableFrames = KNIGHT_ATTR.INVULNERABLITY_TIME;
+        if (!this.invulnerable) {
+            this.toggleInvulnerability(true);
             this.health--;
 
             //Knock the player back.
             //TODO: Knock player back based on direction that damage came from.
-            if (this.direction === KNIGHT_DIR.LEFT) {
+            if (this.direction === DIRECTION.LEFT) {
                 this.xVelocity = KNIGHT_PHYSICS.KNOCKBACK_VELOCITY;
                 this.yVelocity = -6;
             } else {
@@ -304,30 +213,7 @@ Knight.prototype.readInput = function(input, modifier) {
     }
 }
 
-Knight.prototype.adjustXVelocity = function (amount) {
-    var maxVelocity = KNIGHT_PHYSICS.TERMINAL_X_VELOCITY;
-    this.xVelocity += amount;
 
-    if (this.invulnerableFrames > 0) maxVelocity = KNIGHT_PHYSICS.KNOCKBACK_VELOCITY;
-
-    if (this.xVelocity > maxVelocity) {
-        this.xVelocity = maxVelocity;
-    }
-    if (this.xVelocity < -1 * maxVelocity) {
-        this.xVelocity = -1 * maxVelocity;
-    }
-}
-
-Knight.prototype.slowDown = function () {
-    var maxSlowdown = 1;
-    if (this.invulnerableFrames > 0) maxSlowdown = .45;
-
-    if (this.xVelocity > 0) {
-         this.adjustXVelocity(Math.max(maxSlowdown * -1, this.xVelocity * -1));
-    } else if (this.xVelocity < 0) {
-          this.adjustXVelocity(Math.min(maxSlowdown, this.xVelocity * -1));
-    }
-}
 
 /**
   * Create a new sword hitbox.
@@ -353,10 +239,6 @@ SwordHitbox.prototype = {
         }
         //Does not move the entity, but simply checks if it is currently colliding.
         this.game.requestMove(this, 0, 0);
-    },
-
-    draw: function() {
-        this.entity.draw();
     },
 
     checkListeners: function(agent) {

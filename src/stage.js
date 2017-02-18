@@ -13,7 +13,7 @@ function Stage(gameEngine, stageType, music) {
     this.stageMusic = null;
     this.stageHeight = 0;
 
-    if (typeof(music) !== "undefined") {
+    if (typeof(music) !== undefined) {
         this.stageMusic = music;
     }
     this.gameEngine = gameEngine;

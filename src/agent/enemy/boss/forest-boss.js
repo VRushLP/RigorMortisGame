@@ -272,12 +272,12 @@ ForestBoss.prototype = {
 
         if (this.health === FB_ATTR.PHASE_1_HEALTH) {
             this.phase = 1;
-            this.stateTrigger.readInput("advance");
+            this.stateTrigger.readInput(this.input_types.ADVANCE);
             this.currentAttackAnim = FB_ANIM.NORMAL;
         }
         if (this.health === FB_ATTR.PHASE_2_HEALTH) {
             this.phase = 2;
-            this.stateTrigger.readInput("advance");
+            this.stateTrigger.readInput(this.input_types.ADVANCE);
             this.currentAttackAnim = FB_ANIM.WIDE;
         }
     },
@@ -285,7 +285,7 @@ ForestBoss.prototype = {
     //Remove the Forest Boss arms, core, and the controller from world and switch the music back..
     selfDestruct: function () {
         var gameEngine = this.game;
-        this.stateTrigger.readInput("advance");
+        this.stateTrigger.readInput(this.input_types.ADVANCE);
         for (var i = 0; i < this.arms.length; i++) {
             this.arms[i].entity.removeFromWorld = true;
         }
@@ -460,7 +460,7 @@ ForestBossArm.prototype = {
 
     checkListeners: function(agent) {
         if (agent.entity.controllable && this.entity.currentAnimation !== FB_ANIM.PLATFORM) {
-            this.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
         }
     }
 

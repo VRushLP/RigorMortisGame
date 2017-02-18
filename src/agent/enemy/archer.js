@@ -18,7 +18,18 @@ var ARCHER_ANIM = {
     DYING: 8,
 }
 
+var ARCHER_PHYSICS = {
+    TERMINAL_X_VELOCITY : 0,
+    TERMINAL_Y_VELOCITY : 0,
+    KNOCKBACK_VELOCITY : 0,
+    INITIAL_X_VELOCITY : 0,
+    INITIAL_Y_VELOCITY : 0,
+    Y_ACCELERATION : 0,
+    X_ACCELRATION : 0,
+}
+
 function Archer (game, AM, x, y) {
+    AbstractAgent.call(this, game, x, y, ARCHER_PHYSICS);
     this.entity = new Entity(x, y, 68, 60);
     this.game = game;
     this.input_types = game.input_types;
@@ -34,90 +45,89 @@ function Archer (game, AM, x, y) {
     this.arrowImg = AM.getAsset("./img/enemy/arrow.png");
 }
 
-Archer.prototype = {
+Archer.prototype = Object.create(AbstractAgent.prototype);
 
-    update: function () {
-      timeDiff = this.game.clockTick;
+Archer.prototype.update = function() {
+    timeDiff = this.game.clockTick;
 
-        if (this.entity.collidable) {
-            var knightPoint = this.game.playerAgent.entity.getCenter();
+    if (this.entity.collidable) {
+        var knightPoint = this.game.playerAgent.entity.getCenter();
 
-            var distanceX = knightPoint.x - this.center.x;
-            var distanceY = knightPoint.y - this.center.y;
+        var distanceX = knightPoint.x - this.center.x;
+        var distanceY = knightPoint.y - this.center.y;
 
-            var angle = Math.atan2(-distanceY, distanceX);
-            var distance = getDistance(this.center, knightPoint);
+        var angle = Math.atan2(-distanceY, distanceX);
+        var distance = getDistance(this.center, knightPoint);
 
-            if (distance < this.vision) {
-                if (this.timeUntilNextArrow >= ARCHER_ATTR.SHOOTING_TIME) {
-                    this.setAnimationFromAngle(angle);
+        if (distance < this.vision) {
+            if (this.timeUntilNextArrow >= ARCHER_ATTR.SHOOTING_TIME) {
+                this.setAnimationFromAngle(angle);
+            }
+            this.timeUntilNextArrow -= timeDiff;
+            if (this.timeUntilNextArrow <= 0) {
+                this.timeUntilNextArrow = ARCHER_ATTR.SHOOTING_TIME;
+            }
+        }
+
+        if (this.entity.currentAnimation !== ARCHER_ANIM.IDLE_LEFT &&
+            this.entity.currentAnimation !== ARCHER_ANIM.IDLE_RIGHT) {
+
+            if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
+                this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
+
+                var arrow = new Arrow(this, distanceX, distanceY, angle);
+                this.game.addAgent(arrow);
+
+                if (knightPoint.x > this.entity.x) {
+                    this.entity.currentAnimation = ARCHER_ANIM.IDLE_RIGHT;
+                } else {
+                    this.entity.currentAnimation = ARCHER_ANIM.IDLE_LEFT;
                 }
-                this.timeUntilNextArrow -= timeDiff;
-                if (this.timeUntilNextArrow <= 0) {
-                    this.timeUntilNextArrow = ARCHER_ATTR.SHOOTING_TIME;
-                }
-            }
-
-            if (this.entity.currentAnimation !== ARCHER_ANIM.IDLE_LEFT &&
-                this.entity.currentAnimation !== ARCHER_ANIM.IDLE_RIGHT) {
-
-                if (this.entity.animationList[this.entity.currentAnimation].isFinalFrame()) {
-                    this.entity.animationList[this.entity.currentAnimation].elapsedTime = 0;
-
-                    var arrow = new Arrow(this, distanceX, distanceY, angle);
-                    this.game.addAgent(arrow);
-
-                    if (knightPoint.x > this.entity.x) {
-                        this.entity.currentAnimation = ARCHER_ANIM.IDLE_RIGHT;
-                    } else {
-                        this.entity.currentAnimation = ARCHER_ANIM.IDLE_LEFT;
-                    }
-                }
-            }
-        } else {
-            this.entity.setAnimation(ARCHER_ANIM.DYING);
-            if (this.entity.animationList[ARCHER_ANIM.DYING].isDone()) {
-                this.entity.removeFromWorld = true;
             }
         }
-    },
+    } else {
+        this.entity.setAnimation(ARCHER_ANIM.DYING);
+        if (this.entity.animationList[ARCHER_ANIM.DYING].isDone()) {
+            this.entity.removeFromWorld = true;
+        }
+    }
+}
 
-    readInput: function (input, modifier) {
-        if (input === this.input_types.DAMAGE) {
-            this.health--;
-            if (this.health <= 0) {
-                this.entity.x += this.entity.width / 2;
-                this.entity.y += this.entity.height / 2;
-                this.entity.collidable = false;
-            }
+Archer.prototype.readInput = function(input) {
+    if (input === this.input_types.DAMAGE) {
+        this.health--;
+        if (this.health <= 0) {
+            this.entity.x += this.entity.width / 2;
+            this.entity.y += this.entity.height / 2;
+            this.entity.collidable = false;
         }
-        if (input === this.input_types.RESET) {
-            this.entity.collidable = true;
-            this.health = ARCHER_ATTR.STARTING_HEALTH;
-            this.entity.animationList[ARCHER_ANIM.DYING].elapsedTime = 0;
-        }
-    },
+    }
+    if (input === this.input_types.RESET) {
+        this.entity.collidable = true;
+        this.health = ARCHER_ATTR.STARTING_HEALTH;
+        this.entity.animationList[ARCHER_ANIM.DYING].elapsedTime = 0;
+    }
+}
 
-    setAnimationFromAngle: function (angle) {
-        if (angle >= Math.PI / (-6) && angle <= Math.PI / 6) {   // [-30, 30] degree
-            this.entity.currentAnimation = ARCHER_ANIM.ATK_STRAIGHT_RIGHT;
-        } else if (angle > Math.PI / 6 && angle <= Math.PI / 2) {   // (30, 90] degree
-            this.entity.currentAnimation = ARCHER_ANIM.ATK_UP_RIGHT;
-        } else if (angle > Math.PI / 2 && angle < 5 * Math.PI / 6) {   // (90, 150) degree
-            this.entity.currentAnimation = ARCHER_ANIM.ATK_UP_LEFT;
-        } else if (angle >= 5 * Math.PI / 6 || angle <= (-5) * Math.PI / 6) {
-            this.entity.currentAnimation = ARCHER_ANIM.ATK_STRAIGHT_LEFT;
-        } else if (angle > (-5) * Math.PI / 6 && angle <= Math.PI / (-2)) {    // (-150, -90] degree
-            this.entity.currentAnimation = ARCHER_ANIM.ATK_DOWN_LEFT;
-        } else {
-            this.entity.currentAnimation = ARCHER_ANIM.ATK_DOWN_RIGHT;
-        }
-    },
+Archer.prototype.setAnimationFromAngle = function(angle) {
+    if (angle >= Math.PI / (-6) && angle <= Math.PI / 6) {   // [-30, 30] degree
+        this.entity.currentAnimation = ARCHER_ANIM.ATK_STRAIGHT_RIGHT;
+    } else if (angle > Math.PI / 6 && angle <= Math.PI / 2) {   // (30, 90] degree
+        this.entity.currentAnimation = ARCHER_ANIM.ATK_UP_RIGHT;
+    } else if (angle > Math.PI / 2 && angle < 5 * Math.PI / 6) {   // (90, 150) degree
+        this.entity.currentAnimation = ARCHER_ANIM.ATK_UP_LEFT;
+    } else if (angle >= 5 * Math.PI / 6 || angle <= (-5) * Math.PI / 6) {
+        this.entity.currentAnimation = ARCHER_ANIM.ATK_STRAIGHT_LEFT;
+    } else if (angle > (-5) * Math.PI / 6 && angle <= Math.PI / (-2)) {    // (-150, -90] degree
+        this.entity.currentAnimation = ARCHER_ANIM.ATK_DOWN_LEFT;
+    } else {
+        this.entity.currentAnimation = ARCHER_ANIM.ATK_DOWN_RIGHT;
+    }
+}
 
-    checkListeners: function (agent) {
-        if (agent.entity.controllable) {
-            this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
-        }
+Archer.prototype.checkListeners = function(agent) {
+    if (agent.entity.controllable) {
+        this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
     }
 }
 
