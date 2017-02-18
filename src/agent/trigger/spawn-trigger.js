@@ -31,7 +31,7 @@ SpawnTrigger.prototype.checkListeners = function(agent) {
 }
 
 SpawnTrigger.prototype.readInput = function(input) {
-    if (input === "reset") {
+    if (input === this.input_types.RESET) {
         this.entity.collidable = true;
     }
 }

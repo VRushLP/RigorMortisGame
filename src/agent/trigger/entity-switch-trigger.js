@@ -7,15 +7,15 @@ function EntitySwitchTrigger(game, x, y, width, height, entities) {
 EntitySwitchTrigger.prototype = Object.create(AbstractTrigger.prototype);
 
 EntitySwitchTrigger.prototype.checkListeners = function (agent) {
-    if (agent.entity.controllable) 
+    if (agent.entity.controllable)
     {
         this.entity.collidable = false;
-        this.readInput("advance");
+        this.readInput(this.input_types.ADVANCE);
     }
 }
 
 EntitySwitchTrigger.prototype.readInput = function(input) {
-    if (input === "reset") {
+    if (input === this.input_types.RESET) {
         this.entity.collidable = true;
         var index = this.game.agents.indexOf(this.entities[this.currentEntity]);
         if (index > -1) {
@@ -26,7 +26,7 @@ EntitySwitchTrigger.prototype.readInput = function(input) {
     }
 
     //Advance the current entity present.
-    if (input === "advance") {
+    if (input === this.input_types.ADVANCE) {
         if (this.currentEntity + 1 >= this.entities.length) {
             return;
         }

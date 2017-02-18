@@ -49,6 +49,7 @@ var KNIGHT_PHYSICS = {
 function Knight(game, AM, x, y) {
     this.entity = new Entity(x, y, 48, 50);
     this.game = game;
+    this.input_types = this.game.input_types;
     this.swordHitbox = null;
 
     this.yVelocity = 0;
@@ -177,22 +178,22 @@ Knight.prototype.rest = function () {
  * Request the agent to process an input.
  */
 Knight.prototype.readInput = function(input, modifier) {
-    if (input === "down") {
+    if (input === this.input_types.DOWN) {
         if(this.attacking) return;
         this.game.requestMove(this, 0, KNIGHT_PHYSICS.PRESS_DOWN_SPEED);
     }
-    if (input === "up") {
+    if (input === this.input_types.UP) {
         if(this.attacking) return;
         //Add upwards velocity if the player is holding up while jumping.
         if (this.yVelocity < 0) this.yVelocity -= KNIGHT_PHYSICS.PRESS_UP_SPEED;
         this.jump();
 
-        //Allows no-clip debugging.
+        //Allows no-clip debugging. // TODO Fix NoClip
         if(this.noclip) {
             this.game.requestMove(this, 0, -10)
         }
     }
-    if (input === "left") {
+    if (input === this.input_types.LEFT) {
         if(this.attacking) return;
         this.direction = KNIGHT_DIR.LEFT;
         if(this.game.getBottomCollisions(this).length > 0) {
@@ -207,7 +208,7 @@ Knight.prototype.readInput = function(input, modifier) {
         }
     }
     //Uses the same logic as input left.
-    if(input === "right") {
+    if(input === this.input_types.RIGHT) {
         if(this.attacking) return;
         this.direction = KNIGHT_DIR.RIGHT;
         if(this.game.getBottomCollisions(this).length > 0) {
@@ -219,7 +220,7 @@ Knight.prototype.readInput = function(input, modifier) {
             this.slowDown();
         }
     }
-    if (input === "space") {
+    if (input === this.input_types.SPACE) {
         if(this.direction === KNIGHT_DIR.RIGHT) {
             this.entity.setAnimation(KNIGHT_ANIM.ATTACK_RIGHT);
         } else {
@@ -240,30 +241,30 @@ Knight.prototype.readInput = function(input, modifier) {
             this.game.addAgent(this.swordHitbox);
         }
     }
-    if (input === "none") {
+    if (input === this.input_types.NONE) {
         this.rest();
     }
 
     //Knight can only jump upon pressing jump, so reset the ability to jump
     //whenever the jump key is released.
-    if (input === "up_released") {
+    if (input === this.input_types.UP_RELEASED) {
         this.canJump = true;
     }
 
     //If right or left aren't being pressed, but the knight is currently running, then reset
     //the knight's animation.
-    if(input === "right_released" && this.entity.currentAnimation === KNIGHT_ANIM.WALKING_RIGHT) {
+    if(input === this.input_types.RIGHT_RELEASED && this.entity.currentAnimation === KNIGHT_ANIM.WALKING_RIGHT) {
         this.rest();
     }
-    if (input === "left_released" && this.entity.currentAnimation === KNIGHT_ANIM.WALKING_LEFT) {
+    if (input === this.input_types.LEFT_RELEASED && this.entity.currentAnimation === KNIGHT_ANIM.WALKING_LEFT) {
         this.rest();
     }
 
-    if (input === "left_and_right_released") {
+    if (input === this.input_types.LEFT_AND_RIGHT_RELEASED) {
         this.slowDown();
     }
 
-    if (input === "damage") {
+    if (input === this.input_types.DAMAGE) {
         if (this.invulnerableFrames <= 0) {
             this.invulnerableFrames = KNIGHT_ATTR.INVULNERABLITY_TIME;
             this.health--;
@@ -284,18 +285,18 @@ Knight.prototype.readInput = function(input, modifier) {
         }
     }
 
-    if (input === "heal") {
+    if (input === this.input_types.HEAL) {
         this.health = KNIGHT_ATTR.STARTING_HEALTH;
     }
 
-    if (input === "reset") {
+    if (input === this.input_types.RESET) {
         this.health = KNIGHT_ATTR.STARTING_HEALTH;
         this.xVelocity = 0;
         this.yVelocity = 0;
     }
 
     //No-clip activation/deactivation
-    if (input === 'n') {
+    if (input === this.input_types.NOCLIP) {
         if(this.game.DEBUG_MODE === 1) {
             this.noclip = !this.noclip;
             this.entity.collidable = !this.entity.collidable;
@@ -339,6 +340,7 @@ function SwordHitbox(game, x, y, source) {
     this.entity.intangible = true;
     this.entity.temporary = true;
     this.game = game;
+    this.input_types = game.input_types;
     this.source = source;
 }
 
@@ -359,7 +361,7 @@ SwordHitbox.prototype = {
 
     checkListeners: function(agent) {
         if (!agent.entity.controllable) {
-            this.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
         }
     }
 }

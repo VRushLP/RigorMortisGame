@@ -26,9 +26,9 @@ CameraTrigger.prototype.checkListeners = function(agent) {
         this.entity.collidable = false;
     }
 }
-    
+
 CameraTrigger.prototype.readInput = function(input) {
-    if (input === "reset") {
+    if (input === this.input_types.RESET) {
         this.entity.collidable = true;
     }
 }

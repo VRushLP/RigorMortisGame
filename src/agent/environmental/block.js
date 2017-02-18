@@ -86,13 +86,14 @@ function Spike(game, AM, x, y) {
     this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT);
     var spikeAnim = new Animation(AM.getAsset("./img/enemy/spike.png"), BLOCKS_GLOBALS.WIDTH, BLOCKS_GLOBALS.HEIGHT, BLOCKS_GLOBALS.FRAME_DURATION, true);
     this.game = game;
+    this.input_types = game.input_types;
     spikeAnim.addFrame(0, 0);
     this.entity.addAnimation(spikeAnim);
 };
 
 Spike.prototype = {
     checkListeners: function (agent) {
-        this.game.requestInputSend(agent, "damage", 1);
+        this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
     },
     update : function () {}
 };

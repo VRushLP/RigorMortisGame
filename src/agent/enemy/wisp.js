@@ -20,6 +20,7 @@ function Wisp(game, AM, x, y) {
     this.entity.moveable = true;
     this.alive = true;
     this.game = game;
+    this.input_types = game.input_types;
     this.struckRecently = false;
     this.timeToStrikeAgain = 0;
     this.health = WISP_ATTR.STARTING_HEALTH;
@@ -84,7 +85,7 @@ Wisp.prototype = {
                 this.struckRecently = true;
                 this.timeToStrikeAgain = WISP_ATTR.FLEE_TIME;
                 this.entity.collidable = false;
-                this.game.requestInputSend(this.game.playerAgent, "damage", 1);
+                this.game.requestInputSend(this.game.playerAgent, this.input_types.DAMAGE, 1);
             }
         } else {
             this.entity.setAnimation(WISP_ANIM.DYING);
@@ -95,7 +96,7 @@ Wisp.prototype = {
     },
 
     readInput: function (input, modifier) {
-        if (input === "damage") {
+        if (input === this.input_types.DAMAGE) {
             if (this.invulnerableTime <= 0) {
                 this.invulnerableTime = WISP_ATTR.INVULNERABILITY_TIME;
                 this.health--;
@@ -108,7 +109,7 @@ Wisp.prototype = {
                 }
             }
         }
-        if (input === "reset") {
+        if (input === this.input_types.RESET) {
             this.alive = true;
             this.entity.collidable = true;
             this.health = WISP_ATTR.STARTING_HEALTH;

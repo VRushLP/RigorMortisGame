@@ -7,6 +7,35 @@ var CAMERA_MODE = {
     PAN_THEN_INSTANT: 2
 }
 
+var INPUT_TYPES = {
+  NONE: "none",
+
+  RIGHT: "right",
+  LEFT: "left",
+  DOWN: "down",
+  UP: "up",
+
+  NOCLIP: "noclip",
+  // TODO Combine attack and space so it's easier to read.
+  ATTACK: "attack",
+  ATTACK_RELEASED: "attack_released",
+  SPACE: "space",
+  SPACE_RELEASED: "space_released",
+  RESET: "reset",
+
+  RIGHT_RELEASED: "right_released",
+  LEFT_RELEASED: "left_released",
+  UP_RELEASED: "up_released",
+  DOWN_RELEASED: "down_released",
+  LEFT_AND_RIGHT_RELEASED: "left_and_right_released",
+
+  DAMAGE: "damage",
+  HEAL: "heal",
+
+  ADVANCE: "advance",
+
+}
+
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -65,6 +94,8 @@ function GameEngine() {
     this.healthBarVisible = false;
     this.stageReset = false;
 
+    this.input_types = INPUT_TYPES;
+
     //Initially set by main before game start.
     this.playerAgent;
     this.cameraAgent;
@@ -110,7 +141,7 @@ GameEngine.prototype = {
         this.playerAgent.entity.x = this.stages[this.currentStage].spawnX;
         this.playerAgent.entity.y = this.stages[this.currentStage].spawnY;
 
-        this.playerAgent.readInput("reset");
+        this.playerAgent.readInput(this.input_types.RESET);
         this.agents.push(this.playerAgent);
 
         this.switchMusic(this.stages[this.currentStage].stageMusic);
@@ -121,7 +152,7 @@ GameEngine.prototype = {
         //Re-add removed agents to the game.
         for (var i = 0; i < this.removedAgents.length; i++) {
             if (typeof this.removedAgents[i].readInput === 'function') {
-                this.removedAgents[i].readInput("reset");
+                this.removedAgents[i].readInput(this.input_types.RESET);
             }
             this.agents.push(this.removedAgents[i]);
         }
@@ -130,7 +161,7 @@ GameEngine.prototype = {
         //Reset all agents.
         for (var i = 0; i < this.agents.length; i++) {
             if (typeof this.agents[i].readInput === 'function') {
-                this.agents[i].readInput("reset");
+                this.agents[i].readInput(this.input_types.RESET);
             }
 
             if (this.agents[i].entity.removeUponReset) {
@@ -269,8 +300,6 @@ GameEngine.prototype = {
             }
         })
     },
-
-
 
 
     /*********************
@@ -675,25 +704,27 @@ GameEngine.prototype.loop = function () {
     if (this.visible && this.hasFocus && !this.paused) {
       for(var i = 0; i < this.agents.length; i++) {
           if(this.agents[i].entity.controllable === true) {
-              if(this.pressRight && !this.pressLeft) this.agents[i].readInput("right");
-              if(this.pressDown) this.agents[i].readInput("down");
-              if(this.pressUp) this.agents[i].readInput("up");
-              if(this.pressLeft && !this.pressRight) this.agents[i].readInput("left");
-              if(this.pressLeft && this.pressRight) this.agents[i].readInput("none");
-              if(this.pressN) this.agents[i].readInput('n');
-              if(this.pressSpace) this.agents[i].readInput("space");
+              if(this.pressRight && !this.pressLeft) this.agents[i].readInput(this.input_types.RIGHT);
+              if(this.pressDown) this.agents[i].readInput(this.input_types.DOWN);
+              if(this.pressUp) this.agents[i].readInput(this.input_types.UP);
+              if(this.pressLeft && !this.pressRight) this.agents[i].readInput(this.input_types.LEFT);
+              if(this.pressLeft && this.pressRight) this.agents[i].readInput(this.input_types.NONE);
+
+              if(this.pressN) this.agents[i].readInput(this.input_types.NOCLIP);
+              if(this.pressSpace) this.agents[i].readInput(this.input_types.SPACE);
 
               if(this.pressRight && this.pressLeft) {
-                  this.agents[i].readInput("left_released");
-                  this.agents[i].readInput("right_released");
+                  this.agents[i].readInput(this.input_types.LEFT_RELEASED);
+                  this.agents[i].readInput(this.input_types.RIGHT_RELEASED);
+              } else if (!this.pressRight && !this.pressLeft) {
+                  this.agents[i].readInput(this.input_types.LEFT_AND_RIGHT_RELEASED)
               }
-              if(!this.pressUp) this.agents[i].readInput("up_released");
-              if(!this.pressLeft) this.agents[i].readInput("left_released");
-              if(!this.pressRight) this.agents[i].readInput("right_released");
-              if(!this.pressSpace) this.agents[i].readInput("space_released");
-              if(!this.pressRight && !this.pressLeft) this.agents[i].readInput("left_and_right_released");
+              if(!this.pressUp) this.agents[i].readInput(this.input_types.UP_RELEASED);
+              if(!this.pressLeft) this.agents[i].readInput(this.input_types.LEFT_RELEASED);
+              if(!this.pressRight) this.agents[i].readInput(this.input_types.RIGHT_RELEASED);
+              if(!this.pressSpace) this.agents[i].readInput(this.input_types.SPACE_RELEASED);
 
-              if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput("none");
+              if(!this.pressLeft && !this.pressRight && !this.pressDown && !this.pressUp && !this.pressSpace) this.agents[i].readInput(this.input_types.NONE);
           }
       }
 

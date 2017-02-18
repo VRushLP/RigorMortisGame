@@ -21,6 +21,7 @@ var ARCHER_ANIM = {
 function Archer (game, AM, x, y) {
     this.entity = new Entity(x, y, 68, 60);
     this.game = game;
+    this.input_types = game.input_types;
 
     this.timeUntilNextArrow = ARCHER_ATTR.SHOOTING_TIME;
     this.health = ARCHER_ATTR.STARTING_HEALTH;
@@ -28,7 +29,7 @@ function Archer (game, AM, x, y) {
     this.invulnerableTime = 0;
     this.center = this.entity.getCenter()
     this.entity.addAnimationSet(new AnimationSet(ANIMATION_SET.ARCHER, AM));
-    
+
     // For passing to arrows
     this.arrowImg = AM.getAsset("./img/enemy/arrow.png");
 }
@@ -82,7 +83,7 @@ Archer.prototype = {
     },
 
     readInput: function (input, modifier) {
-        if (input === "damage") {
+        if (input === this.input_types.DAMAGE) {
             this.health--;
             if (this.health <= 0) {
                 this.entity.x += this.entity.width / 2;
@@ -90,7 +91,7 @@ Archer.prototype = {
                 this.entity.collidable = false;
             }
         }
-        if (input === "reset") {
+        if (input === this.input_types.RESET) {
             this.entity.collidable = true;
             this.health = ARCHER_ATTR.STARTING_HEALTH;
             this.entity.animationList[ARCHER_ANIM.DYING].elapsedTime = 0;
@@ -115,13 +116,14 @@ Archer.prototype = {
 
     checkListeners: function (agent) {
         if (agent.entity.controllable) {
-            this.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
         }
     }
 }
 
 function Arrow(archer, distanceX, distanceY, angle) {
     this.game = archer.game;
+    this.input_types = archer.input_types;
     this.entity = new Entity(archer.center.x, archer.center.y, 25, 5);
     this.entity.temporary = true;
     this.entity.moveable = true;
@@ -145,7 +147,7 @@ Arrow.prototype = {
 
     checkListeners: function (agent) {
         if (agent.entity.controllable) {
-            this.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
             this.entity.removeFromWorld = true;
         }
 
