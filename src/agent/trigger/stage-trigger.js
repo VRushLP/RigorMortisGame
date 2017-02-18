@@ -7,7 +7,7 @@ function StageTrigger(game, x, y, width, height, stageNumber) {
 }
 
 StageTrigger.prototype = Object.create(AbstractTrigger.prototype);
-    
+
 StageTrigger.prototype.checkListeners = function(agent) {
     if (agent.entity.controllable) {
         //Only change the stage if it is not the current one.

@@ -15,7 +15,6 @@ var IRON_BALL_PHYSICS = {
 }
 
 
-
 function BallDropPoint(game, AM, x, y) {
     this.game = game;
     this.input_types = game.input_types;

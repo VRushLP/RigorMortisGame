@@ -7,7 +7,7 @@ function EntitySwitchTrigger(game, x, y, width, height, entities) {
 EntitySwitchTrigger.prototype = Object.create(AbstractTrigger.prototype);
 
 EntitySwitchTrigger.prototype.checkListeners = function (agent) {
-    if (agent.entity.controllable) 
+    if (agent.entity.controllable)
     {
         this.entity.collidable = false;
         this.readInput(this.input_types.ADVANCE);

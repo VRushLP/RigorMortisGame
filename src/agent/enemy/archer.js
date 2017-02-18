@@ -133,7 +133,7 @@ Archer.prototype.checkListeners = function(agent) {
 
 function Arrow(archer, distanceX, distanceY, angle) {
     this.game = archer.game;
-    this.input_types = this.game.input_types;
+    this.input_types = archer.input_types;
     this.entity = new Entity(archer.center.x, archer.center.y, 25, 5);
     this.entity.temporary = true;
     this.entity.moveable = true;

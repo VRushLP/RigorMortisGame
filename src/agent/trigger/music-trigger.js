@@ -7,7 +7,7 @@ function MusicTrigger(game, x, y, width, height, music) {
 }
 
 MusicTrigger.prototype = Object.create(AbstractTrigger.prototype);
-    
+
 MusicTrigger.prototype.checkListeners = function(agent) {
     if (agent.entity.controllable) {
         //Only change the music if it is not currently the one playing.

@@ -8,31 +8,32 @@ var CAMERA_MODE = {
 }
 
 var INPUT_TYPES = {
-    NONE: "none",
-    
-    RIGHT: "right",
-    LEFT: "left",
-    DOWN: "down",
-    UP: "up",
-    
-    NOCLIP: "noclip",
-    ATTACK: "attack",
-    ATTACK_RELEASED: "attack_released",
-    SPACE: "space",
-    SPACE_RELEASED: "space_released",
-    RESET: "reset",
-    
-    RIGHT_RELEASED: "right_released",
-    LEFT_RELEASED: "left_released",
-    UP_RELEASED: "up_released",
-    DOWN_RELEASED: "down_released",
-    LEFT_AND_RIGHT_RELEASED: "left_and_right_released",
-    
-    DAMAGE: "damage",
-    HEAL: "heal",
-    
-    ADVANCE: "advance",
-    
+  NONE: "none",
+
+  RIGHT: "right",
+  LEFT: "left",
+  DOWN: "down",
+  UP: "up",
+
+  NOCLIP: "noclip",
+  // TODO Combine attack and space so it's easier to read.
+  ATTACK: "attack",
+  ATTACK_RELEASED: "attack_released",
+  SPACE: "space",
+  SPACE_RELEASED: "space_released",
+  RESET: "reset",
+
+  RIGHT_RELEASED: "right_released",
+  LEFT_RELEASED: "left_released",
+  UP_RELEASED: "up_released",
+  DOWN_RELEASED: "down_released",
+  LEFT_AND_RIGHT_RELEASED: "left_and_right_released",
+
+  DAMAGE: "damage",
+  HEAL: "heal",
+
+  ADVANCE: "advance",
+
 }
 
 window.requestAnimFrame = (function () {
@@ -93,6 +94,8 @@ function GameEngine() {
     this.healthBarVisible = false;
     this.stageReset = false;
     
+    this.input_types = INPUT_TYPES;
+
     this.input_types = INPUT_TYPES;
 
     //Initially set by main before game start.
@@ -299,8 +302,6 @@ GameEngine.prototype = {
             }
         })
     },
-
-
 
 
     /*********************
@@ -717,9 +718,8 @@ GameEngine.prototype.loop = function () {
                   this.agents[i].readInput(this.input_types.LEFT_RELEASED);
                   this.agents[i].readInput(this.input_types.RIGHT_RELEASED);
               } else if (!this.pressRight && !this.pressLeft) {
-                  this.agents[i].readInput(this.input_types.LEFT_AND_RIGHT_RELEASED);
+                  this.agents[i].readInput(this.input_types.LEFT_AND_RIGHT_RELEASED)
               }
-              
               if(!this.pressUp) this.agents[i].readInput(this.input_types.UP_RELEASED);
               if(!this.pressLeft) this.agents[i].readInput(this.input_types.LEFT_RELEASED);
               if(!this.pressRight) this.agents[i].readInput(this.input_types.RIGHT_RELEASED);

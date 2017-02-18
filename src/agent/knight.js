@@ -123,7 +123,7 @@ Knight.prototype.readInput = function(input, modifier) {
             this.canJump = false;
         }
 
-        //Allows no-clip debugging.
+        //Allows no-clip debugging. // TODO Fix NoClip
         if(this.noclip) {
             this.game.requestMove(this, 0, -10)
         }
@@ -226,6 +226,7 @@ function SwordHitbox(game, x, y, source) {
     this.entity.intangible = true;
     this.entity.temporary = true;
     this.game = game;
+    this.input_types = game.input_types;
     this.source = source;
 }
 
@@ -242,7 +243,7 @@ SwordHitbox.prototype = {
 
     checkListeners: function(agent) {
         if (!agent.entity.controllable) {
-            this.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
         }
     }
 }
