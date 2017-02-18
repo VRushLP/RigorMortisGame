@@ -24,13 +24,7 @@ function Timer(game, source, startOnCreate, toggleFunction, toggleThis, toggleFu
     this.toggleFunction = toggleFunction;
     this.toggleThis = toggleThis;
     this.toggleFunctionArguments = toggleFunctionArguments;
-    
-    if (startOnCreate) {
-        this.isDone = false;
-    }
-     else {
-         this.isDone = true;
-     }
+    this.isDone = !startOnCreate;
     
     this.initialValue = 0;
     if (typeof this.source === "number") {
