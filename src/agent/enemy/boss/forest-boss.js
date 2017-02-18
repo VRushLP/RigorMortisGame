@@ -77,6 +77,7 @@ var FB_ATTR = {
 function ForestBoss(game, AM, x, y, stage, stateTrigger) {
     this.entity = new Entity(x, y, 0, 0);
     this.game = game;
+    this.input_types = game.input_types;
     this.entity.collidable = false;
     this.exitAgents = [];
     this.stateTrigger = stateTrigger;
@@ -271,12 +272,12 @@ ForestBoss.prototype = {
 
         if (this.health === FB_ATTR.PHASE_1_HEALTH) {
             this.phase = 1;
-            this.stateTrigger.readInput("advance");
+            this.stateTrigger.readInput(this.input_types.ADVANCE);
             this.currentAttackAnim = FB_ANIM.NORMAL;
         }
         if (this.health === FB_ATTR.PHASE_2_HEALTH) {
             this.phase = 2;
-            this.stateTrigger.readInput("advance");
+            this.stateTrigger.readInput(this.input_types.ADVANCE);
             this.currentAttackAnim = FB_ANIM.WIDE;
         }
     },
@@ -284,7 +285,7 @@ ForestBoss.prototype = {
     //Remove the Forest Boss arms, core, and the controller from world and switch the music back..
     selfDestruct: function () {
         var gameEngine = this.game;
-        this.stateTrigger.readInput("advance");
+        this.stateTrigger.readInput(this.input_types.ADVANCE);
         for (var i = 0; i < this.arms.length; i++) {
             this.arms[i].entity.removeFromWorld = true;
         }
@@ -312,7 +313,7 @@ ForestBoss.prototype = {
     },
 
     readInput: function(input, modifier) {
-        if (input === "reset") {
+        if (input === this.input_types.RESET) {
             this.health = FB_ATTR.MAX_HEALTH;
             this.phase = 0;
             this.currentAttackAnim = FB_ANIM.THIN;
@@ -334,6 +335,7 @@ ForestBoss.prototype = {
 function ForestBossArm(game, AM, x, y) {
     this.entity = new Entity(x, y, 0, 0);
     this.game = game;
+    this.input_types = game.input_types;
     this.entity.moveable = true;
     this.entity.pushesOnly = true;
 
@@ -458,7 +460,7 @@ ForestBossArm.prototype = {
 
     checkListeners: function(agent) {
         if (agent.entity.controllable && this.entity.currentAnimation !== FB_ANIM.PLATFORM) {
-            this.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
         }
     }
 
@@ -477,6 +479,7 @@ function ForestBossCore(game, AM, x, y, callback) {
     //this.entity.intangible = true;
     this.entity.pushesOnly = true;
     this.game = game;
+    this.input_types = game.input_types;
     this.arm;
     this.callback = callback;
     this.alive = true;
@@ -530,7 +533,7 @@ ForestBossCore.prototype = {
     },
 
     readInput: function(input, modifier) {
-        if (input === "damage") {
+        if (input === this.input_types.DAMAGE) {
             if (this.callback.pattern !== FB_PATTERN.RETREAT) {
                 this.callback.takeDamage();
             }

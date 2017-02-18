@@ -18,6 +18,7 @@ var IRON_BALL_PHYSICS = {
 
 function BallDropPoint(game, AM, x, y) {
     this.game = game;
+    this.input_types = game.input_types;
     this.entity = new Entity(x, y, 0, 0);
     this.nextBall = BALL_ATTR.DROP_FREQUENCY;
     this.entity.collidable = false;
@@ -61,7 +62,7 @@ IronBall.prototype = {
 
     checkListeners: function (agent) {
         if (agent.entity.controllable) {
-            this.game.requestInputSend(agent, "damage", 1);
+            this.game.requestInputSend(agent, this.input_types.DAMAGE, 1);
         } else if (!agent.entity.intangible) {
             this.entity.removeFromWorld = true;
         }

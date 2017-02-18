@@ -8,6 +8,7 @@ function Platform(game, AM, x, y, width, height, stageType) {
     this.entity = new Entity(x, y, BLOCKS_GLOBALS.WIDTH * width, BLOCKS_GLOBALS.HEIGHT * height);
     this.entity.moveable = true;
     this.game = game;
+    this.input_types = game.input_types;
     this.entity.pushesOnly = true;
 
     this.movePatterns = [];
@@ -115,7 +116,7 @@ Platform.prototype = {
     },
 
     readInput : function (input) {
-        if (input === "reset") {
+        if (input === this.input_types.RESET) {
             this.currentMovePattern = 0;
         }
     }
