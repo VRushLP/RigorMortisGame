@@ -97,8 +97,8 @@ AM.queueDownload("./img/enemy/forest boss/forest boss statue active 3.png");
 AM.queueDownload("./img/other/victory screen.png");
 AM.queueDownload("./img/other/title screen.png");
 
-AM.queueStageDownload("./txt/forest-stage.txt");
-AM.queueStageDownload("./txt/castle-stage.txt");
+AM.queueStageDownload("./dat/forest-stage.txt");
+AM.queueStageDownload("./dat/castle-stage.txt");
 
 /*
 Download all the elements and add entities to the game.
@@ -109,6 +109,9 @@ AM.downloadAll(function () {
     var ctx = canvas.getContext('2d');
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
+
+    var testStage = new Stage(gameEngine, STAGE_TYPE.FOREST, BGM.forestLevel);
+    testStage.parseTiledFile(test_level)
 
     var forestStage = new Stage(gameEngine, STAGE_TYPE.FOREST, BGM.forestLevel);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
@@ -128,7 +131,7 @@ AM.downloadAll(function () {
 
     forestStage.entityList.push(forestBossStatueIdle);
 
-    forestStage.parseLevelFile(AM.getAsset("./txt/forest-stage.txt").split("\n"), AM);
+    forestStage.parseLevelFile(AM.getAsset("./dat/forest-stage.txt").split("\n"), AM);
 
     var knight = new Knight(gameEngine, AM, forestStage.spawnX, forestStage.spawnY);
     knight.entity.controllable = true;
@@ -176,7 +179,7 @@ AM.downloadAll(function () {
     forestStage.entityList.push(castleStageTrigger);
 
     var castleStage = new Stage(gameEngine, STAGE_TYPE.CASTLE, BGM.castleLevel);
-    castleStage.parseLevelFile(AM.getAsset("./txt/castle-stage.txt").split("\n"), AM);
+    castleStage.parseLevelFile(AM.getAsset("./dat/castle-stage.txt").split("\n"), AM);
     castleStage.addBackground(AM.getAsset("./img/castle-stage/castle background.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
 
     var testPlatform = new Platform(gameEngine, AM, 650, 1200, 2, 1, STAGE_TYPE.CASTLE);

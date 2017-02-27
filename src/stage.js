@@ -79,6 +79,27 @@ Stage.prototype = {
             }
         }
     },
+    parseTiledFile: function (input, AM) {
+        var blockArray = [];
+        var parsedData = {}
+        console.log(input);
+
+        var currentX = 0;
+        var currentY = 0;
+
+        var width = input["width"];
+        var tileset = input["tilesets"][0];
+
+        for (layer of input["layers"]) {
+            data = layer["data"]
+
+            var newData = [];
+            while(data.length) newData.push(data.splice(0, width));
+            console.log(newData);
+            parsedData[layer] = newData;
+        }
+        console.log(parsedData);
+    },
 
     /*
      * Read through an array of strings and build the level from recognizable characters.
