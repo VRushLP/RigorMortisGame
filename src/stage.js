@@ -81,24 +81,70 @@ Stage.prototype = {
     },
     parseTiledFile: function (input, AM) {
         var blockArray = [];
-        var parsedData = {}
-        console.log(input);
-
         var currentX = 0;
-        var currentY = 0;
+        var currentY = input["height"] * 50;
+        this.stageHeight = currentY += 50;
 
         var width = input["width"];
         var tileset = input["tilesets"][0];
+        input["layers"] = input["layers"][0]
 
-        for (layer of input["layers"]) {
-            data = layer["data"]
+        //restructure all the 1d data arrays into 2d ones.
+        data = input["layers"]["data"]
 
-            var newData = [];
-            while(data.length) newData.push(data.splice(0, width));
-            console.log(newData);
-            parsedData[layer] = newData;
+        var newData = [];
+        while(data.length) newData.push(data.splice(0, width));
+        console.log(newData);
+
+        for(var lineNum = 0; lineNum < newData.length; lineNum++) {
+            var blockLine = [];
+            console.log(lineNum);
+            console.log(newData[lineNum]);
+            for(var tileNum = 0; tileNum < newData[lineNum].length; tileNum++) {
+                console.log(lineNum, tileNum);
+                var currentSymbol = newData[lineNum][tileNum];
+                blockLine[tileNum] = {exists: false, depth: 0};
+
+                switch (currentSymbol) {
+                    case -1:
+                        console.log(currentY, currentX);
+                        this.spawnX = currentX;
+                        this.spawnY = currentY - 5; //Small drop to avoid spawning into other entities.
+                        break;
+                    case 1:
+                        blockLine[tileNum].exists = true;
+                        break;
+                    case 2:
+                        blockLine[tileNum].exists = true;
+                        break;
+                    case 3:
+                        blockLine[tileNum].exists = true;
+                        break;
+                    case 4:
+                        blockLine[tileNum].exists = true;
+                        break;
+                    case 5:
+                        blockLine[tileNum].exists = true;
+                        break;
+                }
+                currentX += 50;
+            }
+            blockArray[lineNum] = blockLine;
+            currentX = 0;
+            currentY -= 50;
         }
-        console.log(parsedData);
+
+        console.log(blockArray);
+
+        //Scan through the loaded block array and set the block depths.
+        for (var row = 0; row < blockArray.length; row++) {
+            for (var column = 0; column < blockArray[row].length; column++) {
+                if (blockArray[row][column].exists) {
+                    console.log(column, row);
+                    this.placeBlock(blockArray, row, column);
+                }
+            }
+        }
     },
 
     /*
