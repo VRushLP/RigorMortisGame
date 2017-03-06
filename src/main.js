@@ -113,7 +113,7 @@ AM.downloadAll(function () {
     var testStage = new Stage(gameEngine, STAGE_TYPE.FOREST, BGM.forestLevel);
     testStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);
     testStage.addBackground(AM.getAsset("./img/forest-stage/forest trees.png"), RM_GLOBALS.FOREST_STAGE.TREE_SCROLL_SPEED);
-    testStage.parseTiledFile(test_level)
+    testStage.parseTiledFile(test_level, AM)
 
     var forestStage = new Stage(gameEngine, STAGE_TYPE.FOREST, BGM.forestLevel);
     forestStage.addBackground(AM.getAsset("./img/forest-stage/forest sky.png"), RM_GLOBALS.FOREST_STAGE.SKY_SCROLL_SPEED);

@@ -94,20 +94,16 @@ Stage.prototype = {
 
         var newData = [];
         while(data.length) newData.push(data.splice(0, width));
-        console.log(newData);
 
         for(var lineNum = 0; lineNum < newData.length; lineNum++) {
             var blockLine = [];
             console.log(lineNum);
-            console.log(newData[lineNum]);
             for(var tileNum = 0; tileNum < newData[lineNum].length; tileNum++) {
-                console.log(lineNum, tileNum);
                 var currentSymbol = newData[lineNum][tileNum];
                 blockLine[tileNum] = {exists: false, depth: 0};
 
                 switch (currentSymbol) {
                     case -1:
-                        console.log(currentY, currentX);
                         this.spawnX = currentX;
                         this.spawnY = currentY - 5; //Small drop to avoid spawning into other entities.
                         break;
@@ -134,14 +130,12 @@ Stage.prototype = {
             currentY -= 50;
         }
 
-        console.log(blockArray);
-
         //Scan through the loaded block array and set the block depths.
         for (var row = 0; row < blockArray.length; row++) {
             for (var column = 0; column < blockArray[row].length; column++) {
                 if (blockArray[row][column].exists) {
-                    console.log(column, row);
                     this.placeBlock(blockArray, row, column);
+                    this.entityList.push(new Block(this.gameEngine, AM, column * 50, row * 50, this.stageType, 0));
                 }
             }
         }
